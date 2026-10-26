@@ -4,11 +4,10 @@ import { useLocale, useTranslations } from 'next-intl';
 import { type KeyboardEvent, type MouseEvent, useRef } from 'react';
 
 import { usePathname, useRouter } from '@/i18n/navigation';
-import { saveLocalePreference } from '@/i18n/locale-cookie';
 import { type AppLocale, localeTags, routing } from '@/i18n/routing';
 import { cn } from '@/lib/cn';
 
-export const LANGUAGE_SWITCH_KEY = 'jm.language-switch';
+import { switchLocale } from './switch-locale';
 
 /**
  * Segmented EN | PT control made of real links (works without JS). With JS it
@@ -41,24 +40,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
     event.preventDefault();
     if (target === locale) return;
 
-    saveLocalePreference(target);
-    const maxScroll =
-      document.documentElement.scrollHeight - window.innerHeight;
-    try {
-      sessionStorage.setItem(
-        LANGUAGE_SWITCH_KEY,
-        JSON.stringify({
-          ratio: maxScroll > 0 ? window.scrollY / maxScroll : 0,
-          hash: window.location.hash,
-        }),
-      );
-    } catch {
-      // Without storage the switch still works; scroll is simply not kept.
-    }
-    router.replace(
-      `${pathname}${window.location.search}${window.location.hash}`,
-      { locale: target, scroll: false },
-    );
+    switchLocale(router, pathname, target);
   }
 
   // Roving tabindex: the current language is the single tab stop and the

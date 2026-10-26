@@ -38,6 +38,7 @@ interface WindowStore {
   restore: (id: string) => void;
   toggleMaximize: (id: string) => void;
   focus: (id: string) => void;
+  setTitle: (id: string, title: string) => void;
   blur: () => void;
   moveTo: (id: string, x: number, y: number) => void;
   resizeTo: (id: string, rect: Rect) => void;
@@ -158,6 +159,8 @@ export const useWindowStore = create<WindowStore>()((set) => ({
     }),
 
   focus: (id) => set((state) => raise(state, id)),
+
+  setTitle: (id, title) => set((state) => patch(state, id, { title })),
 
   blur: () =>
     set((state) => ({

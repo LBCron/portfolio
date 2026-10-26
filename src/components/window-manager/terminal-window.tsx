@@ -1,25 +1,35 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
-import { useEffect } from 'react';
+import dynamic from 'next/dynamic';
+import { useLocale, useTranslations } from 'next-intl';
+import { useEffect, useState } from 'react';
 
+import { loadSnapshot } from '@/components/terminal/snapshot-client';
+import { ErrorBoundary } from '@/components/ui/error-boundary';
+import type { AppLocale } from '@/i18n/routing';
+import { useReducedMotionPreference } from '@/lib/motion-preference';
 import { isTerminalShortcut } from '@/lib/shortcuts';
 import { useWindowStore } from '@/stores/window-store';
 
+import {
+  TERMINAL_ID,
+  terminalTitle,
+  toggleTerminal,
+} from './terminal-controls';
 import { useWindowSync } from './use-window-sync';
 import { WindowFrame } from './window-frame';
 
-const ID = 'terminal';
-const TITLE = 'visitor@julio-muller: ~';
+// The terminal, its commands and its strings are one lazy chunk.
+const TerminalApp = dynamic(
+  () => import('@/components/terminal/terminal-app'),
+  {
+    ssr: false,
+  },
+);
 
-function toggleTerminal() {
-  const store = useWindowStore.getState();
-  const win = store.windows[ID];
-  if (!win || win.status === 'closed') store.open(ID, TITLE);
-  else if (win.status === 'minimized') store.restore(ID);
-  else if (win.focused) store.minimize(ID);
-  else store.focus(ID);
-}
+const HINT_KEY = 'jm.terminal.hint.v1';
+const HINT_DELAY_MS = 1500;
+const HINT_VISIBLE_MS = 6000;
 
 function isTypingOutsideWindow(target: EventTarget | null) {
   if (!(target instanceof HTMLElement) || target.closest('[data-window]')) {
@@ -30,11 +40,55 @@ function isTypingOutsideWindow(target: EventTarget | null) {
   );
 }
 
-/** The first window of the manager. Phase 6 replaces the placeholder body. */
+/** One-time "type help" hint: once per session, never after an interaction. */
+function useDockHint(enabled: boolean) {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    if (!enabled) return;
+    try {
+      if (sessionStorage.getItem(HINT_KEY)) return;
+    } catch {
+      return;
+    }
+    let interacted = false;
+    let hideTimer: number | undefined;
+    const interact = () => {
+      interacted = true;
+      setVisible(false);
+    };
+    const showTimer = window.setTimeout(() => {
+      if (interacted) return;
+      try {
+        sessionStorage.setItem(HINT_KEY, '1');
+      } catch {
+        // The hint may repeat without storage; harmless.
+      }
+      setVisible(true);
+      hideTimer = window.setTimeout(() => setVisible(false), HINT_VISIBLE_MS);
+    }, HINT_DELAY_MS);
+
+    const events = ['keydown', 'pointerdown', 'wheel', 'touchstart'] as const;
+    for (const name of events)
+      window.addEventListener(name, interact, { once: true });
+    return () => {
+      window.clearTimeout(showTimer);
+      window.clearTimeout(hideTimer);
+      for (const name of events) window.removeEventListener(name, interact);
+    };
+  }, [enabled]);
+
+  return visible;
+}
+
+/** The first window of the manager: the terminal. */
 export function TerminalWindow() {
   const t = useTranslations('window');
-  const win = useWindowStore((state) => state.windows[ID]);
-  useWindowSync(ID, TITLE);
+  const locale = useLocale() as AppLocale;
+  const reduced = useReducedMotionPreference();
+  const win = useWindowStore((state) => state.windows[TERMINAL_ID]);
+  useWindowSync(TERMINAL_ID, terminalTitle('~'));
+  const hint = useDockHint(!reduced && !win);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -57,27 +111,56 @@ export function TerminalWindow() {
     };
   }, []);
 
-  if (!win) return null;
+  // Warm the snapshot while the browser is idle so the first command is instant.
+  useEffect(() => {
+    const warm = () => void loadSnapshot(locale).catch(() => {});
+    if ('requestIdleCallback' in window) {
+      const id = window.requestIdleCallback(warm, { timeout: 4000 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const id = globalThis.setTimeout(warm, 2000);
+    return () => globalThis.clearTimeout(id);
+  }, [locale]);
 
   return (
     <>
-      <WindowFrame
-        id={ID}
-        title={win.title}
-        labels={{
-          window: t('label'),
-          controls: t('controls'),
-          hint: t('controlsHint'),
-          close: t('close'),
-          minimize: t('minimize'),
-          maximize: t('maximize'),
-          restore: t('restore'),
-          resizeSheet: t('resizeSheet'),
-        }}
+      {win ? (
+        <WindowFrame
+          id={TERMINAL_ID}
+          title={win.title}
+          labels={{
+            window: t('label'),
+            controls: t('controls'),
+            hint: t('controlsHint'),
+            close: t('close'),
+            minimize: t('minimize'),
+            maximize: t('maximize'),
+            restore: t('restore'),
+            resizeSheet: t('resizeSheet'),
+          }}
+        >
+          <ErrorBoundary
+            fallback={
+              <p className="p-4 text-small text-danger">{t('error')}</p>
+            }
+          >
+            <TerminalApp />
+          </ErrorBoundary>
+        </WindowFrame>
+      ) : null}
+
+      <div
+        role="status"
+        className="pointer-events-none fixed right-6 bottom-[calc(4.75rem+env(safe-area-inset-bottom))] z-(--z-dock)"
       >
-        <div className="min-h-0 flex-1" />
-      </WindowFrame>
-      {win.status === 'open' ? null : (
+        {hint ? (
+          <span className="block rounded-md border border-line-strong bg-surface-2 px-3 py-1.5 text-small text-text-1">
+            {t('hint')}
+          </span>
+        ) : null}
+      </div>
+
+      {win?.status === 'open' ? null : (
         <button
           type="button"
           aria-keyshortcuts="Control+/ Meta+/"
@@ -86,7 +169,7 @@ export function TerminalWindow() {
         >
           <span aria-hidden="true">&gt;_</span>
           {t('dock')}
-          {win.status === 'minimized' ? (
+          {win?.status === 'minimized' ? (
             <>
               <span
                 aria-hidden="true"

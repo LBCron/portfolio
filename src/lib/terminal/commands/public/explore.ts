@@ -409,7 +409,7 @@ const resume: Command = {
   },
 };
 
-const MARK = [
+export const MARK = [
   '    ██╗███╗   ███╗',
   '    ██║████╗ ████║',
   '    ██║██╔████╔██║',

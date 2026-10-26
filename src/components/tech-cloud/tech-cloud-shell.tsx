@@ -10,12 +10,12 @@ import {
   useSyncExternalStore,
 } from 'react';
 
+import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { cn } from '@/lib/cn';
 import { techCategories, type TechCategory } from '@/lib/content/taxonomy';
 import type { Practice, Technology } from '@/lib/content/types';
 import { useReducedMotionPreference } from '@/lib/motion-preference';
 
-import { CloudErrorBoundary } from './cloud-error-boundary';
 import type { CloudTech } from './geoid-sphere';
 import { StackList } from './stack-list';
 import { geoidStageClassName } from './stage';
@@ -176,7 +176,7 @@ export function TechCloudShell({
         <>
           <div ref={hostRef}>
             {near ? (
-              <CloudErrorBoundary
+              <ErrorBoundary
                 fallback={<div className="container-page">{list}</div>}
                 onError={() => setFailed(true)}
               >
@@ -187,7 +187,7 @@ export function TechCloudShell({
                   selectedId={announced?.id ?? null}
                   onSelect={setSelected}
                 />
-              </CloudErrorBoundary>
+              </ErrorBoundary>
             ) : (
               <div
                 aria-hidden="true"

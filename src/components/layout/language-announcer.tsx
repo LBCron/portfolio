@@ -3,7 +3,7 @@
 import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 
-import { LANGUAGE_SWITCH_KEY } from './language-switcher';
+import { LANGUAGE_SWITCH_KEY } from './switch-locale';
 
 /**
  * After a language switch: restores the approximate scroll position and

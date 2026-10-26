@@ -2,10 +2,8 @@
 
 import { Component, type ReactNode } from 'react';
 
-/**
- * A failed geoid must not take down Home. The shell falls back to List.
- */
-export class CloudErrorBoundary extends Component<
+/** A failed island (geoid, terminal) must not take down the page. */
+export class ErrorBoundary extends Component<
   { children: ReactNode; fallback: ReactNode; onError?: () => void },
   { failed: boolean }
 > {
