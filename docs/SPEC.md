@@ -34,6 +34,7 @@ Where this list and the body below disagree, this list wins. Rationale for each 
 - Motion-init is injected into `<head>` with `useServerInsertedHTML` (not a `<script>` in the layout JSX — React 19.3 rejects that) [D21].
 - Home order is Hero → Quotes of the moment → About (bio + metrics) → Stack → Work → Résumé (tabs + PDF + LinkedIn) → Contact → Recommendations. Nav is About · Stack · Work · Résumé · Contact [D46, D48].
 - Hero uses art-directed photos (`photo` square below `lg`, `photoLg` 3:4 from `lg` up) via `getImageProps` + `<picture>`; owner-supplied masters are encoded to WebP by the fixture generator and not clobbered by SVG art [D47].
+- The window manager is mounted but dark until Phase 6: `Ctrl/Cmd + /` is the only entry, the body is a placeholder, and the dock chip shows only while the window is closed or minimized [D49].
 - About (`#about`) is a two-column block: bio on the left, up to 4 count-up metrics on the right (`#summary` stays on the stats so old hashes resolve). Facts (`location`, `spokenLanguages`, `focus`) stay out of this section (terminal / résumé) [D48].
 
 ## 0. Operating instructions (to the agent)

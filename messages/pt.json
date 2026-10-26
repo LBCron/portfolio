@@ -14,6 +14,19 @@
     "breadcrumb": "Trilha de navegação",
     "scrollRegion": "Conteúdo com rolagem"
   },
+  "terminal": {
+    "windowLabel": "Janela do terminal",
+    "controls": "Controles da janela",
+    "controlsHint": "As setas movem a janela. Alt com as setas redimensiona.",
+    "close": "Fechar terminal",
+    "minimize": "Minimizar terminal",
+    "maximize": "Maximizar terminal",
+    "restore": "Restaurar terminal",
+    "resizeSheet": "Alterar a altura do terminal",
+    "dock": "terminal",
+    "dockMinimized": "(minimizado)",
+    "comingSoon": "O terminal está chegando."
+  },
   "header": {
     "homeLabel": "{name}, voltar ao topo",
     "primaryNav": "Principal",

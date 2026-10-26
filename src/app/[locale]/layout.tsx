@@ -15,6 +15,7 @@ import { RouteFocus } from '@/components/layout/route-focus';
 import { ScrollProgress } from '@/components/layout/scroll-progress';
 import { SkipLink } from '@/components/layout/skip-link';
 import { Toaster } from '@/components/ui/toaster';
+import { TerminalWindow } from '@/components/window-manager/terminal-window';
 import { owner, THEME_COLOR } from '@/config/site';
 import { isAppLocale, localeTags, routing } from '@/i18n/routing';
 import { siteMetadata } from '@/lib/seo/metadata';
@@ -27,6 +28,7 @@ const CLIENT_NAMESPACES = [
   'errors',
   'project',
   'stack',
+  'terminal',
 ] as const;
 
 export const revalidate = 86400;
@@ -83,6 +85,7 @@ export default async function LocaleLayout({
             </main>
             <Footer />
             <Toaster />
+            <TerminalWindow />
             <LanguageAnnouncer />
             <RouteFocus />
           </MotionProvider>

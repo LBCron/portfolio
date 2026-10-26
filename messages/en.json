@@ -14,6 +14,19 @@
     "breadcrumb": "Breadcrumb",
     "scrollRegion": "Scrollable content"
   },
+  "terminal": {
+    "windowLabel": "Terminal window",
+    "controls": "Window controls",
+    "controlsHint": "Arrow keys move the window. Alt plus arrow keys resize it.",
+    "close": "Close terminal",
+    "minimize": "Minimize terminal",
+    "maximize": "Maximize terminal",
+    "restore": "Restore terminal",
+    "resizeSheet": "Change terminal height",
+    "dock": "terminal",
+    "dockMinimized": "(minimized)",
+    "comingSoon": "The terminal is on its way."
+  },
   "header": {
     "homeLabel": "{name}, back to top",
     "primaryNav": "Primary",

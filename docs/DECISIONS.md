@@ -393,6 +393,15 @@ Latest stable unless noted. Majors are pinned with `^`; exact versions come from
 - **Decision.** One `#about` section: `bio` in the existing measure column; up to 4 `metrics` as a 2×2 tile on the right from `lg` (stacked below on smaller screens). `#summary` stays on the stats list so old hashes and the e2e order check still resolve. Quick facts (`location`, `spokenLanguages`, `focus`) drop off the public page — they remain in the terminal snapshot. Section numbers after About decrement by one. Hero scroll-cue fallback is `#about`.
 - **Consequence.** Recruiters see who he is and the numbers in one viewport. A `#summary` bookmark lands on the tiles, not a missing section.
 
+### D49 — Window manager ships dark: shortcut-only entry until Phase 6
+
+- **Context.** Phase 5 builds the generic window system (§9), but the terminal that fills it is Phase 6. A visible `>_` toggle, hero CTA or dock chip would open an empty window for visitors.
+- **Decision.** `<TerminalWindow />` is mounted in `[locale]/layout.tsx`. Nothing renders until the window is opened (no SSR markup, so `check:seo` and the HTML are unchanged). The only entry is `Ctrl/Cmd + /`; the body is a localized placeholder (`terminal.comingSoon`). The dock chip appears once the window has been opened and is shown only while it is closed or minimized (while open it would sit under the default bottom-right rect). The header `>_` toggle, hero "Open the terminal" CTA, footer hint and the one-time "type help" dock hint arrive with Phase 6.
+- **Geometry.** Pure functions in `src/lib/window-manager/geometry.ts`, store in `src/stores/window-store.ts` (both unit-tested). Gestures write `transform`/`width`/`height` straight to the DOM in rAF and commit to the store on release; `Esc` or `pointercancel` reverts (WCAG 2.5.2). Top-edge snap keys off the pointer reaching the screen edge (y ≤ 8), because the window itself is clamped below the header. Snap preview has no fade yet (Phase 10).
+- **Motion.** Open/minimize/close use CSS transitions on `transform` and `opacity` (≈280 ms, `--ease-out-expo`) rather than Motion springs; reduced motion is handled by the existing global rule. Maximize/restore transition `width`/`height`, a deliberate layout animation on a single element.
+- **Persistence.** `sessionStorage['jm.window.<id>.v1']` (status, maximized, rect; validated with zod). A closed window is not persisted, so a reload after closing starts unmounted with default geometry.
+- **Consequence.** No public change for visitors until Phase 6 flips the entry points on. The frame is bundled in the layout client chunk (about 5 KB), not lazy; revisit with the terminal body in Phase 6. The `visualViewport` keyboard offset is implemented but only meaningful once the terminal input exists.
+
 ## 5. Contradictions found in the spec and how they are resolved
 
 1. `dynamicParams` "stays on" (§3.1, §8.5) vs Cache Components rejecting the export → D1.
