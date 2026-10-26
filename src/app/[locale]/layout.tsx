@@ -28,7 +28,7 @@ const CLIENT_NAMESPACES = [
   'errors',
   'project',
   'stack',
-  'terminal',
+  'window',
 ] as const;
 
 export const revalidate = 86400;

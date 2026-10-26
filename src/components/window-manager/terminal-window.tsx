@@ -32,7 +32,7 @@ function isTypingOutsideWindow(target: EventTarget | null) {
 
 /** The first window of the manager. Phase 6 replaces the placeholder body. */
 export function TerminalWindow() {
-  const t = useTranslations('terminal');
+  const t = useTranslations('window');
   const win = useWindowStore((state) => state.windows[ID]);
   useWindowSync(ID, TITLE);
 
@@ -65,7 +65,7 @@ export function TerminalWindow() {
         id={ID}
         title={win.title}
         labels={{
-          window: t('windowLabel'),
+          window: t('label'),
           controls: t('controls'),
           hint: t('controlsHint'),
           close: t('close'),
@@ -75,9 +75,7 @@ export function TerminalWindow() {
           resizeSheet: t('resizeSheet'),
         }}
       >
-        <p className="p-4 font-mono text-[13px] text-text-2">
-          {t('comingSoon')}
-        </p>
+        <div className="min-h-0 flex-1" />
       </WindowFrame>
       {win.status === 'open' ? null : (
         <button

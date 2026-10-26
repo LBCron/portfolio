@@ -14,8 +14,8 @@
     "breadcrumb": "Breadcrumb",
     "scrollRegion": "Scrollable content"
   },
-  "terminal": {
-    "windowLabel": "Terminal window",
+  "window": {
+    "label": "Terminal window",
     "controls": "Window controls",
     "controlsHint": "Arrow keys move the window. Alt plus arrow keys resize it.",
     "close": "Close terminal",
@@ -25,7 +25,225 @@
     "resizeSheet": "Change terminal height",
     "dock": "terminal",
     "dockMinimized": "(minimized)",
-    "comingSoon": "The terminal is on its way."
+    "hint": "Try the terminal: type help",
+    "toggle": "Toggle terminal",
+    "error": "The terminal could not load. Reload the page to try again."
+  },
+  "terminal": {
+    "inputLabel": "Command input, {prompt}",
+    "outputLabel": "Terminal output",
+    "quickActions": "Quick commands",
+    "welcome1": "Welcome. This terminal knows everything on this site.",
+    "welcome2": "Type help to get started.",
+    "pasteMultiline": "Only the first line of the pasted text was run.",
+    "unexpectedError": "Something went wrong running that command.",
+    "usage": "Usage: {usage}",
+    "notFound": "command not found: {name}",
+    "didYouMean": "Did you mean {suggestion}?",
+    "unsupported": {
+      "unterminated": "That line has an unclosed quote.",
+      "chain": "Chaining commands with ; or & is not supported. Run one command at a time.",
+      "pipe": "Pipes are not supported here. Run one command at a time.",
+      "redirect": "Redirects are not supported: this shell is read-only.",
+      "glob": "Wildcards are not supported. Press Tab to complete names instead.",
+      "variable": "Variables are not expanded here. Type the value directly."
+    },
+    "loading": "Loading content…",
+    "loadFailed": "Could not load the site content. Check your connection and try again.",
+    "empty": "Nothing to show yet.",
+    "missingOperand": "{command}: missing operand",
+    "groups": {
+      "navigate": "Navigate",
+      "explore": "Explore",
+      "site": "Site",
+      "fun": "Fun"
+    },
+    "help": {
+      "footer": "Press {shortcut} to toggle the terminal. Add --help to any command for details. Tab completes."
+    },
+    "labels": {
+      "email": "Email",
+      "booking": "Book a call",
+      "links": "Links",
+      "name": "Name",
+      "role": "Role",
+      "location": "Location",
+      "languages": "Languages",
+      "focus": "Focus"
+    },
+    "about": {
+      "pointer": "For the career timeline, run:"
+    },
+    "fs": {
+      "notFound": "{command}: no such file or directory: {path}",
+      "notDirectory": "{command}: not a directory: {path}",
+      "isDirectory": "{command}: {path}: is a directory",
+      "binary": "{path} is a binary file. Run open {path} to download it.",
+      "empty": "(empty)"
+    },
+    "open": {
+      "resume": "Downloading the résumé…",
+      "project": "Opening {title}…",
+      "external": "Opening {label} in a new tab…",
+      "unknown": "open: nothing called {target}. Try a project slug, a section or resume.pdf."
+    },
+    "goto": {
+      "going": "Going to {section}…",
+      "unknown": "goto: unknown section {section}",
+      "available": "Available: {list}"
+    },
+    "resume": {
+      "unavailable": "The résumé is not available yet.",
+      "latest": "Latest role: {title} at {company}",
+      "counts": "{companies, plural, one {# company} other {# companies}} · {education, plural, one {# education entry} other {# education entries}}",
+      "download": "Get the PDF:"
+    },
+    "skills": {
+      "unknown": "skills: unknown category {category}",
+      "available": "Available: {list}"
+    },
+    "projects": {
+      "head": {
+        "slug": "Slug",
+        "summary": "Summary"
+      },
+      "hint": "Run open slug to read the full story.",
+      "none": "No projects match.",
+      "unknownKind": "projects: unknown kind {kind}",
+      "kinds": "Kinds: {list}"
+    },
+    "git": {
+      "onlyLog": "Only git log --oneline is available here.",
+      "milestone": "{title} at {company}"
+    },
+    "history": {
+      "empty": "No commands yet."
+    },
+    "lang": {
+      "current": "Current language: {language}",
+      "available": "Available: {list}",
+      "unknown": "lang: unknown language {language}",
+      "already": "Already using {language}.",
+      "switched": "Language switched to {language}."
+    },
+    "commands": {
+      "help": {
+        "summary": "List commands, or explain one.",
+        "usage": "help [command]"
+      },
+      "ls": {
+        "summary": "List files and folders.",
+        "usage": "ls [path]"
+      },
+      "cd": {
+        "summary": "Change the working directory.",
+        "usage": "cd [path]"
+      },
+      "pwd": {
+        "summary": "Print the working directory.",
+        "usage": "pwd"
+      },
+      "cat": {
+        "summary": "Print a file.",
+        "usage": "cat file..."
+      },
+      "tree": {
+        "summary": "Show the file tree.",
+        "usage": "tree [path]"
+      },
+      "open": {
+        "summary": "Open a project, section, link or the résumé.",
+        "usage": "open project-slug | section | resume.pdf"
+      },
+      "goto": {
+        "summary": "Scroll to a section of the page.",
+        "usage": "goto about|experience|stack|work|recommended|contact"
+      },
+      "about": {
+        "summary": "A short bio.",
+        "usage": "about"
+      },
+      "whoami": {
+        "summary": "Who is using this terminal.",
+        "usage": "whoami"
+      },
+      "experience": {
+        "summary": "Career timeline.",
+        "usage": "experience"
+      },
+      "education": {
+        "summary": "Degrees and certifications.",
+        "usage": "education"
+      },
+      "contact": {
+        "summary": "Email and links (alias: socials).",
+        "usage": "contact"
+      },
+      "links": {
+        "summary": "Featured links.",
+        "usage": "links"
+      },
+      "recommend": {
+        "summary": "People worth following (alias: following).",
+        "usage": "recommend"
+      },
+      "skills": {
+        "summary": "Technologies by category (alias: stack).",
+        "usage": "skills [--category name]"
+      },
+      "projects": {
+        "summary": "List projects.",
+        "usage": "projects [--kind kind] [--featured] | projects open slug"
+      },
+      "resume": {
+        "summary": "Résumé summary, or download the PDF.",
+        "usage": "resume [--download]"
+      },
+      "lang": {
+        "summary": "Show or switch the site language.",
+        "usage": "lang [en|pt]"
+      },
+      "clear": {
+        "summary": "Clear the screen (Ctrl+L).",
+        "usage": "clear"
+      },
+      "echo": {
+        "summary": "Print text.",
+        "usage": "echo [text...]"
+      },
+      "history": {
+        "summary": "Show the command history.",
+        "usage": "history"
+      },
+      "date": {
+        "summary": "Show the date and time.",
+        "usage": "date"
+      },
+      "uname": {
+        "summary": "Show system information.",
+        "usage": "uname [-a]"
+      },
+      "exit": {
+        "summary": "Close the terminal.",
+        "usage": "exit"
+      },
+      "minimize": {
+        "summary": "Minimize the terminal.",
+        "usage": "minimize"
+      },
+      "maximize": {
+        "summary": "Maximize or restore the window.",
+        "usage": "maximize"
+      },
+      "neofetch": {
+        "summary": "A summary card.",
+        "usage": "neofetch"
+      },
+      "git": {
+        "summary": "The career as a commit log.",
+        "usage": "git log --oneline"
+      }
+    }
   },
   "header": {
     "homeLabel": "{name}, back to top",
@@ -60,7 +278,8 @@
     "resume": "Résumé (PDF)",
     "currentRole": "Now: {title} at {company}",
     "linksLabel": "Profiles and links",
-    "scrollCue": "Scroll to the next section"
+    "scrollCue": "Scroll to the next section",
+    "openTerminal": "Open the terminal"
   },
   "quote": {
     "eyebrow": "Quotes of the moment"

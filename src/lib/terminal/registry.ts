@@ -1,0 +1,52 @@
+import type { Command } from './commands/types';
+import { exploreCommands } from './commands/public/explore';
+import { fileCommands } from './commands/public/files';
+import { systemCommands } from './commands/public/system';
+import { didYouMean } from './suggest';
+
+export interface Registry {
+  /** Public commands, in help order. */
+  publicCommands(): readonly Command[];
+  find(name: string): Command | undefined;
+  /** True for secret commands: never recorded, completed or suggested. */
+  isSecret(name: string): boolean;
+  suggest(name: string): string | null;
+}
+
+/**
+ * Secret commands (Phase 7) are passed in only after their lazy module loads;
+ * they stay out of every public listing, completion and suggestion.
+ */
+export function createRegistry(commands: readonly Command[]): Registry {
+  const byName = new Map<string, Command>();
+  for (const command of commands) {
+    byName.set(command.name, command);
+    for (const alias of command.aliases ?? []) byName.set(alias, command);
+  }
+  const visible = commands.filter((command) => command.visibility === 'public');
+  const visibleNames = visible.flatMap((command) => [
+    command.name,
+    ...(command.aliases ?? []),
+  ]);
+
+  return {
+    publicCommands: () => visible,
+    find: (name) => byName.get(name),
+    isSecret: (name) => byName.get(name)?.visibility === 'secret',
+    suggest: (name) => didYouMean(name, visibleNames),
+  };
+}
+
+/** Secret commands are never recorded in history (nor persisted anywhere). */
+export function isRecordable(registry: Registry, line: string) {
+  const first = line.trim().split(/\s+/)[0] ?? '';
+  return first !== '' && !registry.isSecret(first);
+}
+
+export const publicCommands: readonly Command[] = [
+  ...fileCommands,
+  ...exploreCommands,
+  ...systemCommands,
+];
+
+export const defaultRegistry = createRegistry(publicCommands);

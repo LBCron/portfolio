@@ -14,8 +14,8 @@
     "breadcrumb": "Trilha de navegação",
     "scrollRegion": "Conteúdo com rolagem"
   },
-  "terminal": {
-    "windowLabel": "Janela do terminal",
+  "window": {
+    "label": "Janela do terminal",
     "controls": "Controles da janela",
     "controlsHint": "As setas movem a janela. Alt com as setas redimensiona.",
     "close": "Fechar terminal",
@@ -25,7 +25,225 @@
     "resizeSheet": "Alterar a altura do terminal",
     "dock": "terminal",
     "dockMinimized": "(minimizado)",
-    "comingSoon": "O terminal está chegando."
+    "hint": "Experimente o terminal: digite help",
+    "toggle": "Alternar terminal",
+    "error": "Não foi possível carregar o terminal. Recarregue a página e tente de novo."
+  },
+  "terminal": {
+    "inputLabel": "Entrada de comando, {prompt}",
+    "outputLabel": "Saída do terminal",
+    "quickActions": "Comandos rápidos",
+    "welcome1": "Bem-vindo. Este terminal sabe tudo o que há neste site.",
+    "welcome2": "Digite help para começar.",
+    "pasteMultiline": "Só a primeira linha do texto colado foi executada.",
+    "unexpectedError": "Algo deu errado ao executar esse comando.",
+    "usage": "Uso: {usage}",
+    "notFound": "comando não encontrado: {name}",
+    "didYouMean": "Você quis dizer {suggestion}?",
+    "unsupported": {
+      "unterminated": "Essa linha tem uma aspa sem fechar.",
+      "chain": "Encadear comandos com ; ou & não é suportado. Execute um comando por vez.",
+      "pipe": "Pipes não são suportados aqui. Execute um comando por vez.",
+      "redirect": "Redirecionamentos não são suportados: este shell é somente leitura.",
+      "glob": "Curingas não são suportados. Use Tab para completar nomes.",
+      "variable": "Variáveis não são expandidas aqui. Digite o valor diretamente."
+    },
+    "loading": "Carregando conteúdo…",
+    "loadFailed": "Não foi possível carregar o conteúdo do site. Verifique sua conexão e tente de novo.",
+    "empty": "Ainda não há nada para mostrar.",
+    "missingOperand": "{command}: operando ausente",
+    "groups": {
+      "navigate": "Navegar",
+      "explore": "Explorar",
+      "site": "Site",
+      "fun": "Diversão"
+    },
+    "help": {
+      "footer": "Pressione {shortcut} para abrir ou minimizar o terminal. Use --help em qualquer comando para ver detalhes. Tab completa."
+    },
+    "labels": {
+      "email": "E-mail",
+      "booking": "Agendar uma conversa",
+      "links": "Links",
+      "name": "Nome",
+      "role": "Cargo",
+      "location": "Local",
+      "languages": "Idiomas",
+      "focus": "Foco"
+    },
+    "about": {
+      "pointer": "Para a linha do tempo da carreira, rode:"
+    },
+    "fs": {
+      "notFound": "{command}: arquivo ou diretório inexistente: {path}",
+      "notDirectory": "{command}: não é um diretório: {path}",
+      "isDirectory": "{command}: {path}: é um diretório",
+      "binary": "{path} é um arquivo binário. Rode open {path} para baixar.",
+      "empty": "(vazio)"
+    },
+    "open": {
+      "resume": "Baixando o currículo…",
+      "project": "Abrindo {title}…",
+      "external": "Abrindo {label} em uma nova aba…",
+      "unknown": "open: nada chamado {target}. Tente o slug de um projeto, uma seção ou resume.pdf."
+    },
+    "goto": {
+      "going": "Indo para {section}…",
+      "unknown": "goto: seção desconhecida {section}",
+      "available": "Disponíveis: {list}"
+    },
+    "resume": {
+      "unavailable": "O currículo ainda não está disponível.",
+      "latest": "Cargo mais recente: {title}, {company}",
+      "counts": "{companies, plural, one {# empresa} other {# empresas}} · {education, plural, one {# formação} other {# formações}}",
+      "download": "Baixe o PDF:"
+    },
+    "skills": {
+      "unknown": "skills: categoria desconhecida {category}",
+      "available": "Disponíveis: {list}"
+    },
+    "projects": {
+      "head": {
+        "slug": "Slug",
+        "summary": "Resumo"
+      },
+      "hint": "Rode open slug para ver a história completa.",
+      "none": "Nenhum projeto encontrado.",
+      "unknownKind": "projects: tipo desconhecido {kind}",
+      "kinds": "Tipos: {list}"
+    },
+    "git": {
+      "onlyLog": "Aqui só está disponível git log --oneline.",
+      "milestone": "{title} em {company}"
+    },
+    "history": {
+      "empty": "Nenhum comando ainda."
+    },
+    "lang": {
+      "current": "Idioma atual: {language}",
+      "available": "Disponíveis: {list}",
+      "unknown": "lang: idioma desconhecido {language}",
+      "already": "Você já está em {language}.",
+      "switched": "Idioma alterado para {language}."
+    },
+    "commands": {
+      "help": {
+        "summary": "Lista os comandos ou explica um.",
+        "usage": "help [comando]"
+      },
+      "ls": {
+        "summary": "Lista arquivos e pastas.",
+        "usage": "ls [caminho]"
+      },
+      "cd": {
+        "summary": "Muda o diretório atual.",
+        "usage": "cd [caminho]"
+      },
+      "pwd": {
+        "summary": "Mostra o diretório atual.",
+        "usage": "pwd"
+      },
+      "cat": {
+        "summary": "Mostra o conteúdo de um arquivo.",
+        "usage": "cat arquivo..."
+      },
+      "tree": {
+        "summary": "Mostra a árvore de arquivos.",
+        "usage": "tree [caminho]"
+      },
+      "open": {
+        "summary": "Abre um projeto, seção, link ou o currículo.",
+        "usage": "open slug-do-projeto | seção | resume.pdf"
+      },
+      "goto": {
+        "summary": "Rola até uma seção da página.",
+        "usage": "goto about|experience|stack|work|recommended|contact"
+      },
+      "about": {
+        "summary": "Uma bio curta.",
+        "usage": "about"
+      },
+      "whoami": {
+        "summary": "Quem está usando este terminal.",
+        "usage": "whoami"
+      },
+      "experience": {
+        "summary": "Linha do tempo da carreira.",
+        "usage": "experience"
+      },
+      "education": {
+        "summary": "Formações e certificações.",
+        "usage": "education"
+      },
+      "contact": {
+        "summary": "E-mail e links (alias: socials).",
+        "usage": "contact"
+      },
+      "links": {
+        "summary": "Links em destaque.",
+        "usage": "links"
+      },
+      "recommend": {
+        "summary": "Pessoas que vale a pena seguir (alias: following).",
+        "usage": "recommend"
+      },
+      "skills": {
+        "summary": "Tecnologias por categoria (alias: stack).",
+        "usage": "skills [--category nome]"
+      },
+      "projects": {
+        "summary": "Lista os projetos.",
+        "usage": "projects [--kind tipo] [--featured] | projects open slug"
+      },
+      "resume": {
+        "summary": "Resumo do currículo ou download do PDF.",
+        "usage": "resume [--download]"
+      },
+      "lang": {
+        "summary": "Mostra ou troca o idioma do site.",
+        "usage": "lang [en|pt]"
+      },
+      "clear": {
+        "summary": "Limpa a tela (Ctrl+L).",
+        "usage": "clear"
+      },
+      "echo": {
+        "summary": "Imprime um texto.",
+        "usage": "echo [texto...]"
+      },
+      "history": {
+        "summary": "Mostra o histórico de comandos.",
+        "usage": "history"
+      },
+      "date": {
+        "summary": "Mostra data e hora.",
+        "usage": "date"
+      },
+      "uname": {
+        "summary": "Mostra informações do sistema.",
+        "usage": "uname [-a]"
+      },
+      "exit": {
+        "summary": "Fecha o terminal.",
+        "usage": "exit"
+      },
+      "minimize": {
+        "summary": "Minimiza o terminal.",
+        "usage": "minimize"
+      },
+      "maximize": {
+        "summary": "Maximiza ou restaura a janela.",
+        "usage": "maximize"
+      },
+      "neofetch": {
+        "summary": "Um cartão-resumo.",
+        "usage": "neofetch"
+      },
+      "git": {
+        "summary": "A carreira como um log de commits.",
+        "usage": "git log --oneline"
+      }
+    }
   },
   "header": {
     "homeLabel": "{name}, voltar ao topo",
@@ -60,7 +278,8 @@
     "resume": "Currículo (PDF)",
     "currentRole": "Hoje: {title} na {company}",
     "linksLabel": "Perfis e links",
-    "scrollCue": "Rolar até a próxima seção"
+    "scrollCue": "Rolar até a próxima seção",
+    "openTerminal": "Abrir o terminal"
   },
   "quote": {
     "eyebrow": "Frases do momento"
