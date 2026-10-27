@@ -10,6 +10,7 @@ import { isAppLocale } from '@/i18n/routing';
 import { getContent } from '@/lib/content';
 
 import { MotionToggle } from './motion-toggle';
+import { ShortcutKbd } from './shortcut-kbd';
 
 export async function Footer() {
   const locale = await rootLocale();
@@ -33,6 +34,9 @@ export async function Footer() {
             <p className="text-text-1">{t('builtBy', { name: owner.name })}</p>
             <p className="text-small text-text-3">
               {t('copyright', { year, name: owner.name })}
+            </p>
+            <p className="text-small text-text-3">
+              {t.rich('terminalHint', { kbd: () => <ShortcutKbd /> })}
             </p>
           </div>
           {footerLinks.length > 0 ? (

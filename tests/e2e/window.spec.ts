@@ -64,7 +64,9 @@ test.describe('desktop window', () => {
     const scrollBefore = await page.evaluate(() => window.scrollY);
     await openTerminal(page);
     expect(await page.evaluate(() => window.scrollY)).toBe(scrollBefore);
-    await expect(windowOf(page)).toBeFocused();
+    await expect(
+      page.getByRole('textbox', { name: /Command input/ }),
+    ).toBeFocused();
     await page.mouse.move(100, 400);
     await page.mouse.wheel(0, 600);
     await expect

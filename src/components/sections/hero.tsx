@@ -10,6 +10,7 @@ import { Magnetic } from '@/components/motion/magnetic';
 import { RotatingWords } from '@/components/motion/rotating-words';
 import { ScrollCue } from '@/components/motion/scroll-cue';
 import { ButtonAnchor } from '@/components/ui/button';
+import { OpenTerminalButton } from '@/components/window-manager/open-terminal-button';
 import { Chip } from '@/components/ui/chip';
 import { Tooltip } from '@/components/ui/tooltip';
 import { owner } from '@/config/site';
@@ -178,6 +179,7 @@ export async function Hero({
                 {t('resume')}
               </a>
             ) : null}
+            <OpenTerminalButton label={t('openTerminal')} />
           </div>
 
           <div className="mt-9 flex flex-wrap items-center gap-x-5 gap-y-4">

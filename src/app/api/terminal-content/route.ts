@@ -1,0 +1,64 @@
+import { NextResponse } from 'next/server';
+
+import { isAppLocale } from '@/i18n/routing';
+import { getContent } from '@/lib/content';
+import { buildSnapshot } from '@/lib/terminal/snapshot';
+
+/** Public, read-only snapshot for the terminal; hidden items never appear. */
+export async function GET(request: Request) {
+  const locale = new URL(request.url).searchParams.get('locale');
+  if (!isAppLocale(locale)) {
+    return new NextResponse(null, {
+      status: 404,
+      headers: { 'X-Robots-Tag': 'noindex, nofollow' },
+    });
+  }
+
+  const content = getContent();
+  const [
+    profile,
+    contact,
+    resume,
+    links,
+    recommended,
+    projects,
+    experience,
+    education,
+    technologies,
+    practices,
+  ] = await Promise.all([
+    content.getProfile(locale),
+    content.getContact(locale),
+    content.getResume(),
+    content.getFeaturedLinks(locale),
+    content.getRecommendedProfiles(locale),
+    content.getProjects(locale),
+    content.getExperience(locale),
+    content.getEducation(locale),
+    content.getTechnologies(locale),
+    content.getPractices(locale),
+  ]);
+
+  return NextResponse.json(
+    buildSnapshot({
+      locale,
+      profile,
+      contact,
+      resume,
+      links,
+      recommended,
+      projects,
+      experience,
+      education,
+      technologies,
+      practices,
+    }),
+    {
+      headers: {
+        'Cache-Control':
+          'public, max-age=0, s-maxage=300, stale-while-revalidate=3600',
+        'X-Robots-Tag': 'noindex, nofollow',
+      },
+    },
+  );
+}

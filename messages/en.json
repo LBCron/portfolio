@@ -436,7 +436,7 @@
     "builtBy": "Designed and built by {name}.",
     "accessibility": "Accessibility",
     "backToTop": "Back to top",
-    "terminalHint": "Press {shortcut} to open the terminal",
+    "terminalHint": "Press <kbd></kbd> to open the terminal",
     "footerNav": "Footer",
     "linksLabel": "Profiles"
   },

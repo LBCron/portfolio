@@ -436,7 +436,7 @@
     "builtBy": "Projetado e desenvolvido por {name}.",
     "accessibility": "Acessibilidade",
     "backToTop": "Voltar ao topo",
-    "terminalHint": "Pressione {shortcut} para abrir o terminal",
+    "terminalHint": "Pressione <kbd></kbd> para abrir o terminal",
     "footerNav": "Rodapé",
     "linksLabel": "Perfis"
   },

@@ -8,6 +8,7 @@ import { HeaderFrame } from './header-frame';
 import { LanguageSwitcher } from './language-switcher';
 import { MobileMenu } from './mobile-menu';
 import { Monogram } from './monogram';
+import { TerminalToggle } from './terminal-toggle';
 
 export async function Header() {
   const t = await getTranslations('header');
@@ -33,6 +34,7 @@ export async function Header() {
 
         <div className="flex items-center gap-2">
           <LanguageSwitcher className="hidden xs:inline-flex" />
+          <TerminalToggle />
           <MobileMenu />
         </div>
       </div>
