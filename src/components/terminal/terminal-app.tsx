@@ -8,6 +8,8 @@ import {
   TERMINAL_ID,
 } from '@/components/window-manager/terminal-controls';
 import type { AppLocale } from '@/i18n/routing';
+import { getSessionStatus, type SessionStatus } from '@/lib/auth/actions';
+import { isSecretName } from '@/lib/terminal/commands/secret/names';
 import { MARK } from '@/lib/terminal/commands/public/explore';
 import { applyCompletion, complete } from '@/lib/terminal/completion';
 import { buildContext, type EngineDeps, execute } from '@/lib/terminal/engine';
@@ -18,6 +20,7 @@ import { emptySnapshot } from '@/lib/terminal/snapshot';
 import type { Translate } from '@/lib/terminal/vfs';
 import { isApplePlatform, TERMINAL_SHORTCUT } from '@/lib/shortcuts';
 import { useReducedMotionPreference } from '@/lib/motion-preference';
+import { useSessionStore } from '@/stores/session-store';
 import { useTerminalStore } from '@/stores/terminal-store';
 import { useWindowStore } from '@/stores/window-store';
 
@@ -36,14 +39,23 @@ const QUICK_COMMANDS = [
   'resume',
 ];
 
-function promptSpans(cwd: string): Span[] {
+function promptSpans(cwd: string, admin: boolean): Span[] {
   return [
-    { text: 'visitor@julio-muller', tone: 'success' },
+    { text: `${admin ? 'julio' : 'visitor'}@julio-muller`, tone: 'success' },
     { text: ':', tone: 'dim' },
     { text: cwd, tone: 'accent' },
-    { text: '$', tone: 'dim' },
+    admin ? { text: '#', tone: 'error' } : { text: '$', tone: 'dim' },
   ];
 }
+
+const applyStatus = (status: SessionStatus) =>
+  useSessionStore
+    .getState()
+    .set(
+      status.isAdmin
+        ? { expiresAt: status.expiresAt, base: status.base }
+        : null,
+    );
 
 /** The terminal body: boot, output log, quick commands and the input line. */
 export default function TerminalApp() {
@@ -63,6 +75,10 @@ export default function TerminalApp() {
   const booted = useTerminalStore((state) => state.booted);
   const skipTyping = useTerminalStore((state) => state.skipTyping);
   const history = useTerminalStore((state) => state.history);
+  const session = useSessionStore((state) => state.session);
+  const admin = session !== null;
+  const [secretInput, setSecretInput] = useState(false);
+  const secretResolver = useRef<((value: string | null) => void) | null>(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const logRef = useRef<HTMLDivElement>(null);
@@ -110,10 +126,19 @@ export default function TerminalApp() {
     });
   }, []);
 
-  // The window title follows the working directory.
+  // The window title follows the working directory and the session.
   useEffect(() => {
-    useWindowStore.getState().setTitle(TERMINAL_ID, terminalTitle(cwd));
-  }, [cwd]);
+    useWindowStore.getState().setTitle(TERMINAL_ID, terminalTitle(cwd, admin));
+  }, [cwd, admin]);
+
+  // The server owns the session; ask on mount and when the window regains focus.
+  useEffect(() => {
+    const refresh = () => void getSessionStatus().then(applyStatus, () => {});
+    refresh();
+    if (!admin) return;
+    window.addEventListener('focus', refresh);
+    return () => window.removeEventListener('focus', refresh);
+  }, [admin]);
 
   // Boot once per session (not on rehydrate), always while open.
   useEffect(() => {
@@ -171,6 +196,21 @@ export default function TerminalApp() {
       cwd: state.cwd,
       history: state.history,
       actions,
+      session: useSessionStore.getState().session,
+      loadSecret: () => import('@/lib/terminal/commands/secret'),
+      readSecret: (label, signal) =>
+        new Promise<string | null>((resolve) => {
+          const finish = (value: string | null) => {
+            if (secretResolver.current !== finish) return;
+            secretResolver.current = null;
+            setSecretInput(false);
+            resolve(value);
+          };
+          secretResolver.current = finish;
+          signal.addEventListener('abort', () => finish(null), { once: true });
+          useTerminalStore.getState().append(text(label), { volatile: true });
+          setSecretInput(true);
+        }),
       loadContent: () => loadSnapshot(locale),
       delay: (ms, signal) =>
         reducedRef.current
@@ -192,20 +232,28 @@ export default function TerminalApp() {
     };
   }
 
-  function echo(line: string, suffix = '') {
+  function echo(line: string, suffix = '', volatile = false) {
     const { cwd: current } = useTerminalStore.getState();
-    useTerminalStore.getState().append({
-      type: 'text',
-      spans: [...promptSpans(current), { text: ` ${line}${suffix}` }],
-    });
+    useTerminalStore.getState().append(
+      {
+        type: 'text',
+        spans: [
+          ...promptSpans(current, useSessionStore.getState().session !== null),
+          { text: ` ${line}${suffix}` },
+        ],
+      },
+      { volatile },
+    );
   }
 
   async function run(line: string, options?: { multiline: boolean }) {
     const store = useTerminalStore.getState();
     if (!t || store.running) return;
     stickToBottom.current = true;
-    echo(line);
     const trimmed = line.trim();
+    // Secret lines and their output are never persisted.
+    const volatile = isSecretName(trimmed.split(/\s+/)[0]);
+    echo(line, '', volatile);
     if (!trimmed) return;
     if (options?.multiline)
       store.append(text(t('terminal.pasteMultiline'), 'dim'));
@@ -220,7 +268,7 @@ export default function TerminalApp() {
         makeDeps(t),
         controller.signal,
       )) {
-        useTerminalStore.getState().append(node);
+        useTerminalStore.getState().append(node, { volatile });
       }
     } catch {
       if (!controller.signal.aborted) {
@@ -236,7 +284,10 @@ export default function TerminalApp() {
 
   function interrupt(line: string) {
     const store = useTerminalStore.getState();
-    if (controllerRef.current) {
+    if (secretResolver.current) {
+      secretResolver.current(null);
+      store.append(text('^C', 'dim'), { volatile: true });
+    } else if (controllerRef.current) {
       controllerRef.current.abort();
       store.append(text('^C', 'dim'));
     } else if (line) echo(line, '^C');
@@ -323,13 +374,21 @@ export default function TerminalApp() {
 
       <div className="shrink-0 border-t border-line px-3 py-2">
         <InputLine
-          prompt={[...promptSpans(cwd), { text: ' ' }]}
-          label={t('terminal.inputLabel', {
-            prompt: `visitor@julio-muller:${cwd}$`,
-          })}
+          prompt={[...promptSpans(cwd, admin), { text: ' ' }]}
+          secret={secretInput}
+          label={
+            secretInput
+              ? 'Password'
+              : t('terminal.inputLabel', {
+                  prompt: `${admin ? 'julio' : 'visitor'}@julio-muller:${cwd}${admin ? '#' : '$'}`,
+                })
+          }
           history={history}
           inputRef={inputRef}
-          onSubmit={(line, options) => void run(line, options)}
+          onSubmit={(line, options) => {
+            if (secretResolver.current) secretResolver.current(line);
+            else void run(line, options);
+          }}
           onInterrupt={interrupt}
           onClear={() => useTerminalStore.getState().clear()}
           onComplete={completeLine}

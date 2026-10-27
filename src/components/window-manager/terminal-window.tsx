@@ -16,6 +16,7 @@ import {
   terminalTitle,
   toggleTerminal,
 } from './terminal-controls';
+import { SessionPill } from './session-pill';
 import { useWindowSync } from './use-window-sync';
 import { WindowFrame } from './window-frame';
 
@@ -128,6 +129,7 @@ export function TerminalWindow() {
         <WindowFrame
           id={TERMINAL_ID}
           title={win.title}
+          badge={<SessionPill />}
           labels={{
             window: t('label'),
             controls: t('controls'),

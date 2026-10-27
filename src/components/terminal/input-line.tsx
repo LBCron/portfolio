@@ -27,6 +27,8 @@ interface InputLineProps {
   onClear: () => void;
   onComplete: (line: string, cursor: number) => AppliedCompletion;
   onListCandidates: (line: string, candidates: string[]) => void;
+  /** Secret-input mode: nothing is echoed and no caret is drawn. */
+  secret?: boolean;
   /** Any key press (skips the boot typing). */
   onKey: () => void;
 }
@@ -76,6 +78,18 @@ export function InputLine(props: InputLineProps) {
     if (event.key !== 'Tab') tabPending.current = false;
     const caret = event.currentTarget.selectionStart ?? value.length;
     const ctrl = event.ctrlKey && !event.metaKey && !event.altKey;
+
+    if (props.secret) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        submit(value);
+      } else if (ctrl && event.key === 'c') {
+        event.preventDefault();
+        props.onInterrupt('');
+        edit('', 0);
+      }
+      return;
+    }
 
     if (event.key === 'Enter') {
       event.preventDefault();
@@ -129,6 +143,7 @@ export function InputLine(props: InputLineProps) {
   }
 
   function handlePaste(event: ClipboardEvent<HTMLInputElement>) {
+    if (props.secret) return;
     const pasted = event.clipboardData.getData('text');
     if (!/[\r\n]/.test(pasted)) return;
     event.preventDefault();
@@ -143,7 +158,10 @@ export function InputLine(props: InputLineProps) {
 
   return (
     <div className="relative flex min-h-6 items-start gap-2 rounded-sm has-[input:focus-visible]:outline-2 has-[input:focus-visible]:outline-offset-2 has-[input:focus-visible]:outline-accent-2">
-      <span aria-hidden="true" className="shrink-0 whitespace-pre">
+      <span
+        aria-hidden="true"
+        className={cn('shrink-0 whitespace-pre', props.secret && 'hidden')}
+      >
         {props.prompt.map((span, index) => (
           <span key={index} className={TONE_CLASS[span.tone ?? 'default']}>
             {span.text}
@@ -152,7 +170,10 @@ export function InputLine(props: InputLineProps) {
       </span>
       <span
         aria-hidden="true"
-        className="min-w-0 flex-1 break-all whitespace-pre-wrap text-text-1"
+        className={cn(
+          'min-w-0 flex-1 break-all whitespace-pre-wrap text-text-1',
+          props.secret && 'hidden',
+        )}
       >
         {value.slice(0, start)}
         {collapsed ? (
@@ -178,6 +199,7 @@ export function InputLine(props: InputLineProps) {
       <input
         ref={inputRef}
         value={value}
+        type={props.secret ? 'password' : 'text'}
         aria-label={props.label}
         autoCapitalize="off"
         autoCorrect="off"

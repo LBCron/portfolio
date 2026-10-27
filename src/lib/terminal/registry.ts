@@ -1,4 +1,5 @@
 import type { Command } from './commands/types';
+import { isSecretName } from './commands/secret/names';
 import { exploreCommands } from './commands/public/explore';
 import { fileCommands } from './commands/public/files';
 import { systemCommands } from './commands/public/system';
@@ -40,7 +41,7 @@ export function createRegistry(commands: readonly Command[]): Registry {
 /** Secret commands are never recorded in history (nor persisted anywhere). */
 export function isRecordable(registry: Registry, line: string) {
   const first = line.trim().split(/\s+/)[0] ?? '';
-  return first !== '' && !registry.isSecret(first);
+  return first !== '' && !isSecretName(first) && !registry.isSecret(first);
 }
 
 export const publicCommands: readonly Command[] = [

@@ -6,7 +6,7 @@ import type { AppLocale } from '@/i18n/routing';
 import { createRepository } from '@/lib/content/create-repository';
 import { createFixtureSource } from '@/lib/content/fixtures/source';
 
-import type { Command, CommandActions } from './commands/types';
+import type { Command, CommandActions, SessionInfo } from './commands/types';
 import { createRegistry, defaultRegistry } from './registry';
 import type { EngineDeps } from './engine';
 import { execute } from './engine';
@@ -85,6 +85,9 @@ export async function createHarness(
     cwd?: string;
     history?: string[];
     loadContent?: () => Promise<ContentSnapshot>;
+    session?: SessionInfo | null;
+    readSecret?: EngineDeps['readSecret'];
+    loadSecret?: EngineDeps['loadSecret'];
   } = {},
 ): Promise<Harness> {
   const snapshot = await fixtureSnapshot(locale);
@@ -97,6 +100,8 @@ export async function createHarness(
     clear: () => calls.push('clear'),
     downloadResume: (next) => calls.push(`download:${next}`),
     openExternal: (url) => calls.push(`external:${url}`),
+    goTo: (url) => calls.push(`goto:${url}`),
+    setSession: (session) => calls.push(session ? 'session:on' : 'session:off'),
     window: {
       close: () => calls.push('close'),
       minimize: () => calls.push('minimize'),
@@ -121,6 +126,9 @@ export async function createHarness(
       if (signal.aborted) throw new Error('aborted');
     },
     shortcutLabel: 'Ctrl /',
+    session: options.session ?? null,
+    ...(options.readSecret ? { readSecret: options.readSecret } : {}),
+    ...(options.loadSecret ? { loadSecret: options.loadSecret } : {}),
   };
   return {
     deps,

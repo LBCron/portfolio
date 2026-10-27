@@ -102,11 +102,14 @@ export function WindowFrame({
   id,
   title,
   labels,
+  badge,
   children,
 }: {
   id: string;
   title: string;
   labels: WindowLabels;
+  /** Optional chip at the right end of the title bar. */
+  badge?: ReactNode;
   children: ReactNode;
 }) {
   const win = useWindowStore((state) => state.windows[id]);
@@ -384,6 +387,7 @@ export function WindowFrame({
             >
               {title}
             </span>
+            <div className="flex justify-end">{badge}</div>
             <span id={hintId} className="sr-only">
               {labels.hint}
             </span>

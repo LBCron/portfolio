@@ -2,8 +2,8 @@ import { useWindowStore } from '@/stores/window-store';
 
 export const TERMINAL_ID = 'terminal';
 
-export function terminalTitle(cwd: string) {
-  return `visitor@julio-muller: ${cwd}`;
+export function terminalTitle(cwd: string, admin = false) {
+  return `${admin ? 'julio' : 'visitor'}@julio-muller: ${cwd}`;
 }
 
 /** Shortcut and header button: open, restore, or minimize when focused. */

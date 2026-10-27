@@ -9,6 +9,12 @@ export type { ParsedArgs };
 
 export type CommandGroup = 'navigate' | 'explore' | 'site' | 'fun';
 
+/** A live admin session as the server reported it. */
+export interface SessionInfo {
+  expiresAt: number;
+  base: string;
+}
+
 export interface CommandActions {
   /** Internal path without a locale prefix, e.g. `/projects/x`. */
   navigate(href: string): void;
@@ -18,6 +24,9 @@ export interface CommandActions {
   clear(): void;
   downloadResume(locale: AppLocale): void;
   openExternal(url: string): void;
+  /** Full page load, for leaving the public site (the admin is another app). */
+  goTo(url: string): void;
+  setSession(session: SessionInfo | null): void;
   window: { close(): void; minimize(): void; maximize(): void };
 }
 
@@ -37,6 +46,8 @@ export interface CommandContext {
   shortcutLabel: string;
   /** Abortable pause; resolves immediately with reduced motion. */
   delay(ms: number): Promise<void>;
+  /** Secret-input mode: resolves with the typed value, or null on Ctrl+C. */
+  readSecret(label: string): Promise<string | null>;
 }
 
 export interface Command {
@@ -47,6 +58,8 @@ export interface Command {
   usageKey: string;
   group: CommandGroup;
   visibility: 'public' | 'secret';
+  /** Unknown-command behavior unless an admin session exists. */
+  requiresSession?: boolean;
   /** Flags that consume the next token as their value. */
   valueFlags?: string[];
   /** Waits for the content snapshot (and builds the file system) first. */
