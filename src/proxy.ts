@@ -2,6 +2,14 @@ import { type NextRequest, NextResponse } from 'next/server';
 
 import { negotiateLocale } from '@/i18n/negotiate';
 import { isAppLocale, LOCALE_COOKIE } from '@/i18n/routing';
+import { SESSION_COOKIE, sessionCookie } from '@/lib/auth/cookie';
+import {
+  isStrongSecret,
+  nowSeconds,
+  RENEW_AFTER_SECONDS,
+  signSession,
+  verifySession,
+} from '@/lib/auth/token';
 
 /**
  * Rewrite target for every request that must produce the global 404. Its
@@ -27,7 +35,40 @@ function notFound(request: NextRequest) {
   return NextResponse.rewrite(new URL(NOT_FOUND_PATH, request.url));
 }
 
-export function proxy(request: NextRequest) {
+const ADMIN_HEADERS = {
+  'X-Robots-Tag':
+    'noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate, noai, noimageai',
+  'Referrer-Policy': 'no-referrer',
+  'Cache-Control': 'private, no-store',
+};
+
+/**
+ * No valid session means the same global 404 as any unknown path, so these
+ * headers (which would reveal the area) are only set on the allowed branch.
+ */
+async function guardAdmin(request: NextRequest) {
+  const secret = process.env['SESSION_SECRET'];
+  const token = request.cookies.get(SESSION_COOKIE)?.value;
+  const session =
+    isStrongSecret(secret) && token ? await verifySession(secret, token) : null;
+  if (!isStrongSecret(secret) || !session) return notFound(request);
+
+  const response = NextResponse.next();
+  for (const [name, value] of Object.entries(ADMIN_HEADERS)) {
+    response.headers.set(name, value);
+  }
+  // Sliding renewal at most once a minute; session checks (actions) never extend it.
+  if (
+    !request.headers.has('next-action') &&
+    nowSeconds() - session.iat >= RENEW_AFTER_SECONDS
+  ) {
+    const next = await signSession(secret, session.start);
+    response.cookies.set(sessionCookie(next.token, next.exp));
+  }
+  return response;
+}
+
+export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
 
   const lowercased = pathname.toLowerCase();
@@ -56,6 +97,8 @@ export function proxy(request: NextRequest) {
   if (isAppLocale(firstSegment) || ROOT_PASSTHROUGH.has(firstSegment)) {
     return NextResponse.next();
   }
+
+  if (firstSegment === 'admin') return guardAdmin(request);
 
   if (firstSegment === 'dev' && !isProduction) {
     return NextResponse.next();

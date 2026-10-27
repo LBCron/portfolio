@@ -35,6 +35,7 @@ Where this list and the body below disagree, this list wins. Rationale for each 
 - Home order is Hero → Quotes of the moment → About (bio + metrics) → Stack → Work → Résumé (tabs + PDF + LinkedIn) → Contact → Recommendations. Nav is About · Stack · Work · Résumé · Contact [D46, D48].
 - Hero uses art-directed photos (`photo` square below `lg`, `photoLg` 3:4 from `lg` up) via `getImageProps` + `<picture>`; owner-supplied masters are encoded to WebP by the fixture generator and not clobbered by SVG art [D47].
 - The window manager hides the dock chip while the window is open [D49]. The public terminal is live: header toggle, hero CTA, footer hint and dock chip; its code and strings are a lazy chunk, the snapshot comes from `/api/terminal-content`, and secret commands wait for Phase 7 [D50].
+- Admin access (Phase 7): fixed `/admin`, proxy gate, session with an extra `ses` claim, `Secure`/`__Host-` following the https site URL, in-memory rate limiter only (no Upstash), light dashboard; the secret terminal flow loads lazily and `su` always prompts [D51, D52].
 - About (`#about`) is a two-column block: bio on the left, up to 4 count-up metrics on the right (`#summary` stays on the stats so old hashes resolve). Facts (`location`, `spokenLanguages`, `focus`) stay out of this section (terminal / résumé) [D48].
 
 ## 0. Operating instructions (to the agent)

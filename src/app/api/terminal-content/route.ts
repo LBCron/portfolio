@@ -8,10 +8,7 @@ import { buildSnapshot } from '@/lib/terminal/snapshot';
 export async function GET(request: Request) {
   const locale = new URL(request.url).searchParams.get('locale');
   if (!isAppLocale(locale)) {
-    return new NextResponse(null, {
-      status: 404,
-      headers: { 'X-Robots-Tag': 'noindex, nofollow' },
-    });
+    return new NextResponse(null, { status: 404 });
   }
 
   const content = getContent();
@@ -57,7 +54,6 @@ export async function GET(request: Request) {
       headers: {
         'Cache-Control':
           'public, max-age=0, s-maxage=300, stale-while-revalidate=3600',
-        'X-Robots-Tag': 'noindex, nofollow',
       },
     },
   );

@@ -119,16 +119,12 @@ test.describe('shell', () => {
     await expect(logOf(page)).toContainText('Chaining commands');
   });
 
-  test('secret-looking commands behave as unknown commands', async ({
+  test('names reserved for later are plain unknown commands', async ({
     page,
   }) => {
     await openTerminal(page);
-    await run(page, 'su julio');
     await run(page, 'admin');
-    await expect(logOf(page)).toContainText('command not found: su');
     await expect(logOf(page)).toContainText('command not found: admin');
-    await run(page, 'help');
-    await expect(logOf(page)).not.toContainText('logout');
   });
 
   test('navigates the virtual file system and follows the title', async ({

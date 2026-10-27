@@ -1,5 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
+import { ADMIN_PASSWORD, SESSION_SECRET } from './tests/e2e/auth-constants';
+
 const PORT = Number(process.env.E2E_PORT ?? 3100);
 const baseURL = `http://localhost:${PORT}`;
 
@@ -51,6 +53,10 @@ export default defineConfig({
     url: `${baseURL}/en`,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
-    env: { CONTENT_SOURCE: 'fixtures' },
+    env: {
+      CONTENT_SOURCE: 'fixtures',
+      ADMIN_PASSWORD,
+      SESSION_SECRET,
+    },
   },
 });
