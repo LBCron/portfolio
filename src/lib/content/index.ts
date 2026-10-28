@@ -4,6 +4,7 @@ import { contentSource } from '@/env';
 
 import { createRepository } from './create-repository';
 import { createFixtureSource } from './fixtures/source';
+import { getFixtureDataset } from './fixtures/shared';
 import type { ContentRepository } from './repository';
 import { createSanityHttpFetch } from './sanity/http';
 import { createSanitySource } from './sanity/source';
@@ -15,7 +16,7 @@ export function getContent(): ContentRepository {
   repository ??= createRepository(
     contentSource === 'sanity'
       ? createSanitySource(createSanityHttpFetch())
-      : createFixtureSource(),
+      : createFixtureSource(getFixtureDataset()),
   );
   return repository;
 }

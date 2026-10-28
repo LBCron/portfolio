@@ -43,6 +43,22 @@ function loadDevicon(): Promise<IconifyJSON[]> {
   return deviconSets;
 }
 
+/** Every Simple Icons brand, for the admin picker. */
+export async function simpleIconCatalog() {
+  return [...(await loadSimpleIcons()).values()].map((icon) => ({
+    slug: icon.slug,
+    label: icon.title,
+  }));
+}
+
+/** Every Devicon name (plain and original sets), for the admin picker. */
+export async function deviconCatalog() {
+  const sets = await loadDevicon();
+  return [...new Set(sets.flatMap((set) => Object.keys(set.icons)))]
+    .sort()
+    .map((slug) => ({ slug, label: slug }));
+}
+
 export async function simpleIcon(slug: string): Promise<SvgData | null> {
   const icon = (await loadSimpleIcons()).get(slug);
   return icon ? { viewBox: '0 0 24 24', paths: [icon.path] } : null;

@@ -39,6 +39,8 @@ const schema = z.object({
   SANITY_READ_TOKEN: optionalString,
   SANITY_WRITE_TOKEN: optionalString,
   SANITY_WEBHOOK_SECRET: optionalString,
+  /** `1` lets the admin write fixtures in production (e2e only). */
+  ADMIN_FIXTURE_WRITES: optionalString,
   ADMIN_PASSWORD: optionalString,
   ADMIN_PASSWORD_HASH: optionalString,
   SESSION_SECRET: optionalString,

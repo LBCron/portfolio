@@ -1,6 +1,10 @@
 import { defineConfig, devices } from '@playwright/test';
 
-import { ADMIN_PASSWORD, SESSION_SECRET } from './tests/e2e/auth-constants';
+import {
+  ADMIN_PASSWORD,
+  SESSION_SECRET,
+  WEBHOOK_SECRET,
+} from './tests/e2e/auth-constants';
 
 const PORT = Number(process.env.E2E_PORT ?? 3100);
 const baseURL = `http://localhost:${PORT}`;
@@ -57,6 +61,8 @@ export default defineConfig({
       CONTENT_SOURCE: 'fixtures',
       ADMIN_PASSWORD,
       SESSION_SECRET,
+      ADMIN_FIXTURE_WRITES: '1',
+      SANITY_WEBHOOK_SECRET: WEBHOOK_SECRET,
     },
   },
 });
