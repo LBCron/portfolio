@@ -68,6 +68,7 @@ function DropZone({
         id={id}
         type="file"
         accept={accept}
+        aria-label={label}
         disabled={form.disabled || busy}
         onChange={(event) => {
           const file = event.target.files?.[0];

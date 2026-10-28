@@ -1,47 +1,19 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 
-import { contentSource, env, isProduction } from '@/env';
+import { getAdminStore } from '@/lib/content/admin';
 
-import { ADMIN_NAV } from './nav';
+import { AdminNav } from './admin-nav';
 import { SessionControls } from './session-controls';
 
-const itemClass =
-  'inline-flex min-h-11 shrink-0 items-center rounded-md px-3 text-small';
-
-function NavItems() {
-  return ADMIN_NAV.map((item) => (
-    <li key={item.label} className="shrink-0">
-      {item.href ? (
-        <a
-          href={item.href}
-          aria-current="page"
-          className={`${itemClass} bg-surface-2 text-text-1`}
-        >
-          {item.label}
-        </a>
-      ) : (
-        <span aria-disabled="true" className={`${itemClass} text-text-3`}>
-          {item.label}
-        </span>
-      )}
-    </li>
-  ));
-}
-
-export function AdminShell({
+export async function AdminShell({
   expiresAt,
   children,
 }: {
   expiresAt: number;
   children: ReactNode;
 }) {
-  const source =
-    contentSource === 'sanity'
-      ? `Sanity · ${env.SANITY_DATASET}`
-      : isProduction
-        ? 'Demo data, read-only'
-        : 'Demo data';
+  const source = getAdminStore().label;
 
   return (
     <div className="min-h-dvh md:grid md:grid-cols-[14rem_1fr]">
@@ -53,11 +25,7 @@ export function AdminShell({
       </a>
       <aside className="hidden border-r border-line md:block">
         <p className="p-4 font-mono text-small text-text-1">julio · admin</p>
-        <nav aria-label="Admin areas">
-          <ul className="flex flex-col gap-1 p-2">
-            <NavItems />
-          </ul>
-        </nav>
+        <AdminNav />
       </aside>
 
       <div className="flex min-h-dvh min-w-0 flex-col pb-14 md:pb-0">
@@ -83,14 +51,7 @@ export function AdminShell({
         </main>
       </div>
 
-      <nav
-        aria-label="Admin areas"
-        className="fixed inset-x-0 bottom-0 overflow-x-auto border-t border-line bg-bg-1 pb-[env(safe-area-inset-bottom)] md:hidden"
-      >
-        <ul className="flex gap-1 px-2">
-          <NavItems />
-        </ul>
-      </nav>
+      <AdminNav className="fixed inset-x-0 bottom-0 z-20 overflow-x-auto border-t border-line bg-bg-1 pb-[env(safe-area-inset-bottom)] md:hidden" />
     </div>
   );
 }

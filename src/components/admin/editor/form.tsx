@@ -10,6 +10,7 @@ import {
   useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
 } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -18,7 +19,10 @@ import { deleteDocumentAction, saveDocumentAction } from '@/lib/admin/actions';
 import { fieldId, getIn, setIn } from '@/lib/admin/path';
 import type { FieldErrors } from '@/lib/content/admin/normalize';
 import type { Reference } from '@/lib/content/admin/types';
+import type { DocumentType } from '@/lib/content/schema';
 import { toast } from '@/stores/toast-store';
+
+import { idToSegment } from '../areas';
 
 import { inputClass } from './styles';
 
@@ -31,6 +35,8 @@ export interface FormApi {
   error: (path: string) => string | undefined;
   disabled: boolean;
 }
+
+const noSubscription = () => () => {};
 
 const FormContext = createContext<FormApi | null>(null);
 
@@ -82,6 +88,12 @@ export function DocumentEditor({
   const [saving, setSaving] = useState(false);
   const [conflict, setConflict] = useState(false);
   const summaryRef = useRef<HTMLDivElement>(null);
+  // Lets tests (and impatient fingers) know the form is interactive.
+  const hydrated = useSyncExternalStore(
+    noSubscription,
+    () => true,
+    () => false,
+  );
 
   const disabled = readOnlyReason !== null || saving;
   const dirty = useMemo(
@@ -156,7 +168,10 @@ export function DocumentEditor({
         setErrors({});
         setFormErrors([]);
         toast('Published · public pages refreshed', 'success');
-        if (!id) router.replace(`${basePath}/${outcome.id}`);
+        if (!id && !singleton)
+          router.replace(
+            `${basePath}/${idToSegment(type as DocumentType, outcome.id)}`,
+          );
         return;
       }
       if (outcome.kind === 'invalid') {
@@ -192,7 +207,12 @@ export function DocumentEditor({
 
   return (
     <FormContext.Provider value={api}>
-      <form onSubmit={onSubmit} noValidate className="mx-auto max-w-4xl">
+      <form
+        onSubmit={onSubmit}
+        noValidate
+        data-hydrated={hydrated}
+        className="mx-auto max-w-4xl"
+      >
         <h1 className="text-h2">{title}</h1>
         {readOnlyReason ? (
           <p

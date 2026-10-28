@@ -3,6 +3,7 @@ import '@/styles/globals.css';
 import type { Metadata, Viewport } from 'next';
 
 import { AdminShell } from '@/components/admin/shell';
+import { Toaster } from '@/components/ui/toaster';
 import { THEME_COLOR } from '@/config/site';
 import { requireAdmin } from '@/lib/auth/session';
 import { fontVariables } from '@/styles/fonts';
@@ -34,6 +35,7 @@ export default async function AdminLayout({ children }: LayoutProps<'/admin'>) {
     <html lang="en" className={fontVariables}>
       <body>
         <AdminShell expiresAt={session.exp * 1000}>{children}</AdminShell>
+        <Toaster />
       </body>
     </html>
   );

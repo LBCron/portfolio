@@ -16,6 +16,7 @@ const AREAS = [
   'experience',
   'education',
   'technologies',
+  'practices',
   'contact',
   'resume',
 ];

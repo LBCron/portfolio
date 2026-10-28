@@ -22,7 +22,8 @@
     "fixtures:generate": "bun scripts/generate-fixtures.ts && prettier --write src/lib/content/fixtures/assets.generated.ts",
     "sanity:seed": "bun --conditions=react-server scripts/seed-sanity.ts",
     "admin:hash": "bun --conditions=react-server scripts/admin-hash.ts",
-    "prepare": "husky"
+    "prepare": "husky",
+    "admin:smoke": "bun --conditions=react-server scripts/admin-smoke.ts"
   },
   "dependencies": {
     "@iconify-json/devicon": "^1.2.71",
