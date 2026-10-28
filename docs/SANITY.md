@@ -72,3 +72,30 @@ Last run, 2026-10-13, on `development`: 86 documents and 15 assets seeded; re-se
 ## Webhook (Phase 8)
 
 `POST /api/revalidate` with `SANITY_WEBHOOK_SECRET`, for edits made outside the admin (e.g. a Studio). It maps the document type to `content:*` tags (`tagsForDocument`) and calls `revalidateTag(tag, { expire: 0 })` (D9). Configure it in sanity.io/manage → API → Webhooks with the projection `{ _type, "slug": slug.current, previousSlugs }`, and filter to the dataset the deployment reads.
+
+## Admin writes (Phase 8)
+
+The admin (`/admin`) is the editor: it writes through `src/lib/content/admin/` with `SANITY_WRITE_TOKEN` (an Editor token), documents are written already published, and every change calls `updateTag` for the affected `content:*` tags (D53).
+
+### Revalidation webhook
+
+Edits made outside the admin (Studio, the Sanity Manage UI) reach the site through `POST /api/revalidate`. After deploying:
+
+1. In [sanity.io/manage](https://www.sanity.io/manage/project/njcnsmax) → API → Webhooks, add a webhook to `https://<your-domain>/api/revalidate`, method POST, dataset `production` (and one for `development` if previews matter).
+2. Filter: `_type in ["profile","contact","resume","featuredLink","recommendedProfile","project","experience","education","technology","practice"]`. Projection: `{_type, "slug": slug.current}`. Trigger on create, update and delete; drafts off.
+3. Set a secret and put the same value in `SANITY_WEBHOOK_SECRET`. Anything unsigned, stale (over 10 minutes) or malformed gets a bare 404.
+
+### Smoke run against a real dataset
+
+`bun run admin:smoke` drives the real Sanity store and the admin service on the dataset in `.env.local`. It refuses `production`, needs `SANITY_WRITE_TOKEN`, and cleans up after itself:
+
+- creates a practice and reads it back with an order and a revision;
+- rejects a missing translation;
+- updates with the loaded revision, then proves a stale revision is a conflict;
+- hides it (a flag patch), reorders, and checks reference lookups;
+- processes and uploads an image and checks the CDN metadata;
+- deletes the practice.
+
+Last run: `development`, all checks passed. Leftovers: the uploaded test image stays as an unreferenced asset (remove it in Manage → Media if you care), and the reorder renumbered the practices' `order` values (the relative order is unchanged; `sanity:seed --reset` restores the seed).
+
+To try the UI itself, run the app with `CONTENT_SOURCE=sanity`, `SANITY_DATASET=development`, an admin password and `SESSION_SECRET`, sign in through the terminal, edit something, and confirm the change on the public page. Do not point it at `production` until you are ready to enter real content.

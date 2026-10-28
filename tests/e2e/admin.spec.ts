@@ -1,7 +1,17 @@
 import AxeBuilder from '@axe-core/playwright';
-import { expect, type Page, test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
-import { ADMIN_PASSWORD, SESSION_SECRET } from './auth-constants';
+import { SESSION_SECRET } from './auth-constants';
+import {
+  inputOf,
+  logOf,
+  openTerminal,
+  passwordOf,
+  run,
+  signIn,
+  submitPassword,
+  windowOf,
+} from './admin-helpers';
 
 const SHORTCUT = 'Control+/';
 const FAILURE = 'su: Authentication failure';
@@ -13,44 +23,6 @@ test.beforeEach(async ({ page }) => {
     'x-forwarded-for': `10.${Math.floor(Math.random() * 250)}.${Math.floor(Math.random() * 250)}.${Math.floor(Math.random() * 250)}`,
   });
 });
-
-const windowOf = (page: Page) => page.locator('[data-window=terminal]');
-const inputOf = (page: Page) =>
-  page.getByRole('textbox', { name: /Command input/ });
-const passwordOf = (page: Page) => page.getByLabel('Password', { exact: true });
-const logOf = (page: Page) =>
-  page.getByRole('log', { name: 'Terminal output' });
-
-async function openTerminal(page: Page, path = '/en') {
-  await page.goto(path, { waitUntil: 'domcontentloaded' });
-  await expect(async () => {
-    await page.keyboard.press(SHORTCUT);
-    await expect(windowOf(page)).toHaveAttribute('data-status', 'open', {
-      timeout: 1_000,
-    });
-  }).toPass();
-  await expect(inputOf(page)).toBeFocused();
-}
-
-async function run(page: Page, line: string) {
-  await inputOf(page).fill(line);
-  await inputOf(page).press('Enter');
-}
-
-async function submitPassword(page: Page, password: string) {
-  await expect(passwordOf(page)).toBeFocused();
-  await passwordOf(page).fill(password);
-  await passwordOf(page).press('Enter');
-}
-
-/** Signs in through the terminal and lands on the dashboard. */
-async function signIn(page: Page) {
-  await openTerminal(page);
-  await run(page, 'su julio');
-  await submitPassword(page, ADMIN_PASSWORD);
-  await expect(page).toHaveURL(/\/admin$/);
-  await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
-}
 
 const ANONYMOUS_PATHS = [
   '/admin',
@@ -317,7 +289,9 @@ test.describe('admin shell', () => {
     ).toHaveCount(0);
     await expect(page.getByText('Demo data')).toBeVisible();
     await expect(page.getByText(/Session · \d+ min/)).toBeVisible();
-    await expect(page.getByRole('term').first()).toBeVisible();
+    await expect(
+      page.getByRole('link', { name: /^Projects \d+/ }),
+    ).toBeVisible();
   });
 
   test('warns before expiry and renews on request', async ({
