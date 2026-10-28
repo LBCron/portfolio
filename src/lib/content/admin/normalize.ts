@@ -40,6 +40,12 @@ function friendly(issue: IssueLike): string {
   ) {
     return 'Required';
   }
+  if (issue.code === 'too_small' && issue.origin === 'array') {
+    return `At least ${issue.minimum} items`;
+  }
+  if (issue.code === 'too_big' && issue.origin === 'array') {
+    return `At most ${issue.maximum} items`;
+  }
   if (issue.code === 'too_big' && issue.origin === 'string') {
     return `At most ${issue.maximum} characters`;
   }

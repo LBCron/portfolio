@@ -14,7 +14,13 @@ export interface AdminHooks {
 }
 
 export type SaveOutcome =
-  | { ok: true; id: string; rev: string; slug?: string }
+  | {
+      ok: true;
+      id: string;
+      rev: string;
+      slug?: string;
+      doc: Record<string, unknown>;
+    }
   | {
       ok: false;
       kind: 'invalid';
@@ -181,6 +187,7 @@ export function createAdminService(store: AdminStore, hooks: AdminHooks) {
         ok: true,
         id: documentId,
         rev: written.rev,
+        doc: { ...parsed, rev: written.rev },
         ...(slug ? { slug } : {}),
       };
     },
