@@ -77,6 +77,8 @@ All are documented in [.env.example](.env.example). Only `NEXT_PUBLIC_SITE_URL` 
 
 ## Deployment (Vercel)
 
+The full walkthrough for local, staging (Vercel Preview) and production, including the GitHub Pages cutover, is [docs/SETUP.md](docs/SETUP.md). In short:
+
 1. Import the repository; Vercel reads `vercel.json` (Bun install, frozen lockfile). The build command is the default `bun run build`.
 2. Set the variables above for **Production** (dataset `production`) and **Preview** (dataset `development`, its own tokens). Previews are never indexed (pages carry a `noindex` robots meta unless `VERCEL_ENV` is `production`).
 3. Add the domain `juliolmuller.com` and set `NEXT_PUBLIC_SITE_URL=https://juliolmuller.com`.
@@ -100,6 +102,7 @@ GitHub Actions (`.github/workflows/ci.yml`) on pull requests and pushes to `main
 
 ## Documentation
 
+- [docs/SETUP.md](docs/SETUP.md): local, staging and production setup, cutover and operations.
 - [docs/SPEC.md](docs/SPEC.md): the product and engineering specification.
 - [docs/DECISIONS.md](docs/DECISIONS.md): architecture, resolved versions and every decision (D1–D61), contradictions and risks.
 - [docs/ADDING_CONTENT.md](docs/ADDING_CONTENT.md): editing guide and what the owner still has to supply.
