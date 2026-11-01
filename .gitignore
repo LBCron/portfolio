@@ -47,3 +47,8 @@ next-env.d.ts
 
 # env files, except the documented example
 !.env.example
+
+# Lighthouse CI
+/.lighthouseci
+# Chrome profiles chrome-launcher leaves under WSL
+/C:*

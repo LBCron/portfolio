@@ -2,7 +2,9 @@ import { TechIcon } from '@/components/content/tech-icon';
 import { Chip } from '@/components/ui/chip';
 import { Reveal } from '@/components/ui/reveal';
 import { techCategories } from '@/lib/content/taxonomy';
-import type { Practice, Technology } from '@/lib/content/types';
+import type { Practice } from '@/lib/content/types';
+
+import type { StackTech } from './types';
 
 export function StackList({
   technologies,
@@ -10,7 +12,7 @@ export function StackList({
   categoryLabels,
   practicesTitle,
 }: {
-  technologies: Technology[];
+  technologies: StackTech[];
   practices: Practice[];
   categoryLabels: Record<(typeof techCategories)[number], string>;
   practicesTitle: string;

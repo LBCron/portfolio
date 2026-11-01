@@ -1,12 +1,18 @@
+import type { CSSProperties } from 'react';
+
 import { cn } from '@/lib/cn';
 import type { TechIcon as TechIconData } from '@/lib/content';
+import type { PublicTechIcon } from '@/lib/content/icon-src';
 
-/** Logo (single-tone paths in `currentColor`) or a monogram badge. */
+/**
+ * Logo in `currentColor` or a monogram badge. A `src` icon is a cached file
+ * drawn as a mask (D59); inline paths are kept for the few icons elsewhere.
+ */
 export function TechIcon({
   icon,
   className,
 }: {
-  icon: TechIconData;
+  icon: TechIconData | PublicTechIcon;
   className?: string;
 }) {
   if ('monogram' in icon) {
@@ -20,6 +26,19 @@ export function TechIcon({
       >
         {icon.monogram}
       </span>
+    );
+  }
+  if ('src' in icon) {
+    const mask = `url("${icon.src}") center / contain no-repeat`;
+    return (
+      <span
+        aria-hidden="true"
+        className={cn(
+          'inline-block size-5 shrink-0 bg-current forced-color-adjust-none forced-colors:bg-[CanvasText]',
+          className,
+        )}
+        style={{ mask, WebkitMask: mask } as CSSProperties}
+      />
     );
   }
   return (

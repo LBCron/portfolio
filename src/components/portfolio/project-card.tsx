@@ -27,6 +27,8 @@ interface ProjectCardProps {
   headingLevel?: 'h2' | 'h3';
   /** Above-the-fold covers load eagerly. */
   eager?: boolean;
+  /** The likely LCP element: fetched at high priority. */
+  lcp?: boolean;
 }
 
 /**
@@ -39,6 +41,7 @@ export async function ProjectCard({
   techNames,
   headingLevel: Heading = 'h3',
   eager = false,
+  lcp = false,
 }: ProjectCardProps) {
   const t = await getTranslations('work');
   const chips = techNames.slice(0, MAX_CHIPS);
@@ -64,6 +67,7 @@ export async function ProjectCard({
                 alt={project.cover.alt}
                 sizes="(min-width: 1100px) 384px, (min-width: 768px) 50vw, 100vw"
                 loading={eager ? 'eager' : 'lazy'}
+                fetchPriority={lcp ? 'high' : undefined}
                 placeholder={project.cover.lqip ? 'blur' : 'empty'}
                 blurDataURL={project.cover.lqip}
                 className="size-full object-cover transition-transform duration-500 ease-out-expo group-hover/card:scale-[1.04]"

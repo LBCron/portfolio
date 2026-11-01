@@ -59,6 +59,16 @@ jobs:
       - run: bunx playwright install --with-deps chromium webkit
       - run: bun run test:e2e
 
+      # Mobile profile, 3 runs per URL against the production build (D60).
+      - run: bun run lhci
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-reports
+          path: .lighthouseci/
+          retention-days: 14
+
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

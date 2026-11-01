@@ -13,12 +13,13 @@ import {
 import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { cn } from '@/lib/cn';
 import { techCategories, type TechCategory } from '@/lib/content/taxonomy';
-import type { Practice, Technology } from '@/lib/content/types';
+import type { Practice } from '@/lib/content/types';
 import { useReducedMotionPreference } from '@/lib/motion-preference';
 
 import type { CloudTech } from './geoid-sphere';
 import { StackList } from './stack-list';
 import { geoidStageClassName } from './stage';
+import type { StackTech } from './types';
 
 const GeoidSphere = dynamic(
   () => import('./geoid-sphere').then((module) => module.GeoidSphere),
@@ -33,7 +34,7 @@ const GeoidSphere = dynamic(
   },
 );
 
-function toCloudTech(tech: Technology): CloudTech {
+function toCloudTech(tech: StackTech): CloudTech {
   return {
     id: tech.id,
     name: tech.name,
@@ -64,7 +65,7 @@ export function TechCloudShell({
   technologies,
   practices,
 }: {
-  technologies: Technology[];
+  technologies: StackTech[];
   practices: Practice[];
 }) {
   const t = useTranslations('stack');

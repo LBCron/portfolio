@@ -484,6 +484,22 @@ Latest stable unless noted. Majors are pinned with `^`; exact versions come from
 - **Decision.** `bun run check:bundle` (CI, after the build) reads `.next/diagnostics/route-bundle-stats.json` and enforces regression ceilings instead: Home 195 KB (measured 190.7 KB after D56/D57, down from 198.9 KB), projects and detail 190 KB, accessibility and catch-all 185 KB; lazy chunks terminal ≤ 20 KB (12.6), secret ≤ 3 KB (0.9), sphere ≤ 10 KB (3.4). It also fails when a public first load contains terminal or secret code, when any chunk outside the admin's first load mentions the admin path, and when any client file contains a server-only variable name or the value of one present in the environment. `next analyze --output` gives the module breakdown.
 - **Consequence.** A documented deviation from §16 for the owner to accept or revisit: reaching 150 KB would mean dropping Motion and next-intl from the client. Lighthouse CI (Performance ≥ 95, TBT < 150 ms) remains the user-facing gate.
 
+### D59 — Technology logos as cached files; document weight
+
+- **Context.** Home's HTML was 690 KB (232 KB gzip): the stack's 96 logos were inline SVG paths, written once into the HTML and again into the RSC payload (every rendered element is in both). That pushed simulated FCP to ~2 s.
+- **Decision.**
+  - Logos are content-addressed files: `GET /tech-icons/<hash>.svg` (`src/app/tech-icons/[file]/route.ts`), where the hash (`iconHash`, two FNV-1a passes over viewBox and paths) changes whenever an icon changes, so responses are `Cache-Control: public, max-age=31536000, immutable`. Only visible technologies resolve; anything else is 404. `?fill=<6 hex>` colors the file for the geoid's `<img>`; the List view draws the same file as a `currentColor` CSS mask (CanvasText under forced colors). The server `Stack` section maps technologies to `StackTech` with `{ src } | { monogram }`, so no path reaches the client. The proxy lets `/tech-icons` through.
+  - The project detail page keeps inline icons (a handful per page).
+  - JetBrains Mono is no longer preloaded (labels only); Geist stays preloaded.
+  - LCP images: the detail cover uses `preload` + `fetchPriority="high"` (`priority` is deprecated in Next 16); the first card on `/projects` gets `fetchPriority="high"`.
+- **Consequence.** Home HTML is 278 KB raw / 47 KB gzip. The List view needs CSS masks (all supported browsers); no-JS still shows every logo.
+
+### D60 — Lighthouse CI thresholds as enforced
+
+- **Context.** §16 asks for Performance ≥ 95, LCP < 2.0 s and TBT < 150 ms (mobile, simulated throttling). Lighthouse's simulated LCP counts every request that starts before the observed LCP, and the App Router requests the whole first-load JS (~190 KB, D58) before first paint; locally, observed LCP is ~150 ms but simulated LCP is 2.8–3.5 s. After D56–D59, local medians: detail pages 0.95, `/projects` 0.93–0.94, Home 0.89–0.92 (TBT 200–250 ms from hydration). Accessibility, Best Practices and SEO are 100 on every URL; CLS is 0.
+- **Decision.** `lighthouserc.json` runs 3 times per URL (Home, `/projects`, one detail page; both locales) in CI with `bun x @lhci/cli@0.15.1` (on demand, so its dependency tree stays out of `bun audit`), uploads reports as an artifact, and **fails** on: accessibility < 1, SEO < 1, best practices < 0.95, CLS > 0.05, and the regression floors performance < 0.85, LCP > 3.8 s, TBT > 350 ms.
+- **Consequence.** The §16 performance, LCP and TBT targets are **not met** and are not enforced at their spec values; the owner decides whether to accept the floors or fund deeper work (for example, moving the hero animations and the window-manager shell off the initial hydration path). Running `lhci` under WSL leaves Chrome profile folders named `C:\Users\…\lighthouse.*` in the working directory; delete them (Tailwind's scanner trips over their sockets).
+
 ## 5. Contradictions found in the spec and how they are resolved
 
 1. `dynamicParams` "stays on" (§3.1, §8.5) vs Cache Components rejecting the export → D1.

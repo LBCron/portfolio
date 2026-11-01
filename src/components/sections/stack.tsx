@@ -2,7 +2,22 @@ import { getTranslations } from 'next-intl/server';
 
 import { TechCloudShell } from '@/components/tech-cloud/tech-cloud-shell';
 import { SectionHeader } from '@/components/ui/section-header';
+import type { StackTech } from '@/components/tech-cloud/types';
 import type { Practice, Technology } from '@/lib/content';
+import { toPublicIcon } from '@/lib/content/icon-src';
+
+/** Only what the client needs: icon URLs, never paths (D59). */
+function toStackTech(tech: Technology): StackTech {
+  return {
+    id: tech.id,
+    name: tech.name,
+    category: tech.category,
+    icon: toPublicIcon(tech.icon),
+    brandColor: tech.brandColor,
+    url: tech.url,
+    priority: tech.priority,
+  };
+}
 
 /**
  * Stack section: List is the SSR / reduced-motion baseline; the geoid cloud
@@ -32,7 +47,10 @@ export async function Stack({
           lead={t('lead')}
         />
       </div>
-      <TechCloudShell technologies={technologies} practices={practices} />
+      <TechCloudShell
+        technologies={technologies.map(toStackTech)}
+        practices={practices}
+      />
     </section>
   );
 }

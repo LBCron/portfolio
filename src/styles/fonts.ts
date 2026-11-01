@@ -12,6 +12,9 @@ export const fontMono = localFont({
   // Metric overrides are computed against a sans fallback, which would
   // distort a monospace fallback; mono text is never the LCP element.
   adjustFontFallback: false,
+  // Only labels use it: fetched when the CSS needs it instead of competing
+  // with the document and Geist on a slow first load (D59).
+  preload: false,
 });
 
 export const fontVariables = `${fontSans.variable} ${fontMono.variable}`;

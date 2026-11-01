@@ -146,6 +146,7 @@ export default async function ProjectsPage({
                   techNames={namesFor(project.techIds)}
                   headingLevel="h2"
                   eager={index < 3}
+                  lcp={index === 0}
                 />
               </li>
             ))}

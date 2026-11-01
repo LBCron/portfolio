@@ -8,7 +8,7 @@ import {
 
 import { cn } from '@/lib/cn';
 import type { TechCategory } from '@/lib/content/taxonomy';
-import type { TechIcon } from '@/lib/content/types';
+import type { PublicTechIcon } from '@/lib/content/icon-src';
 import { fibonacciGeoid } from '@/lib/tech-cloud/geoid';
 
 import { CloudMark } from './cloud-mark';
@@ -18,7 +18,7 @@ export interface CloudTech {
   id: string;
   name: string;
   category: TechCategory;
-  icon: TechIcon;
+  icon: PublicTechIcon;
   brandColor?: string;
   url?: string;
   priority: 1 | 2 | 3;

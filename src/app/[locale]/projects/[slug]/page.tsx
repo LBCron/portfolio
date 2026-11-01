@@ -177,7 +177,8 @@ export default async function ProjectPage({
                   height={project.cover.height}
                   alt={project.cover.alt}
                   sizes="(min-width: 1024px) 448px, 100vw"
-                  priority
+                  preload
+                  fetchPriority="high"
                   placeholder={project.cover.lqip ? 'blur' : 'empty'}
                   blurDataURL={project.cover.lqip}
                   className="size-full object-cover"
