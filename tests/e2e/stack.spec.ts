@@ -43,11 +43,17 @@ test('cloud hydrates and category chips dim the geoid', async ({ page }) => {
     page.getByRole('toolbar', { name: 'Filter by category' }),
   ).toBeVisible();
   await expect(page.getByRole('button', { name: /AI agents/ })).toBeVisible();
-  await page.getByRole('button', { name: /Languages/ }).click({ force: true });
-  await expect(page.getByRole('button', { name: /Languages/ })).toHaveAttribute(
-    'aria-pressed',
-    'true',
-  );
+  // The chip row re-renders once the viewport cull settles; a click that
+  // lands on the outgoing node is lost, so retry until it registers.
+  const languages = page.getByRole('button', { name: /Languages/ });
+  await expect(async () => {
+    if ((await languages.getAttribute('aria-pressed')) !== 'true') {
+      await languages.click({ force: true });
+    }
+    await expect(languages).toHaveAttribute('aria-pressed', 'true', {
+      timeout: 1_000,
+    });
+  }).toPass();
   await expect
     .poll(async () =>
       page.evaluate(() => {
