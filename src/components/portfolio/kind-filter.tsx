@@ -1,5 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 
+import { RovingRadiogroup } from '@/components/ui/roving-radiogroup';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/cn';
 import type { ProjectKind } from '@/lib/content';
@@ -23,8 +24,7 @@ export async function KindFilter({ kinds, active }: KindFilterProps) {
   ];
 
   return (
-    <div
-      role="radiogroup"
+    <RovingRadiogroup
       aria-label={t('filterLabel')}
       className="flex flex-wrap gap-2"
     >
@@ -52,6 +52,6 @@ export async function KindFilter({ kinds, active }: KindFilterProps) {
           </Link>
         );
       })}
-    </div>
+    </RovingRadiogroup>
   );
 }

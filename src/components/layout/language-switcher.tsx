@@ -1,7 +1,12 @@
 'use client';
 
 import { useLocale, useTranslations } from 'next-intl';
-import { type KeyboardEvent, type MouseEvent, useRef } from 'react';
+import {
+  type KeyboardEvent,
+  type MouseEvent,
+  useRef,
+  useSyncExternalStore,
+} from 'react';
 
 import { usePathname, useRouter } from '@/i18n/navigation';
 import { type AppLocale, localeTags, routing } from '@/i18n/routing';
@@ -19,6 +24,13 @@ export function LanguageSwitcher({ className }: { className?: string }) {
   const pathname = usePathname();
   const router = useRouter();
   const groupRef = useRef<HTMLDivElement>(null);
+  // Roving tabindex needs the arrow-key handler, so the server HTML keeps
+  // every link tabbable for keyboard users without JavaScript.
+  const hydrated = useSyncExternalStore(
+    () => () => undefined,
+    () => true,
+    () => false,
+  );
 
   function hrefFor(target: AppLocale) {
     return pathname === '/' ? `/${target}` : `/${target}${pathname}`;
@@ -84,7 +96,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
             hrefLang={localeTags[target]}
             lang={localeTags[target]}
             aria-current={current ? 'true' : undefined}
-            tabIndex={current ? 0 : -1}
+            tabIndex={current || !hydrated ? 0 : -1}
             onClick={(event) => handleClick(event, target)}
             onKeyDown={handleKeyDown}
             className={cn(
