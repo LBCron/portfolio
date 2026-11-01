@@ -1,7 +1,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, type Page, test } from '@playwright/test';
 
-const SHORTCUT = 'Control+/';
+import { openWithShortcut } from './hydration';
 
 // Reduced motion keeps WebKit's actionability check from waiting on the hero
 // loops (D36) and makes the boot lines instant; one test covers the typing.
@@ -17,12 +17,7 @@ const logOf = (page: Page) =>
 
 async function openTerminal(page: Page, path = '/en') {
   await page.goto(path, { waitUntil: 'domcontentloaded' });
-  await expect(async () => {
-    await page.keyboard.press(SHORTCUT);
-    await expect(windowOf(page)).toHaveAttribute('data-status', 'open', {
-      timeout: 1_000,
-    });
-  }).toPass();
+  await openWithShortcut(page, windowOf(page));
   await expect(inputOf(page)).toBeFocused();
 }
 
@@ -147,6 +142,7 @@ test.describe('shell', () => {
 
   test('Tab completes, lists candidates on a second Tab, and leaves when idle', async ({
     page,
+    browserName,
   }) => {
     await openTerminal(page);
     const input = inputOf(page);
@@ -161,8 +157,24 @@ test.describe('shell', () => {
     await expect(logOf(page)).toContainText('socials');
 
     await input.fill('');
+    await page.evaluate(() => {
+      window.addEventListener('keydown', (event) => {
+        if (event.key === 'Tab') {
+          document.body.dataset['tabPrevented'] = String(
+            event.defaultPrevented,
+          );
+        }
+      });
+    });
     await input.press('Tab');
-    await expect(input).not.toBeFocused();
+    // Idle Tab is left to the browser. The input is the last tab stop, and
+    // headless Firefox has no browser UI to move focus to, so check the
+    // default action rather than where focus went there.
+    await expect(page.locator('body')).toHaveAttribute(
+      'data-tab-prevented',
+      'false',
+    );
+    if (browserName !== 'firefox') await expect(input).not.toBeFocused();
   });
 
   test('history, line editing and clearing', async ({ page }) => {
@@ -197,7 +209,14 @@ test.describe('shell', () => {
     await expect(logOf(page)).not.toContainText('whoami');
   });
 
-  test('a multi-line paste runs only the first line', async ({ page }) => {
+  test('a multi-line paste runs only the first line', async ({
+    page,
+    browserName,
+  }) => {
+    test.skip(
+      browserName === 'firefox',
+      'Firefox empties clipboardData on synthetic paste events',
+    );
     await openTerminal(page);
     await inputOf(page).evaluate((element) => {
       const data = new DataTransfer();

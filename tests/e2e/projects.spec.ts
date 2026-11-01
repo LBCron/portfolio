@@ -98,22 +98,3 @@ test('lightbox has no axe violations when open', async ({
     .analyze();
   expect(results.violations).toEqual([]);
 });
-
-test.describe('screenshots', () => {
-  for (const width of [375, 768, 1440] as const) {
-    test(`home ${width}`, async ({ page }, testInfo) => {
-      test.skip(testInfo.project.name !== 'chromium', 'one browser is enough');
-      await page.emulateMedia({ reducedMotion: 'reduce' });
-      await page.setViewportSize({
-        width,
-        height: width < 768 ? 812 : 900,
-      });
-      await page.goto('/en');
-      await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-      await page.screenshot({
-        path: `.cache/screenshots/home-${width}.png`,
-        fullPage: true,
-      });
-    });
-  }
-});

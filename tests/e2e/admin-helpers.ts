@@ -1,8 +1,7 @@
 import { expect, type Page } from '@playwright/test';
 
 import { ADMIN_PASSWORD } from './auth-constants';
-
-const SHORTCUT = 'Control+/';
+import { openWithShortcut } from './hydration';
 
 export const windowOf = (page: Page) => page.locator('[data-window=terminal]');
 export const inputOf = (page: Page) =>
@@ -14,12 +13,7 @@ export const logOf = (page: Page) =>
 
 export async function openTerminal(page: Page, path = '/en') {
   await page.goto(path, { waitUntil: 'domcontentloaded' });
-  await expect(async () => {
-    await page.keyboard.press(SHORTCUT);
-    await expect(windowOf(page)).toHaveAttribute('data-status', 'open', {
-      timeout: 1_000,
-    });
-  }).toPass();
+  await openWithShortcut(page, windowOf(page));
   await expect(inputOf(page)).toBeFocused();
 }
 

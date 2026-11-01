@@ -11,12 +11,18 @@ const baseURL = `http://localhost:${PORT}`;
 
 export default defineConfig({
   testDir: './tests/e2e',
+  // Baselines are committed for Linux, the CI platform (D61).
+  snapshotPathTemplate:
+    '{testDir}/__screenshots__/{testFilePath}/{arg}-{projectName}{ext}',
+  expect: {
+    timeout: 10_000,
+    toHaveScreenshot: { maxDiffPixelRatio: 0.01, animations: 'disabled' },
+  },
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 2 : 1,
   workers: 2,
   timeout: 60_000,
-  expect: { timeout: 10_000 },
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
   use: {
     baseURL,
@@ -39,6 +45,21 @@ export default defineConfig({
       name: 'mobile',
       use: { ...devices['Pixel 7'] },
       testIgnore: 'stack.perf.spec.ts',
+    },
+    {
+      // Cross-browser smoke (D61): the public specs only; the admin and the
+      // visual baselines stay on the projects above.
+      name: 'firefox',
+      use: { ...devices['Desktop Firefox'] },
+      testMatch: [
+        'shell.spec.ts',
+        'projects.spec.ts',
+        'terminal.spec.ts',
+        'window.spec.ts',
+        'stack.spec.ts',
+        'security.spec.ts',
+        'a11y.spec.ts',
+      ],
     },
     {
       name: 'perf',

@@ -500,6 +500,15 @@ Latest stable unless noted. Majors are pinned with `^`; exact versions come from
 - **Decision.** `lighthouserc.json` runs 3 times per URL (Home, `/projects`, one detail page; both locales) in CI with `bun x @lhci/cli@0.15.1` (on demand, so its dependency tree stays out of `bun audit`), uploads reports as an artifact, and **fails** on: accessibility < 1, SEO < 1, best practices < 0.95, CLS > 0.05, and the regression floors performance < 0.85, LCP > 3.8 s, TBT > 350 ms.
 - **Consequence.** The §16 performance, LCP and TBT targets are **not met** and are not enforced at their spec values; the owner decides whether to accept the floors or fund deeper work (for example, moving the hero animations and the window-manager shell off the initial hydration path). Running `lhci` under WSL leaves Chrome profile folders named `C:\Users\…\lighthouse.*` in the working directory; delete them (Tailwind's scanner trips over their sockets).
 
+### D61 — Cross-browser smoke and visual baselines
+
+- **Context.** The owner chose a Firefox smoke run on the public specs and CI-generated screenshot baselines.
+- **Decision.**
+  - A `firefox` Playwright project (Desktop Firefox) runs the public specs (`shell`, `projects`, `terminal`, `window`, `stack`, `security`, `a11y`); the admin specs stay on Chromium, WebKit and the mobile project. CI installs Firefox alongside Chromium and WebKit.
+  - The Firefox pass found test-harness problems only, fixed in the tests: the terminal helpers pressed the toggle shortcut repeatedly, so a slow mount closed the window again (`tests/e2e/hydration.ts` now waits for React hydration, then gives each press 5 s); a window drag left the viewport, where synthetic pointer moves are not reported; one test measured scroll across two page loads. Two checks are adjusted per browser with a stated reason: Firefox empties `clipboardData` on synthetic paste events (the multi-line paste test is skipped there), and headless Firefox keeps focus on the last tab stop when Tab leaves the page (the idle-Tab test asserts that the default action is not prevented).
+  - Visual snapshots (`tests/e2e/visual.spec.ts`): the hero and the first project card at 375, 768 and 1440 px, Chromium only, reduced motion, animations disabled, `maxDiffPixelRatio: 0.01`. Baselines live in `tests/e2e/__screenshots__/` (Linux). They run in CI and locally only with `VISUAL=1`; the manual `Visual baselines` workflow regenerates them on the CI image and uploads them as an artifact.
+- **Consequence.** The first baselines were generated under WSL Linux with the self-hosted fonts; if CI's rendering differs beyond the tolerance, run the workflow once and commit its PNGs. Manual checks on real Safari/iOS 16 and Edge remain in the launch checklist (README).
+
 ## 5. Contradictions found in the spec and how they are resolved
 
 1. `dynamicParams` "stays on" (§3.1, §8.5) vs Cache Components rejecting the export → D1.

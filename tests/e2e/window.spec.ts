@@ -1,6 +1,8 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, type Locator, type Page, test } from '@playwright/test';
 
+import { openWithShortcut } from './hydration';
+
 const SHORTCUT = 'Control+/';
 
 // Reduced motion makes transitions instant and keeps WebKit's actionability
@@ -22,12 +24,7 @@ async function box(locator: Locator) {
 async function openTerminal(page: Page) {
   await page.goto('/en', { waitUntil: 'domcontentloaded' });
   // The shortcut listener attaches after hydration; a press before that is a no-op.
-  await expect(async () => {
-    await page.keyboard.press(SHORTCUT);
-    await expect(windowOf(page)).toHaveAttribute('data-status', 'open', {
-      timeout: 1_000,
-    });
-  }).toPass();
+  await openWithShortcut(page, windowOf(page));
   await expect(windowOf(page)).toBeVisible();
 }
 
@@ -62,7 +59,8 @@ test.describe('desktop window', () => {
     await page.goto('/en', { waitUntil: 'domcontentloaded' });
     await expect(windowOf(page)).toHaveCount(0);
     const scrollBefore = await page.evaluate(() => window.scrollY);
-    await openTerminal(page);
+    // Same page: navigating again would compare two different loads.
+    await openWithShortcut(page, windowOf(page));
     expect(await page.evaluate(() => window.scrollY)).toBe(scrollBefore);
     await expect(
       page.getByRole('textbox', { name: /Command input/ }),
@@ -106,7 +104,9 @@ test.describe('desktop window', () => {
   test('keeps 96px of the title bar on screen', async ({ page }) => {
     await openTerminal(page);
     const viewport = page.viewportSize()!;
-    const release = await dragTitleBar(page, 120, { dy: 600 });
+    // Far below the clamp but inside the viewport: Firefox reports no moves
+    // for a synthetic pointer outside it.
+    const release = await dragTitleBar(page, 120, { y: viewport.height - 1 });
     await release();
     await expect
       .poll(async () => (await box(windowOf(page))).y)

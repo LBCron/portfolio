@@ -1,0 +1,35 @@
+name: Visual baselines
+
+# Regenerates the Linux screenshot baselines on the CI image (D61). Download
+# the artifact and commit its PNGs under tests/e2e/__screenshots__/.
+on:
+  workflow_dispatch:
+
+env:
+  CONTENT_SOURCE: fixtures
+  NEXT_PUBLIC_SITE_URL: http://localhost:3100
+  ADMIN_PASSWORD: ci-only-password-not-a-secret
+  SESSION_SECRET: ci-only-session-secret-0123456789abcdef0123456789abcdef
+  NEXT_TELEMETRY_DISABLED: '1'
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: package.json
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+      - run: bun install --frozen-lockfile
+      - run: bun run build
+      - run: bunx playwright install --with-deps chromium
+      - run: bunx playwright test visual.spec.ts --project=chromium --update-snapshots
+      - uses: actions/upload-artifact@v4
+        with:
+          name: visual-baselines
+          path: tests/e2e/__screenshots__/
+          retention-days: 7
