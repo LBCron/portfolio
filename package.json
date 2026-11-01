@@ -17,6 +17,7 @@
     "i18n:check": "bun --conditions=react-server scripts/i18n-check.ts",
     "icons:audit": "bun --conditions=react-server scripts/icons-audit.ts",
     "check:seo": "bun --conditions=react-server scripts/check-seo.ts",
+    "check:bundle": "bun scripts/check-bundle.ts",
     "content:smoke": "bun --conditions=react-server scripts/content-smoke.ts",
     "sanity:schema": "bun scripts/sanity-schema.ts",
     "fixtures:generate": "bun scripts/generate-fixtures.ts && prettier --write src/lib/content/fixtures/assets.generated.ts",

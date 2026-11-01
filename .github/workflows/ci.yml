@@ -47,6 +47,7 @@ jobs:
       - run: bun run i18n:check
       - run: bun run icons:audit
       - run: bun run build
+      - run: bun run check:bundle
       - run: bun run check:seo
 
       - name: Cache Playwright browsers

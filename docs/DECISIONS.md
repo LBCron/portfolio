@@ -86,7 +86,7 @@ Latest stable unless noted. Majors are pinned with `^`; exact versions come from
 
 - **Context.** Nonces require dynamic rendering for every page (Next docs, "Static vs Dynamic Rendering with CSP") and are incompatible with PPR. Experimental SRI (`experimental.sri`) adds `integrity` to external chunks but does not cover the inline RSC flight scripts (`self.__next_f.push(...)`) that every App Router page emits; those differ per page and per revalidation, so build-time hashes are impossible under ISR.
 - **Decision.**
-  - Public routes (`next.config.ts` `headers()`): `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self'; style-src-attr 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests`, plus `experimental.sri` (`sha384`) on external chunks. `'unsafe-eval'` in development only.
+  - Public routes (`next.config.ts` `headers()`): `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self'; style-src-attr 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests`. (SRI was planned here and dropped in D56.) `'unsafe-eval'` in development only.
   - Admin routes (proxy): `script-src 'self' 'nonce-…' 'strict-dynamic'`, `style-src 'self' 'nonce-…'` + `style-src-attr 'unsafe-inline'`, otherwise identical.
 - **Consequence.** The public policy deviates from "no blanket `unsafe-inline`" for scripts. Mitigation: zero third-party origins (`connect-src`/`script-src` are `'self'` only, so injected script cannot exfiltrate or load remote code), no user-generated HTML, sanitized Markdown, JSON-LD serializer escapes `<`. Revisit when Next ships hash support for inline flight data. `style-src-attr 'unsafe-inline'` is needed by Motion and `next/image` placeholders; verified in Phase 9.
 
@@ -461,6 +461,28 @@ Latest stable unless noted. Majors are pinned with `^`; exact versions come from
 
 - **Decision.** One dynamic route tree (`/admin/[area]`, `/new`, `/[id]`) driven by `areas.ts` and `area-config.tsx`; ten areas plus Practices. Admin URLs carry only the uuid part of an id (`/admin/recommended/<uuid>`) because the proxy lowercases every URL and ids contain capitals. Forms are client components built from shared fields (`LocalizedField` with side-by-side EN/PT from 1024 px and tabs below, counters, completeness badge, copy EN → PT, identical-text warning; Markdown editor with toolbar and safe preview; image field with focal point; list editor with up/down and drag; checkbox groups; icon pickers with server-side search). The editor keeps a dirty guard (browser prompt plus a confirm on in-app links), an error summary that takes focus and links to fields, a conflict dialog and typed-confirmation delete. Saves answer with the stored document so local state matches the server (for example the new `previousSlugs`). The dashboard shows counts with hidden ones, a "needs attention" list (missing Portuguese, images without alt text, project title and summary lengths, more than six featured projects), recent changes and the two buttons.
 - **Consequence.** The dirty guard cannot stop the browser's Back button. Sidebar labels, the badge and all admin copy are English only.
+
+### D56 — Security headers as built (Phase 9)
+
+- **Context.** D4 chose the policies; Phase 9 implements them (§15). The owner chose HSTS without `preload`.
+- **Decision.**
+  - `src/lib/security/headers.ts` builds both policies and the common headers; it is dependency-free because `next.config.ts` imports it. `next.config` `headers()` puts the public CSP plus `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, a `Permissions-Policy` denying 20 unused features, `Cross-Origin-Opener-Policy` and `Cross-Origin-Resource-Policy: same-origin` and `X-Permitted-Cross-Domain-Policies: none` on **every** path, so the anonymous admin 404 carries exactly the headers of any other 404. On the allowed admin branch the proxy replaces the CSP with a per-request nonce policy (`'nonce-…' 'strict-dynamic'` for scripts, nonce for styles) and sets `Referrer-Policy: no-referrer`.
+  - `Strict-Transport-Security: max-age=63072000; includeSubDomains` and `upgrade-insecure-requests` are sent only when `NEXT_PUBLIC_SITE_URL` is https (the same switch as the `__Host-` cookie). On the plain-http e2e server WebKit would otherwise upgrade localhost requests.
+  - **`experimental.sri` is not enabled.** Under Turbopack it stamps `integrity` on only some of the chunks, and every chunk is same-origin, so it would protect little while looking complete.
+  - The zod import in `use-window-sync.ts` (the only client use) was replaced with a hand-written guard: zod v4 probes `new Function('')` for its JIT, which the CSP reports as a violation, and it put zod's runtime in the initial bundle.
+  - `tests/e2e/security.spec.ts` asserts the headers and records `securitypolicyviolation` events on the public routes, with the terminal and the lightbox open, and across the admin: zero allowed.
+- **Consequence.** `style-src-attr 'unsafe-inline'` stays (Motion and `next/image` placeholders write style attributes). The public `script-src 'unsafe-inline'` trade-off of D4 is unchanged.
+
+### D57 — Precompiled messages
+
+- **Decision.** next-intl's `experimental.messages` (`path: ./messages`, `format: json`, `precompile: true`) compiles ICU messages at build time, so the client ships the format-only runtime instead of the ICU parser (about 8 KB gzip off every public first load). Code must read messages through a translator, never as raw strings. `global-not-found.tsx` now uses `createTranslator`.
+- **Consequence.** `messages/*.json` imported in app code resolve to compiled objects; scripts run by Bun outside Next (`i18n:check`) still read the source JSON.
+
+### D58 — Bundle budgets as enforced
+
+- **Context.** §16 sets initial JS for Home at ≤ 150 KB gzip. The framework floor alone (Next 16.4 + React 19.3; `/_not-found`, which ships no app code) is **135.5 KB**, leaving 15 KB for Motion's `m` runtime (~16 KB), next-intl (~7 KB), lucide icons, tailwind-merge and the shell.
+- **Decision.** `bun run check:bundle` (CI, after the build) reads `.next/diagnostics/route-bundle-stats.json` and enforces regression ceilings instead: Home 195 KB (measured 190.7 KB after D56/D57, down from 198.9 KB), projects and detail 190 KB, accessibility and catch-all 185 KB; lazy chunks terminal ≤ 20 KB (12.6), secret ≤ 3 KB (0.9), sphere ≤ 10 KB (3.4). It also fails when a public first load contains terminal or secret code, when any chunk outside the admin's first load mentions the admin path, and when any client file contains a server-only variable name or the value of one present in the environment. `next analyze --output` gives the module breakdown.
+- **Consequence.** A documented deviation from §16 for the owner to accept or revisit: reaching 150 KB would mean dropping Motion and next-intl from the client. Lighthouse CI (Performance ≥ 95, TBT < 150 ms) remains the user-facing gate.
 
 ## 5. Contradictions found in the spec and how they are resolved
 

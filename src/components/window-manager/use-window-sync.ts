@@ -1,20 +1,42 @@
 'use client';
 
 import { useEffect } from 'react';
-import { z } from 'zod';
 
+import type { Rect } from '@/lib/window-manager/geometry';
 import { useWindowStore } from '@/stores/window-store';
 
-const savedSchema = z.object({
-  status: z.enum(['open', 'minimized']),
-  maximized: z.boolean(),
-  rect: z.object({
-    x: z.number(),
-    y: z.number(),
-    width: z.number(),
-    height: z.number(),
-  }),
-});
+interface Saved {
+  status: 'open' | 'minimized';
+  maximized: boolean;
+  rect: Rect;
+}
+
+const isNumber = (value: unknown) =>
+  typeof value === 'number' && Number.isFinite(value);
+
+/**
+ * Hand-written instead of zod: zod would add its whole runtime to the initial
+ * public bundle, and its JIT probe (`new Function`) trips the CSP (D56).
+ */
+export function parseSaved(value: unknown): Saved | null {
+  if (typeof value !== 'object' || value === null) return null;
+  const { status, maximized, rect } = value as Record<string, unknown>;
+  if (status !== 'open' && status !== 'minimized') return null;
+  if (typeof maximized !== 'boolean') return null;
+  if (typeof rect !== 'object' || rect === null) return null;
+  const { x, y, width, height } = rect as Record<string, unknown>;
+  if (![x, y, width, height].every(isNumber)) return null;
+  return {
+    status,
+    maximized,
+    rect: {
+      x: x as number,
+      y: y as number,
+      width: width as number,
+      height: height as number,
+    },
+  };
+}
 
 /**
  * Keeps the store's viewport current and persists one window to
@@ -42,8 +64,8 @@ export function useWindowSync(id: string, title: string) {
 
     try {
       const raw = sessionStorage.getItem(key);
-      const saved = raw ? savedSchema.safeParse(JSON.parse(raw)) : null;
-      if (saved?.success) store.hydrate(id, title, saved.data);
+      const saved = raw ? parseSaved(JSON.parse(raw)) : null;
+      if (saved) store.hydrate(id, title, saved);
     } catch {
       // Storage unavailable or corrupt: start from defaults.
     }

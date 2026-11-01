@@ -10,6 +10,7 @@ import {
   signSession,
   verifySession,
 } from '@/lib/auth/token';
+import { adminCsp, isHttpsSite } from '@/lib/security/headers';
 
 /**
  * Rewrite target for every request that must produce the global 404. Its
@@ -30,6 +31,10 @@ const ROOT_PASSTHROUGH = new Set([
 ]);
 
 const isProduction = process.env.NODE_ENV === 'production';
+const securityOptions = {
+  dev: process.env.NODE_ENV === 'development',
+  https: isHttpsSite(process.env['NEXT_PUBLIC_SITE_URL']),
+};
 
 function notFound(request: NextRequest) {
   return NextResponse.rewrite(new URL(NOT_FOUND_PATH, request.url));
@@ -53,7 +58,14 @@ async function guardAdmin(request: NextRequest) {
     isStrongSecret(secret) && token ? await verifySession(secret, token) : null;
   if (!isStrongSecret(secret) || !session) return notFound(request);
 
-  const response = NextResponse.next();
+  // Next reads the nonce from the request's CSP header and stamps it on its
+  // own scripts and styles while rendering the (dynamic) admin tree.
+  const nonce = btoa(crypto.randomUUID());
+  const csp = adminCsp(nonce, securityOptions);
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('Content-Security-Policy', csp);
+  const response = NextResponse.next({ request: { headers: requestHeaders } });
+  response.headers.set('Content-Security-Policy', csp);
   for (const [name, value] of Object.entries(ADMIN_HEADERS)) {
     response.headers.set(name, value);
   }
