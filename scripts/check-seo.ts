@@ -8,6 +8,8 @@ import { spawn, type ChildProcess } from 'node:child_process';
 
 import { HtmlValidate } from 'html-validate';
 
+import { SESSION_COOKIE } from '@/lib/auth/cookie';
+import { isStrongSecret, nowSeconds, signSession } from '@/lib/auth/token';
 import { DESCRIPTION_MAX, DESCRIPTION_MIN, TITLE_MAX } from '@/lib/seo/text';
 
 const PORT = Number(process.env.SEO_PORT ?? 3101);
@@ -207,18 +209,71 @@ async function checkPage(loc: string) {
     fail(`${path}: html-validate (${messages.slice(0, 3).join('; ')})`);
   }
 
-  const internals = all(text, /href="(\/(?:en|pt)\/[^"]*)"/g);
-  const seen = new Set<string>();
-  for (const href of internals) {
-    const clean = href.split('#')[0] ?? href;
-    if (seen.has(clean) || clean.includes('?')) continue;
-    seen.add(clean);
-    if (seen.size > 20) break;
-    const linked = await fetchText(clean);
-    if (linked.response.status >= 400) {
-      fail(`${path}: internal link ${clean} → ${linked.response.status}`);
+  // Social previews render (§13.8): each og:image once.
+  const ogImage = text.match(
+    /<meta[^>]*property="og:image"[^>]*content="([^"]+)"/i,
+  )?.[1];
+  if (!ogImage) fail(`${path}: missing og:image`);
+  else {
+    const imagePath = toFetch(ogImage.replaceAll('&amp;', '&'));
+    if (!imageStatus.has(imagePath)) {
+      const image = await fetch(`${BASE}${imagePath}`);
+      imageStatus.set(
+        imagePath,
+        `${image.status} ${image.headers.get('content-type') ?? ''}`,
+      );
+      await image.arrayBuffer();
+    }
+    const result = imageStatus.get(imagePath) ?? '';
+    if (!result.startsWith('200 image/png')) {
+      fail(`${path}: og:image ${imagePath} → ${result}`);
     }
   }
+
+  // Every internal link on every page, each URL fetched once (§13.10).
+  for (const href of all(text, /href="(\/(?:en|pt)(?:\/[^"]*)?)"/g)) {
+    const clean = (href.split('#')[0] ?? href).replaceAll('&amp;', '&');
+    let status = linkStatus.get(clean);
+    if (status === undefined) {
+      status = (await fetchText(clean)).response.status;
+      linkStatus.set(clean, status);
+    }
+    if (status >= 400) fail(`${path}: internal link ${clean} → ${status}`);
+  }
+}
+
+const linkStatus = new Map<string, number>();
+const imageStatus = new Map<string, string>();
+
+const NOINDEX = /\bnoindex\b/i;
+
+/** API responses and (with a test session) the admin are never indexable. */
+async function checkPrivateHeaders() {
+  const api = await fetchText('/api/terminal-content?locale=en');
+  if (!NOINDEX.test(api.response.headers.get('x-robots-tag') ?? '')) {
+    fail('/api/terminal-content: missing X-Robots-Tag noindex');
+  }
+
+  const secret = process.env['SESSION_SECRET'];
+  if (!isStrongSecret(secret)) {
+    console.warn('! SESSION_SECRET not set: admin header check skipped');
+    return;
+  }
+  const { token } = await signSession(secret, nowSeconds());
+  const admin = await fetchText('/admin', {
+    headers: { Cookie: `${SESSION_COOKIE}=${token}` },
+  });
+  const headers = admin.response.headers;
+  if (admin.response.status !== 200) {
+    fail(`/admin with a test session returned ${admin.response.status}`);
+  }
+  if (!NOINDEX.test(headers.get('x-robots-tag') ?? '')) {
+    fail('/admin: missing X-Robots-Tag noindex');
+  }
+  if (!/no-store/.test(headers.get('cache-control') ?? '')) {
+    fail('/admin: missing Cache-Control no-store');
+  }
+  if (!NOINDEX.test(admin.text)) fail('/admin: missing robots meta noindex');
 }
 
 async function extras() {
@@ -268,6 +323,7 @@ async function main() {
     const locs = await checkRobotsAndSitemap();
     for (const loc of locs) await checkPage(loc);
     await extras();
+    await checkPrivateHeaders();
   } finally {
     child?.kill('SIGTERM');
   }
