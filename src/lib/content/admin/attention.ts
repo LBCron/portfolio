@@ -47,7 +47,15 @@ const length = (field: unknown, lang: 'en' | 'pt') =>
     ? (field[lang] as string).trim().length
     : 0;
 
-/** What the dashboard lists under "needs attention" (§12.6). */
+const words = (field: unknown, lang: 'en' | 'pt') =>
+  isBag(field) && typeof field[lang] === 'string'
+    ? (field[lang] as string).split(/\s+/).filter(Boolean).length
+    : 0;
+
+/** §13.5: a project write-up under this many words reads as thin. */
+export const THIN_WORDS = 150;
+
+/** What the dashboard lists under "needs attention" (§12.6, §13.5). */
 export function findAttention(
   docs: Partial<Record<DocumentType, AdminDoc[]>>,
   featuredLimit = 6,
@@ -78,6 +86,13 @@ export function findAttention(
           if (summary > 0 && (summary < 70 || summary > 160)) {
             add(`Summary (${lang}) is ${summary} characters; aim for 70–160`);
           }
+        }
+        const en = words(doc['body'], 'en');
+        const pt = words(doc['body'], 'pt');
+        if (en < THIN_WORDS || pt < THIN_WORDS) {
+          add(
+            `Write-up has ${en} words (en) and ${pt} (pt); under ${THIN_WORDS} reads as a thin page`,
+          );
         }
       }
     }

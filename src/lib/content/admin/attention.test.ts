@@ -34,6 +34,22 @@ describe('findAttention', () => {
     expect(text).toMatch(/no alt text/);
   });
 
+  it('flags thin write-ups and stays quiet about long ones', () => {
+    const long = Array.from({ length: 160 }, () => 'word').join(' ');
+    const items = findAttention({
+      project: asDocs([
+        { id: 'project.thin', visible: true, body: { en: 'Too short.' } },
+        { id: 'project.long', visible: true, body: { en: long, pt: long } },
+        { id: 'project.hidden', visible: false },
+      ]),
+    });
+    const thin = items.filter((item) => /thin page/.test(item.issue));
+    expect(thin.map((item) => item.id)).toEqual(['project.thin']);
+    expect(thin[0]?.issue).toBe(
+      'Write-up has 2 words (en) and 0 (pt); under 150 reads as a thin page',
+    );
+  });
+
   it('warns when more than six projects are featured', () => {
     const many = Array.from({ length: 7 }, (_, index) => ({
       id: `project.${index}`,
