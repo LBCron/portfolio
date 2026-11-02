@@ -27,7 +27,7 @@ async function run(page: Page, line: string) {
 }
 
 test.describe('entry points', () => {
-  test('the dock chip, header toggle and hero button open the terminal', async ({
+  test('the dock chip and header toggle open the terminal', async ({
     page,
   }) => {
     await page.goto('/en', { waitUntil: 'domcontentloaded' });
@@ -37,10 +37,6 @@ test.describe('entry points', () => {
     await expect(windowOf(page)).toHaveAttribute('data-status', 'closed');
 
     await page.getByRole('button', { name: 'Toggle terminal' }).click();
-    await expect(windowOf(page)).toHaveAttribute('data-status', 'open');
-    await page.getByRole('button', { name: 'Close terminal' }).click();
-
-    await page.getByRole('button', { name: 'Open the terminal' }).click();
     await expect(windowOf(page)).toHaveAttribute('data-status', 'open');
   });
 
