@@ -128,8 +128,8 @@ bun run sanity:seed --dataset development --reset
 bun run sanity:seed --dataset production --force   # never for real content
 ```
 
-- Writes the Appendix A fixtures (86 documents) in one `createOrReplace` transaction with stable ids, so re-running is idempotent.
-- Uploads the 13 images and 2 PDFs from `public/fixtures`. Sanity deduplicates assets by content hash, and only `lqip` metadata is extracted.
+- Writes the Appendix A fixtures (136 documents) in one `createOrReplace` transaction with stable ids, so re-running is idempotent.
+- Uploads the 14 images and 2 PDFs from `public/fixtures`. Sanity deduplicates assets by content hash, and only `lqip` metadata is extracted.
 - `--reset` deletes documents with `isFixture == true` only, after you type the dataset name in an interactive terminal.
 - Refuses `production` without `--force`.
 
@@ -137,7 +137,7 @@ bun run sanity:seed --dataset production --force   # never for real content
 
 After seeding `development`, run `bun run content:smoke`. It reads every repository method in both locales from Sanity and from fixtures, and fails on any difference other than asset URLs, LQIPs and revision metadata, or on any content warning. The repository equality test proves the same offline against `groq-js` (D27); the live run covers the hosted GROQ engine, the auth header and the asset pipeline.
 
-Last run, 2026-10-13, on `development`: 86 documents and 15 assets seeded; re-seeding left the totals unchanged (101 documents, 0 drafts); `content:smoke` passed, with all 24 reads matching.
+Last run, 2026-11-02, on `development`: `--reset` deleted 145 fixture documents (renamed technologies had left stale copies, e.g. `HTML5` next to `HTML`), then 136 documents and 16 assets were seeded; `content:smoke` passed, with all 24 reads matching. A plain re-seed never deletes, so use `--reset` after fixture ids change.
 
 ## Webhook (Phase 8)
 
