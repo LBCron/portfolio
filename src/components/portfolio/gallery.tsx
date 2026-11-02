@@ -65,7 +65,10 @@ export function Gallery({ images }: GalleryProps) {
               aria-label={t('openImage', {
                 index: imageIndex + 1,
                 total: images.length,
-                alt: image.alt,
+                // The visible caption must be part of the name (WCAG 2.5.3).
+                alt: image.caption
+                  ? `${image.alt}. ${image.caption}`
+                  : image.alt,
               })}
               className="group relative block w-full overflow-hidden rounded-md border border-line text-left"
             >

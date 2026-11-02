@@ -408,7 +408,7 @@
     },
     "practicesTitle": "Practices and concepts",
     "filterLabel": "Filter by category",
-    "filterChip": "{category}, {count, plural, one {# technology} other {# technologies}}",
+    "filterChip": "{category} {count, plural, one {# technology} other {# technologies}}",
     "officialSite": "Official site ↗"
   },
   "work": {

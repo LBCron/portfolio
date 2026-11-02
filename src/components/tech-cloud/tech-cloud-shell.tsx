@@ -159,7 +159,7 @@ export function TechCloudShell({
                 : 'border-line text-text-2 hover-fine:border-line-strong hover-fine:text-text-1',
             )}
           >
-            {label}
+            {label}{' '}
             <span aria-hidden="true" className="text-text-3 tabular-nums">
               {count}
             </span>
