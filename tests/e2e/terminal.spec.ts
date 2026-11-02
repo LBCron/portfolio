@@ -332,6 +332,65 @@ test.describe('shell', () => {
   });
 });
 
+test.describe('easter eggs', () => {
+  test('sudo, rm and the editors stay harmless', async ({ page }) => {
+    await openTerminal(page);
+    await run(page, 'sudo rm -rf /');
+    await expect(logOf(page)).toContainText(
+      'visitor is not in the sudoers file.',
+    );
+    await run(page, 'rm -rf /');
+    await expect(logOf(page)).toContainText('rm: refusing to remove that.');
+    await run(page, 'nano about.md');
+    await expect(logOf(page)).toContainText('No editors here');
+    await expect(logOf(page)).not.toContainText(/admin/i);
+    await run(page, 'help');
+    await expect(logOf(page)).toContainText('fortune');
+  });
+
+  test('cowsay is labelled art and fortune prints a maxim', async ({
+    page,
+  }) => {
+    await openTerminal(page);
+    await run(page, 'cowsay make it kind');
+    await expect(
+      page.getByRole('img', { name: 'A cow says: make it kind' }),
+    ).toContainText('< make it kind >');
+    await run(page, 'fortune');
+    await expect(logOf(page).locator('[data-block=text]').last()).toHaveText(
+      /\.$/,
+    );
+  });
+
+  test('matrix rains for about four seconds, then stops', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await openTerminal(page);
+    await run(page, 'matrix');
+    const rain = windowOf(page).locator('[data-effect=matrix]');
+    await expect(rain).toBeVisible();
+    await expect(rain).toHaveAttribute('aria-hidden', 'true');
+    await expect(rain).toHaveCount(0, { timeout: 8_000 });
+    await expect(logOf(page)).toContainText('The rain stops.');
+  });
+
+  test('Ctrl+C stops the rain; reduced motion skips it', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await openTerminal(page);
+    await run(page, 'matrix');
+    const rain = windowOf(page).locator('[data-effect=matrix]');
+    await expect(rain).toBeVisible();
+    await inputOf(page).press('Control+c');
+    await expect(rain).toHaveCount(0);
+
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await run(page, 'matrix');
+    await expect(logOf(page)).toContainText(
+      'The rain stays off while animations are reduced or paused.',
+    );
+    await expect(rain).toHaveCount(0);
+  });
+});
+
 test.describe('snapshot endpoint', () => {
   test('is public, noindex and free of hidden or private data', async ({
     request,

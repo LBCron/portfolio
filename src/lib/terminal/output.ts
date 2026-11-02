@@ -32,7 +32,13 @@ export type OutputNode =
   | { type: 'table'; head?: string[]; rows: string[][] }
   | { type: 'tree'; lines: string[] }
   | { type: 'kv'; items: KvItem[] }
-  | { type: 'ascii'; lines: string[]; fallback?: string }
+  | {
+      type: 'ascii';
+      lines: string[];
+      fallback?: string;
+      /** Meaningful art: read as an image with this name, shown when narrow. */
+      label?: string;
+    }
   | { type: 'spinner'; label: string }
   | { type: 'blank' };
 

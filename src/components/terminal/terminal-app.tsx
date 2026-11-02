@@ -17,15 +17,20 @@ import { text, type Span } from '@/lib/terminal/output';
 import { defaultRegistry, isRecordable } from '@/lib/terminal/registry';
 import { loadSession, saveSession } from '@/lib/terminal/session';
 import { emptySnapshot } from '@/lib/terminal/snapshot';
+import type { TerminalEffect } from '@/lib/terminal/commands/types';
 import type { Translate } from '@/lib/terminal/vfs';
 import { isApplePlatform, TERMINAL_SHORTCUT } from '@/lib/shortcuts';
-import { useReducedMotionPreference } from '@/lib/motion-preference';
+import {
+  isMotionReduced,
+  useReducedMotionPreference,
+} from '@/lib/motion-preference';
 import { useSessionStore } from '@/stores/session-store';
 import { useTerminalStore } from '@/stores/terminal-store';
 import { useWindowStore } from '@/stores/window-store';
 
 import { loadTranslator } from './catalog';
 import { InputLine } from './input-line';
+import { MatrixRain } from './matrix-rain';
 import { OutputRenderer } from './output-renderer';
 import { loadSnapshot, peekSnapshot } from './snapshot-client';
 import { useTerminalActions } from './use-terminal-actions';
@@ -78,6 +83,7 @@ export default function TerminalApp() {
   const session = useSessionStore((state) => state.session);
   const admin = session !== null;
   const [secretInput, setSecretInput] = useState(false);
+  const [effect, setEffect] = useState<TerminalEffect | null>(null);
   const secretResolver = useRef<((value: string | null) => void) | null>(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -195,7 +201,9 @@ export default function TerminalApp() {
       t: translator,
       cwd: state.cwd,
       history: state.history,
-      actions,
+      actions: { ...actions, effect: setEffect },
+      // Read live: a ref updated by an effect can lag a just-changed setting.
+      reducedMotion: isMotionReduced(),
       session: useSessionStore.getState().session,
       loadSecret: () => import('@/lib/terminal/commands/secret'),
       readSecret: (label, signal) =>
@@ -323,32 +331,35 @@ export default function TerminalApp() {
       ref={rootRef}
       className="flex size-full flex-col font-mono text-[13px] leading-[1.55] max-[480px]:text-xs"
     >
-      <div
-        ref={logRef}
-        role="log"
-        aria-label={t('terminal.outputLabel')}
-        aria-live="polite"
-        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a scrollable log must be keyboard reachable
-        tabIndex={0}
-        onScroll={(event) => {
-          const el = event.currentTarget;
-          stickToBottom.current =
-            el.scrollHeight - el.scrollTop - el.clientHeight < 24;
-        }}
-        className="min-h-0 flex-1 overflow-y-auto px-3 py-2"
-      >
-        {blocks.map((block) => (
-          <OutputRenderer
-            key={block.id}
-            block={block}
-            t={t}
-            skipTyping={skipTyping}
-            onRun={(command) => {
-              void run(command);
-              inputRef.current?.focus({ preventScroll: true });
-            }}
-          />
-        ))}
+      <div className="relative flex min-h-0 flex-1 flex-col">
+        <div
+          ref={logRef}
+          role="log"
+          aria-label={t('terminal.outputLabel')}
+          aria-live="polite"
+          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a scrollable log must be keyboard reachable
+          tabIndex={0}
+          onScroll={(event) => {
+            const el = event.currentTarget;
+            stickToBottom.current =
+              el.scrollHeight - el.scrollTop - el.clientHeight < 24;
+          }}
+          className="min-h-0 flex-1 overflow-y-auto px-3 py-2"
+        >
+          {blocks.map((block) => (
+            <OutputRenderer
+              key={block.id}
+              block={block}
+              t={t}
+              skipTyping={skipTyping}
+              onRun={(command) => {
+                void run(command);
+                inputRef.current?.focus({ preventScroll: true });
+              }}
+            />
+          ))}
+        </div>
+        {effect === 'matrix' ? <MatrixRain /> : null}
       </div>
 
       <ul

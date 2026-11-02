@@ -2,6 +2,7 @@ import type { Command } from './commands/types';
 import { isSecretName } from './commands/secret/names';
 import { exploreCommands } from './commands/public/explore';
 import { fileCommands } from './commands/public/files';
+import { funCommands } from './commands/public/fun';
 import { systemCommands } from './commands/public/system';
 import { didYouMean } from './suggest';
 
@@ -48,6 +49,7 @@ export const publicCommands: readonly Command[] = [
   ...fileCommands,
   ...exploreCommands,
   ...systemCommands,
+  ...funCommands,
 ];
 
 export const defaultRegistry = createRegistry(publicCommands);

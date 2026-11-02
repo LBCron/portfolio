@@ -9,7 +9,7 @@ import { createHarness, flatten } from './test-utils';
 const LOCALES: AppLocale[] = ['en', 'pt'];
 
 const secret: Command = {
-  name: 'sudoku',
+  name: 'zyzzyva',
   summaryKey: 'terminal.commands.help.summary',
   usageKey: 'terminal.commands.help.usage',
   group: 'fun',
@@ -297,19 +297,19 @@ describe('engine behavior', () => {
 describe('secret commands', () => {
   it('never appear in help, suggestions or recordable history', async () => {
     const harness = await createHarness('en', { extraCommands: [secret] });
-    expect(flatten(await harness.run('help'))).not.toContain('sudoku');
-    expect(flatten(await harness.run('sudok'))).not.toContain(
-      'Did you mean sudoku',
+    expect(flatten(await harness.run('help'))).not.toContain('zyzzyva');
+    expect(flatten(await harness.run('zyzzyv'))).not.toContain(
+      'Did you mean zyzzyva',
     );
-    expect(harness.deps.registry.suggest('sudoku')).toBeNull();
-    expect(harness.deps.registry.isSecret('sudoku')).toBe(true);
-    expect(defaultRegistry.isSecret('sudoku')).toBe(false);
+    expect(harness.deps.registry.suggest('zyzzyva')).toBeNull();
+    expect(harness.deps.registry.isSecret('zyzzyva')).toBe(true);
+    expect(defaultRegistry.isSecret('zyzzyva')).toBe(false);
   });
 
   it('are indistinguishable from unknown commands while unavailable', async () => {
     const unavailable = await createHarness('en');
-    const typed = await unavailable.run('sudoku');
-    const unknown = await unavailable.run('sudokx');
-    expect(flatten(typed)).toBe(flatten(unknown).replace('sudokx', 'sudoku'));
+    const typed = await unavailable.run('zyzzyva');
+    const unknown = await unavailable.run('zyzzyx');
+    expect(flatten(typed)).toBe(flatten(unknown).replace('zyzzyx', 'zyzzyva'));
   });
 });

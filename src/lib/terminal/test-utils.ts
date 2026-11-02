@@ -88,6 +88,7 @@ export async function createHarness(
     session?: SessionInfo | null;
     readSecret?: EngineDeps['readSecret'];
     loadSecret?: EngineDeps['loadSecret'];
+    reducedMotion?: boolean;
   } = {},
 ): Promise<Harness> {
   const snapshot = await fixtureSnapshot(locale);
@@ -102,6 +103,7 @@ export async function createHarness(
     openExternal: (url) => calls.push(`external:${url}`),
     goTo: (url) => calls.push(`goto:${url}`),
     setSession: (session) => calls.push(session ? 'session:on' : 'session:off'),
+    effect: (effect) => calls.push(`effect:${effect ?? 'off'}`),
     window: {
       close: () => calls.push('close'),
       minimize: () => calls.push('minimize'),
@@ -126,6 +128,7 @@ export async function createHarness(
       if (signal.aborted) throw new Error('aborted');
     },
     shortcutLabel: 'Ctrl /',
+    reducedMotion: options.reducedMotion ?? false,
     session: options.session ?? null,
     ...(options.readSecret ? { readSecret: options.readSecret } : {}),
     ...(options.loadSecret ? { loadSecret: options.loadSecret } : {}),

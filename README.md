@@ -7,7 +7,7 @@ The initial content is fictional demo data; [docs/ADDING_CONTENT.md](docs/ADDING
 ## Features
 
 - **Public site:** Home (hero, about, stack, selected work, résumé, contact, recommended people), `/projects` with a crawlable filter and pagination, project detail pages with a gallery lightbox, a résumé PDF route, and an accessibility statement, all in `/en` and `/pt`.
-- **Terminal:** a windowed shell (`Ctrl/Cmd + /`) that knows the site: `help`, `ls`, `cd`, `cat`, `tree`, `open`, `goto`, `lang`, `projects`, `resume`, `neofetch`, `git log` and more, with history and Tab completion. It can be moved, resized, snapped, minimized and maximized, and becomes a bottom sheet on phones.
+- **Terminal:** a windowed shell (`Ctrl/Cmd + /`) that knows the site: `help`, `ls`, `cd`, `cat`, `tree`, `open`, `goto`, `lang`, `projects`, `resume`, `neofetch`, `git log`, a few harmless easter eggs (`fortune`, `cowsay`, `matrix`, `sudo`…) and more, with history and Tab completion. It can be moved, resized, snapped, minimized and maximized, and becomes a bottom sheet on phones.
 - **Technology cloud:** a rotating geoid of logos with category filters; the List view is the no-JS, reduced-motion and screen-reader equivalent.
 - **Admin:** `su julio` in the terminal opens a session for `/admin`, where every piece of content is edited. Anonymous requests get the same 404 as any unknown URL.
 - **Quality bar:** WCAG 2.2 AA, maximal SEO (metadata, JSON-LD, sitemap, hreflang, OG images), strict security headers, and no third-party requests, trackers or cookies for visitors.

@@ -24,6 +24,8 @@ export interface EngineDeps {
   loadContent(): Promise<ContentSnapshot>;
   /** Pause for `ms`; resolves at once with reduced motion, rejects on abort. */
   delay(ms: number, signal: AbortSignal): Promise<void>;
+  /** Reduced motion or Pause animations is on. */
+  reducedMotion?: boolean;
   shortcutLabel: string;
   /** The client's view of the admin session (a hint, never authority). */
   session?: SessionInfo | null;
@@ -60,6 +62,7 @@ export function buildContext(
     commands: () => deps.registry.publicCommands(),
     shortcutLabel: deps.shortcutLabel,
     delay: (ms) => deps.delay(ms, signal),
+    reducedMotion: deps.reducedMotion ?? false,
     readSecret: (label) =>
       deps.readSecret?.(label, signal) ?? Promise.resolve(null),
   };

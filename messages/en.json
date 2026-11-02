@@ -242,6 +242,84 @@
       "git": {
         "summary": "The career as a commit log.",
         "usage": "git log --oneline"
+      },
+      "fortune": {
+        "summary": "Print a short engineering maxim.",
+        "usage": "fortune"
+      },
+      "cowsay": {
+        "summary": "Let a cow say it.",
+        "usage": "cowsay [text...]"
+      },
+      "matrix": {
+        "summary": "A few seconds of green rain.",
+        "usage": "matrix"
+      },
+      "ping": {
+        "summary": "Check that this site is still here.",
+        "usage": "ping [host]"
+      },
+      "ssh": {
+        "summary": "Try to open a remote shell.",
+        "usage": "ssh [host]"
+      },
+      "sudo": {
+        "summary": "Ask for superpowers.",
+        "usage": "sudo command..."
+      },
+      "rm": {
+        "summary": "Remove files (not really).",
+        "usage": "rm [-rf] path"
+      },
+      "vim": {
+        "summary": "Open an editor (also vi, nano, emacs).",
+        "usage": "vim [file]"
+      }
+    },
+    "fun": {
+      "sudo": {
+        "denied": "visitor is not in the sudoers file. This incident will be reported.",
+        "joke": "To nobody, really. Nice try, though."
+      },
+      "rm": {
+        "refuse": "rm: refusing to remove that. Recursively deleting a website from inside it is a bold plan.",
+        "joke": "Everything here is read-only, including my sense of humor about this.",
+        "readOnly": "rm: cannot remove {path}: read-only file system"
+      },
+      "editor": "No editors here: this file system is read-only. On the bright side, you will never have to figure out how to quit.",
+      "ping": {
+        "header": "PING {host} (127.0.0.1): 56 data bytes",
+        "reply": "64 bytes from {host}: icmp_seq={seq} ttl=64 time={time} ms",
+        "summary": "{count} packets sent, {count} received. Latency: low. Curiosity: high.",
+        "offline": "ping: {host}: this terminal has no network access. To reach Julio, try contact."
+      },
+      "ssh": {
+        "refused": "ssh: connect to host {host} port 22: Connection refused",
+        "joke": "No remote shells here. The whole site already fits in this window."
+      },
+      "matrix": {
+        "done": "The rain stops. It was only CSS all along.",
+        "reduced": "The rain stays off while animations are reduced or paused."
+      },
+      "cowsay": {
+        "default": "Moo. Type help for the real commands.",
+        "label": "A cow says: {message}"
+      }
+    },
+    "fortune": {
+      "items": {
+        "names": "Name things for the person reading the code at 2 a.m., in the middle of an incident.",
+        "deleted": "The fastest code is the code you deleted last sprint.",
+        "cache": "Every cache is a promise that someone will have to keep.",
+        "estimate": "An estimate without its assumptions written next to it is a wish.",
+        "logs": "Logs are letters to your future self. Write legibly.",
+        "rollback": "A migration you cannot roll back is a decision, not a change.",
+        "boring": "Ship the boring version first. It pays for the interesting one.",
+        "a11y": "Accessibility bugs are bugs. The people they hit are just less likely to file the ticket.",
+        "abstraction": "The right abstraction is usually the third one. The first two teach you what it is.",
+        "tests": "Tests are how you tell the next developer what you meant.",
+        "profile": "Profile first. Intuition is a hypothesis, not a measurement.",
+        "dependency": "Every dependency is a teammate you never interviewed."
       }
     }
   },

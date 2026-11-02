@@ -242,6 +242,84 @@
       "git": {
         "summary": "A carreira como um log de commits.",
         "usage": "git log --oneline"
+      },
+      "fortune": {
+        "summary": "Mostra uma máxima curta de engenharia.",
+        "usage": "fortune"
+      },
+      "cowsay": {
+        "summary": "Deixa a vaca falar por você.",
+        "usage": "cowsay [texto...]"
+      },
+      "matrix": {
+        "summary": "Alguns segundos de chuva verde.",
+        "usage": "matrix"
+      },
+      "ping": {
+        "summary": "Confere se este site continua no ar.",
+        "usage": "ping [host]"
+      },
+      "ssh": {
+        "summary": "Tenta abrir um shell remoto.",
+        "usage": "ssh [host]"
+      },
+      "sudo": {
+        "summary": "Pede superpoderes.",
+        "usage": "sudo comando..."
+      },
+      "rm": {
+        "summary": "Remove arquivos (só que não).",
+        "usage": "rm [-rf] caminho"
+      },
+      "vim": {
+        "summary": "Abre um editor (também vi, nano, emacs).",
+        "usage": "vim [arquivo]"
+      }
+    },
+    "fun": {
+      "sudo": {
+        "denied": "visitor não está no arquivo sudoers. Este incidente será reportado.",
+        "joke": "Para ninguém, na verdade. Mas valeu a tentativa."
+      },
+      "rm": {
+        "refuse": "rm: me recuso a apagar isso. Excluir um site recursivamente de dentro dele é um plano ousado.",
+        "joke": "Aqui tudo é somente leitura, inclusive meu senso de humor sobre isso.",
+        "readOnly": "rm: não foi possível remover {path}: sistema de arquivos somente leitura"
+      },
+      "editor": "Nada de editor por aqui: o sistema de arquivos é somente leitura. O lado bom é que você nunca vai precisar descobrir como sair.",
+      "ping": {
+        "header": "PING {host} (127.0.0.1): 56 bytes de dados",
+        "reply": "64 bytes de {host}: icmp_seq={seq} ttl=64 tempo={time} ms",
+        "summary": "{count} pacotes enviados, {count} recebidos. Latência: baixa. Curiosidade: alta.",
+        "offline": "ping: {host}: este terminal não tem acesso à rede. Para falar com o Julio, use contact."
+      },
+      "ssh": {
+        "refused": "ssh: conexão com o host {host} na porta 22 recusada",
+        "joke": "Nada de shell remoto por aqui. O site inteiro já cabe nesta janela."
+      },
+      "matrix": {
+        "done": "A chuva passou. Era só CSS o tempo todo.",
+        "reduced": "A chuva fica desligada enquanto as animações estiverem reduzidas ou pausadas."
+      },
+      "cowsay": {
+        "default": "Muu. Digite help para ver os comandos de verdade.",
+        "label": "Uma vaca diz: {message}"
+      }
+    },
+    "fortune": {
+      "items": {
+        "names": "Dê nomes pensando em quem vai ler o código às 2 da manhã, no meio de um incidente.",
+        "deleted": "O código mais rápido é aquele que você apagou na última sprint.",
+        "cache": "Todo cache é uma promessa que alguém vai ter que cumprir.",
+        "estimate": "Estimativa sem as premissas escritas do lado é só um desejo.",
+        "logs": "Log é carta para o seu eu do futuro. Capriche na letra.",
+        "rollback": "Migration sem rollback é decisão, não mudança.",
+        "boring": "Entregue primeiro a versão sem graça. É ela que paga a interessante.",
+        "a11y": "Bug de acessibilidade também é bug. Só que quem sofre com ele raramente consegue abrir o chamado.",
+        "abstraction": "A abstração certa costuma ser a terceira. As duas primeiras ensinam o que ela deveria ser.",
+        "tests": "Teste é como você explica para o próximo dev o que queria dizer.",
+        "profile": "Meça antes de otimizar. Intuição é hipótese, não medição.",
+        "dependency": "Toda dependência é um colega de time que você nunca entrevistou."
       }
     }
   },

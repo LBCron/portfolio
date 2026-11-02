@@ -9,6 +9,9 @@ export type { ParsedArgs };
 
 export type CommandGroup = 'navigate' | 'explore' | 'site' | 'fun';
 
+/** Short visual effects the terminal UI can play over its body. */
+export type TerminalEffect = 'matrix';
+
 /** A live admin session as the server reported it. */
 export interface SessionInfo {
   expiresAt: number;
@@ -27,6 +30,8 @@ export interface CommandActions {
   /** Full page load, for leaving the public site (the admin is another app). */
   goTo(url: string): void;
   setSession(session: SessionInfo | null): void;
+  /** Starts (or, with null, stops) a visual effect over the terminal body. */
+  effect(effect: TerminalEffect | null): void;
   window: { close(): void; minimize(): void; maximize(): void };
 }
 
@@ -46,6 +51,8 @@ export interface CommandContext {
   shortcutLabel: string;
   /** Abortable pause; resolves immediately with reduced motion. */
   delay(ms: number): Promise<void>;
+  /** Reduced motion or Pause animations: skip anything animated. */
+  reducedMotion: boolean;
   /** Secret-input mode: resolves with the typed value, or null on Ctrl+C. */
   readSecret(label: string): Promise<string | null>;
 }

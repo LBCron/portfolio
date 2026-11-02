@@ -373,6 +373,43 @@ html[data-motion='reduced']::view-transition-new(*) {
   animation: none !important;
 }
 
+/* `matrix` in the terminal: 4s of falling columns, transforms only. */
+.matrix-rain {
+  container-type: size;
+  animation: matrix-fade 4s linear both;
+}
+
+.matrix-column {
+  position: absolute;
+  top: 0;
+  white-space: pre;
+  line-height: 1.15;
+  color: var(--color-term-green);
+  mask-image: linear-gradient(to bottom, transparent, #000 75%);
+  transform: translateY(-100%);
+  animation: matrix-fall var(--fall) linear var(--wait) 3 both;
+}
+
+@keyframes matrix-fade {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  8%,
+  90% {
+    opacity: 1;
+  }
+}
+
+@keyframes matrix-fall {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(100cqh);
+  }
+}
+
 /* Delayed entrances must not wait out their delay with reduced motion. */
 @media (prefers-reduced-motion: reduce) {
   .reveal-word > span,

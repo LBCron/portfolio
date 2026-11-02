@@ -19,7 +19,7 @@ function openInNewTab(href: string) {
 }
 
 /** What commands may do to the site; the window stays open throughout. */
-export function useTerminalActions(): CommandActions {
+export function useTerminalActions(): Omit<CommandActions, 'effect'> {
   const router = useRouter();
   const pathname = usePathname();
 

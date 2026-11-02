@@ -22,7 +22,8 @@ function isPausedSnapshot() {
   return document.documentElement.dataset.motion === 'reduced';
 }
 
-function isReducedSnapshot() {
+/** Reads the preference right now (system setting or site toggle). */
+export function isMotionReduced() {
   return isPausedSnapshot() || window.matchMedia(REDUCED_QUERY).matches;
 }
 
@@ -33,7 +34,7 @@ export function useMotionPaused() {
 
 /** True when motion must be reduced: system preference or site toggle. */
 export function useReducedMotionPreference() {
-  return useSyncExternalStore(subscribe, isReducedSnapshot, () => false);
+  return useSyncExternalStore(subscribe, isMotionReduced, () => false);
 }
 
 export function setMotionPaused(paused: boolean) {

@@ -248,6 +248,23 @@ function Node({
       );
 
     case 'ascii':
+      if (node.label) {
+        // Meaningful art (cowsay): one image with a name; plain text when narrow.
+        return (
+          <div className="@container">
+            <pre
+              role="img"
+              aria-label={node.label}
+              className="leading-tight text-text-1 @max-[20rem]:hidden"
+            >
+              {node.lines.join('\n')}
+            </pre>
+            <p className="hidden text-text-1 @max-[20rem]:block">
+              {node.label}
+            </p>
+          </div>
+        );
+      }
       return (
         <div className="@container">
           <pre

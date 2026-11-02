@@ -527,6 +527,15 @@ Latest stable unless noted. Majors are pinned with `^`; exact versions come from
   - Motion is CSS transitions only, so reduced motion and Pause animations make it instant (existing global rule); forced colors hide it (`decorative`), like before.
 - **Consequence.** Snapping feels like a desktop OS and the preview never strobes. Covered in `geometry.test.ts` and `window.spec.ts` (arming box, hysteresis, disarm without snapping, transition duration with and without reduced motion).
 
+### D64 — Terminal easter eggs (Phase 10)
+
+- **Context.** §10.4 lists easter eggs as SHOULD; D50 left them out of Phase 6.
+- **Decision.**
+  - `src/lib/terminal/commands/public/fun.ts` adds, all in the help "Fun" group, localized in both catalogs (`terminal.fun.*`, `terminal.fortune.items.*`) and inside the lazy terminal chunk: `fortune` (12 original engineering maxims, not quotations), `cowsay [text]` (classic cow, word-wrapped at 36 columns by code point; rendered as one `role="img"` with the message as its name, plain text below 20 rem), `matrix`, `ping [host]` (four made-up replies 250 ms apart for `julio-muller`/`localhost`, abortable; any other host says there is no network and offers `contact`), `ssh [host]` (connection refused), `sudo …` (not in the sudoers file; it never runs or grants anything), `rm` (read-only file system; `rm -r` on `/`, `~`, `.` or `..` politely refuses) and `vim` with aliases `vi`, `nano`, `emacs` (one shared line about the read-only file system).
+  - `matrix` asks the UI for an effect through a new `actions.effect('matrix' | null)` and waits 4 s with the abortable `ctx.delay`, switching it off in `finally` (Ctrl+C or closing the window ends it). `MatrixRain` is 32 CSS-animated columns of fixed glyphs (deterministic, transforms only, no glyph swapping, so nothing flashes; two React state updates in total). `ctx.reducedMotion` (reduced motion or Pause animations) skips it with a one-line message; the global reduced-motion rule also stops it mid-way.
+  - None of the outputs mentions the admin, `su`, sessions or passwords (unit-tested for every egg); `sudo` is public, so the engine test's fake secret command was renamed from `sudoku` to avoid a legitimate "did you mean sudo".
+- **Consequence.** The help list grows by eight lines. The terminal chunk grows by about 2 KB gzip (still under its 20 KB ceiling, D58); strings live in the lazy catalog.
+
 ## 5. Contradictions found in the spec and how they are resolved
 
 1. `dynamicParams` "stays on" (§3.1, §8.5) vs Cache Components rejecting the export → D1.
