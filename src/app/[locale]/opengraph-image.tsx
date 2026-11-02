@@ -17,7 +17,7 @@ export default async function Image({
   const resolved = isAppLocale(locale) ? locale : routing.defaultLocale;
   const profile = await getContent().getProfile(resolved);
   return renderOgImage({
-    title: profile?.heroHeadline ?? owner.name,
+    title: profile?.displayName ?? owner.name,
     subtitle: profile?.jobTitle ?? owner.jobTitle,
     alt,
     photoUrl: profile?.photo?.url,

@@ -15,7 +15,7 @@ const VISIBLE = /* groq */ `visible != false`;
 const TECH_REFS = /* groq */ `*[_type == "technology"]{ "id": _id, visible }`;
 
 const PROFILE_FIELDS = /* groq */ `
-  ${META}, displayName, jobTitle, heroHeadline, heroLead, rotatingWords,
+  ${META}, displayName, jobTitle, heroLead, titleFont,
   "photo": photo{ ${IMAGE} },
   "photoLg": photoLg{ ${IMAGE} },
   bio, location, spokenLanguages, focus,

@@ -1,8 +1,14 @@
 import { z } from 'zod';
 
-import { techCategories } from './taxonomy';
+import { techCategories, titleFonts } from './taxonomy';
 
-export { techCategories, type TechCategory } from './taxonomy';
+export {
+  techCategories,
+  titleFontLabels,
+  titleFonts,
+  type TechCategory,
+  type TitleFont,
+} from './taxonomy';
 
 /**
  * The content contract. Every adapter hands documents in this shape (localized
@@ -166,9 +172,9 @@ export const profileSchema = z.object({
   id: z.literal('profile'),
   displayName: text(80),
   jobTitle: localized(80),
-  heroHeadline: localized(90),
-  heroLead: localized(280),
-  rotatingWords: z.array(localized(40)).min(1).max(6),
+  heroLead: localized(120),
+  /** Font of the hero title; unset is the site font. */
+  titleFont: z.enum(titleFonts).optional(),
   photo: imageSchema.optional(),
   /** Side-by-side hero art (lg+); falls back to `photo` when absent. */
   photoLg: imageSchema.optional(),
@@ -210,7 +216,7 @@ export const resumeSchema = z.object({
 // --- Collections -------------------------------------------------------------
 
 export const linkKinds = ['social', 'site', 'other'] as const;
-export const linkPlacements = ['hero', 'contact', 'footer'] as const;
+export const linkPlacements = ['header', 'contact', 'footer'] as const;
 
 /** `simple-icons:<slug>`, `lucide:<name>` or the generic `link`. */
 export const linkIconSchema = z.union([

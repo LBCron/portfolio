@@ -2,6 +2,7 @@ import {
   featuredLinkSchema,
   hasNoRawHtml,
   httpsUrlSchema,
+  profileSchema,
   projectSchema,
   slugSchema,
   technologySchema,
@@ -12,6 +13,7 @@ const dataset = createFixtureDataset();
 const project = dataset.project[0];
 const link = dataset.featuredLink[0];
 const tech = dataset.technology[0];
+const profile = dataset.profile[0];
 
 describe('content schema', () => {
   it.each([
@@ -34,6 +36,29 @@ describe('content schema', () => {
     ['orbit_x', false],
   ])('slug %s → %s', (value, ok) => {
     expect(slugSchema.safeParse(value).success).toBe(ok);
+  });
+
+  it('validates the profile title font and lead length', () => {
+    expect(profileSchema.safeParse(profile).success).toBe(true);
+    expect(
+      profileSchema.safeParse({ ...profile, titleFont: 'comic-sans' }).success,
+    ).toBe(false);
+    const long = 'x'.repeat(121);
+    expect(
+      profileSchema.safeParse({
+        ...profile,
+        heroLead: { en: long, pt: long },
+      }).success,
+    ).toBe(false);
+  });
+
+  it('rejects the retired hero link placement', () => {
+    expect(
+      featuredLinkSchema.safeParse({ ...link, placements: ['hero'] }).success,
+    ).toBe(false);
+    expect(
+      featuredLinkSchema.safeParse({ ...link, placements: ['header'] }).success,
+    ).toBe(true);
   });
 
   it('accepts mailto only where allowed', () => {

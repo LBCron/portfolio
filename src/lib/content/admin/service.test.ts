@@ -196,7 +196,7 @@ describe('save', () => {
     const result = await service.save(
       'featuredLink',
       link.id,
-      { ...full, placements: ['hero'] },
+      { ...full, placements: ['header'] },
       full.rev,
     );
     expect(result).toMatchObject({ ok: true });

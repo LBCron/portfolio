@@ -3,6 +3,7 @@ import type {
   ProjectStatus,
   SvgData,
   TechCategory,
+  TitleFont,
   linkKinds,
   linkPlacements,
 } from './schema';
@@ -37,9 +38,8 @@ export interface Metric {
 export interface Profile {
   displayName: string;
   jobTitle: string;
-  heroHeadline: string;
   heroLead: string;
-  rotatingWords: string[];
+  titleFont?: TitleFont;
   photo?: ImageRef;
   /** Side-by-side hero art (lg+); falls back to `photo` when absent. */
   photoLg?: ImageRef;

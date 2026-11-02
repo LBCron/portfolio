@@ -1,9 +1,12 @@
 'use client';
 
+import { titleFontLabels, titleFonts } from '@/lib/content/taxonomy';
+
 import {
   LocalizedField,
   NumberField,
   Section,
+  SelectField,
   TextField,
   ToggleField,
 } from '../editor/fields';
@@ -36,25 +39,22 @@ export function ProfileForm() {
       </Section>
 
       <Section title="Hero">
-        <LocalizedField path="heroHeadline" label="Headline" max={90} />
         <LocalizedField
           path="heroLead"
           label="Lead paragraph"
-          max={280}
+          max={120}
           multiline
         />
-        <ListEditor
-          path="rotatingWords"
-          label="Rotating words"
-          itemLabel="word"
-          min={1}
-          max={6}
-          newItem={blank}
-        >
-          {(_, itemPath) => (
-            <LocalizedField path={itemPath} label="Word" max={40} />
-          )}
-        </ListEditor>
+        <SelectField
+          path="titleFont"
+          label="Title font"
+          hint="Used for your name in the hero."
+          emptyLabel="Geist (default)"
+          options={titleFonts.map((value) => ({
+            value,
+            label: titleFontLabels[value],
+          }))}
+        />
         <ImageField
           path="photo"
           label="Photo (square, hero and social image)"

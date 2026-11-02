@@ -9,21 +9,11 @@ export const profile: DocumentInput<'profile'> = {
   ...singletonMeta('profile'),
   displayName: owner.name,
   jobTitle: L(owner.jobTitle, 'Engenheiro de Software Full Stack Sênior'),
-  heroHeadline: L(
-    'Messy problems, reliable software.',
-    'Problemas bagunçados, software confiável.',
-  ),
   heroLead: L(
-    'I design and build software end to end, from the first sketch of a data model to the last pixel of the interface. Web systems are where I do my best work.',
-    'Projeto e construo software de ponta a ponta, do primeiro rascunho do modelo de dados ao último pixel da interface. É em sistemas web que entrego meu melhor trabalho.',
+    'I design and build web software, end to end.',
+    'Projeto e construo software web de ponta a ponta.',
   ),
-  rotatingWords: [
-    L('web platforms', 'plataformas web'),
-    L('mobile and desktop apps', 'apps mobile e desktop'),
-    L('automations', 'automações'),
-    L('integrations', 'integrações'),
-    L('APIs', 'APIs'),
-  ],
+  titleFont: 'kaushan-script',
   photo: fixtureImage('profile-photo', photoAlt, { x: 0.5, y: 0.4 }),
   photoLg: fixtureImage('profile-photo-lg', photoAlt, { x: 0.5, y: 0.35 }),
   bio: L(

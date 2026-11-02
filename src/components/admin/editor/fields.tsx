@@ -179,11 +179,14 @@ export function SelectField({
   label,
   hint,
   options,
+  emptyLabel,
 }: {
   path: string;
   label: string;
   hint?: ReactNode;
   options: readonly { value: string | number; label: string }[];
+  /** Optional field: an always-available empty choice that unsets it. */
+  emptyLabel?: string;
 }) {
   const form = useForm();
   const value = form.get(path);
@@ -197,12 +200,17 @@ export function SelectField({
             const chosen = options.find(
               (option) => String(option.value) === event.target.value,
             );
-            form.set(path, chosen?.value ?? event.target.value);
+            form.set(
+              path,
+              event.target.value === '' && emptyLabel
+                ? undefined
+                : (chosen?.value ?? event.target.value),
+            );
           }}
           className={inputClass}
         >
-          {value === undefined || value === '' ? (
-            <option value="">Choose…</option>
+          {emptyLabel || value === undefined || value === '' ? (
+            <option value="">{emptyLabel ?? 'Choose…'}</option>
           ) : null}
           {options.map((option) => (
             <option key={option.value} value={option.value}>

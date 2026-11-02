@@ -160,9 +160,8 @@ export function createRepository(
       return defined({
         displayName: profile.displayName,
         jobTitle: pick(profile.jobTitle, locale),
-        heroHeadline: pick(profile.heroHeadline, locale),
         heroLead: pick(profile.heroLead, locale),
-        rotatingWords: profile.rotatingWords.map((word) => pick(word, locale)),
+        titleFont: profile.titleFont,
         photo: image(profile.photo, locale),
         photoLg: image(profile.photoLg, locale),
         bio: pick(profile.bio, locale),

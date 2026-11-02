@@ -37,9 +37,9 @@ export function describeRepositoryContract(
       const pt = await repository.getProfile('pt');
       expect(en?.displayName).toBe(owner.name);
       expect(en?.jobTitle).toBe(owner.jobTitle);
-      expect(en?.heroHeadline).toBe('Messy problems, reliable software.');
-      expect(pt?.heroHeadline).not.toBe(en?.heroHeadline);
-      expect(en?.rotatingWords).toHaveLength(5);
+      expect(en?.heroLead).toBe('I design and build web software, end to end.');
+      expect(pt?.heroLead).not.toBe(en?.heroLead);
+      expect(en?.titleFont).toBe('kaushan-script');
       expect(en?.metrics).toHaveLength(4);
       expect(en?.photo?.alt).toBeTruthy();
       expect(pt?.photo?.alt).not.toBe(en?.photo?.alt);

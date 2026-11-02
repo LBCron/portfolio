@@ -36,7 +36,7 @@ export function LinkForm() {
         path="placements"
         label="Where it appears"
         options={[
-          { value: 'hero', label: 'Hero' },
+          { value: 'header', label: 'Header (max 3 icons)' },
           { value: 'contact', label: 'Contact section' },
           { value: 'footer', label: 'Footer' },
         ]}

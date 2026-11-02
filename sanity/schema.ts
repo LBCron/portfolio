@@ -7,6 +7,8 @@
  * `./studio.ts`, which adds previews, orderings and zod-backed validation.
  */
 
+import { titleFontLabels, titleFonts } from '../src/lib/content/taxonomy';
+
 type Field = Record<string, unknown> & { name: string; type: string };
 type SchemaType = Record<string, unknown> & {
   name: string;
@@ -120,9 +122,17 @@ const documents: SchemaType[] = [
     fields: [
       field('displayName', 'string'),
       localeString('jobTitle'),
-      localeString('heroHeadline'),
       localeText('heroLead'),
-      field('rotatingWords', 'array', { of: [{ type: 'localeString' }] }),
+      field('titleFont', 'string', {
+        title: 'Title font',
+        description: 'Empty = Geist (default)',
+        options: {
+          list: titleFonts.map((value) => ({
+            title: titleFontLabels[value],
+            value,
+          })),
+        },
+      }),
       image('photo'),
       image('photoLg'),
       field('bio', 'localeText'),
@@ -178,7 +188,7 @@ const documents: SchemaType[] = [
       }),
       field('placements', 'array', {
         of: [{ type: 'string' }],
-        options: { list: ['hero', 'contact', 'footer'] },
+        options: { list: ['header', 'contact', 'footer'] },
       }),
       field('isOwnProfile', 'boolean', { initialValue: false }),
       ...common,

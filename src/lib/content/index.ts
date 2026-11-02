@@ -43,7 +43,13 @@ export function indexOrder<T extends { featured: boolean }>(
 
 export type { ContentRepository } from './repository';
 export type * from './types';
-export { techCategories, type TechCategory } from './taxonomy';
+export {
+  techCategories,
+  titleFontLabels,
+  titleFonts,
+  type TechCategory,
+  type TitleFont,
+} from './taxonomy';
 export {
   contentLocales,
   projectKinds,
