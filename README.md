@@ -81,8 +81,8 @@ The full walkthrough for local, staging (Vercel Preview) and production, includi
 
 1. Import the repository; Vercel reads `vercel.json` (Bun install, frozen lockfile). The build command is the default `bun run build`.
 2. Set the variables above for **Production** (dataset `production`) and **Preview** (dataset `development`, its own tokens). Previews are never indexed (pages carry a `noindex` robots meta unless `VERCEL_ENV` is `production`).
-3. Add the domain `juliolmuller.com` and set `NEXT_PUBLIC_SITE_URL=https://juliolmuller.com`.
-4. Configure the Sanity webhook to `https://juliolmuller.com/api/revalidate` with `SANITY_WEBHOOK_SECRET` (steps in [docs/SANITY.md](docs/SANITY.md)).
+3. Set `NEXT_PUBLIC_SITE_URL=https://juliolmuller.vercel.app` for Production and `https://next-juliolmuller.vercel.app` for Preview (staging, assigned to the `next` branch).
+4. Configure the Sanity webhook to `https://juliolmuller.vercel.app/api/revalidate` with `SANITY_WEBHOOK_SECRET` (steps in [docs/SANITY.md](docs/SANITY.md)).
 5. Run the launch checklists in [docs/SEO.md](docs/SEO.md) and the manual screen-reader pass in [docs/ACCESSIBILITY.md](docs/ACCESSIBILITY.md).
 
 Self-hosting works with `bun run build && bun run start` behind a reverse proxy that terminates TLS, compresses responses and **overwrites** `X-Forwarded-For` (the login rate limiter trusts its first entry). If the proxy rewrites the host, set `serverActions.allowedOrigins`.
