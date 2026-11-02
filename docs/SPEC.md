@@ -34,7 +34,7 @@ Where this list and the body below disagree, this list wins. Rationale for each 
 - Motion-init is injected into `<head>` with `useServerInsertedHTML` (not a `<script>` in the layout JSX — React 19.3 rejects that) [D21].
 - Home order is Hero → Quotes of the moment → About (bio + metrics) → Stack → Work → Résumé (tabs + PDF + LinkedIn) → Contact → Recommendations. Nav is About · Stack · Work · Résumé · Contact [D46, D48].
 - Hero uses art-directed photos (`photo` square below `lg`, `photoLg` 3:4 from `lg` up) via `getImageProps` + `<picture>`; owner-supplied masters are encoded to WebP by the fixture generator and not clobbered by SVG art [D47].
-- The window manager hides the dock chip while the window is open [D49]. The public terminal is live: header toggle, hero CTA, footer hint and dock chip; its code and strings are a lazy chunk, the snapshot comes from `/api/terminal-content`, and secret commands wait for Phase 7 [D50].
+- The window manager hides the dock chip while the window is open [D49]. The public terminal is live: header button, footer hint and dock chip; its code and strings are a lazy chunk, the snapshot comes from `/api/terminal-content`, and secret commands wait for Phase 7 [D50].
 - Admin access (Phase 7): fixed `/admin`, proxy gate, session with an extra `ses` claim, `Secure`/`__Host-` following the https site URL, in-memory rate limiter only (no Upstash), light dashboard; the secret terminal flow loads lazily and `su` always prompts [D51, D52].
 - Admin write path (Phase 8): an `AdminStore` with fixtures and Sanity adapters behind a validating service, optimistic concurrency, uploads with sanitizers, the signed revalidation webhook, and admin URLs that use the uuid part of ids [D53–D55].
 - Phase 10: the card → detail cover morph uses React `<ViewTransition>` (shared pair only, instant for reduced motion and Pause animations), and `<html data-scroll-behavior="smooth">` lets Next disable smooth scrolling during route changes [D62].
@@ -146,9 +146,9 @@ Public routes live under `[locale]`; the admin area is not localized (§12).
 ### 3.2 Header and navigation
 
 - Fixed, 64px high (56px on mobile). Transparent at the top; after 24px of scroll becomes `bg-0` at 70% + backdrop blur + hairline bottom border (solid fallback when `backdrop-filter` is unsupported).
-- Left: JM monogram (SVG, gradient) + wordmark ‘Julio Muller’ (wordmark hidden below 400px); links to `#top`.
+- Left: JM monogram (SVG, gradient) + wordmark ‘Julio Muller’ (wordmark hidden below 400px, and while the hero is on screen since the H1 already shows the name; D67); links to `#top`.
 - Nav: About · Stack · Work · Résumé · Contact (localized). The active section is highlighted by an indicator that slides between items (Motion `layoutId`), driven by IntersectionObserver (`rootMargin: '-40% 0px -55% 0px'`). Quote, Summary and Recommendations stay off the primary nav.
-- Right: language switcher (segmented `EN | PT`, §6) and a terminal toggle button (`>_`) whose tooltip shows the keyboard shortcut (§9).
+- Right: `header` featured-link icons (from `md`; inside the mobile menu below), language switcher (segmented `EN | PT`, §6) and a primary terminal button with a visible ‘Terminal’ label (icon-only from `md` to `lg`; accessible name ‘Toggle terminal’) whose tooltip shows the keyboard shortcut (§9). D67.
 - Mobile (<768px): hamburger opens a full-screen overlay, large links with staggered entrance; focus trap, Esc closes, body scroll locked only while open, closes on navigation.
 - First focusable element: ‘Skip to content’ link.
 - On project pages the nav links point to `/{locale}#section` and a ‘Back to work’ link is shown.
@@ -156,7 +156,7 @@ Public routes live under `[locale]`; the admin area is not localized (§12).
 
 ### 3.3 Home sections (in order)
 
-1. **Hero** (`#top`). Server-rendered. Content: the profile photo with art direction — `profile.photo` (square) below `lg` in an accent-ring frame with LQIP; optional `profile.photoLg` (3:4) from `lg` up, frameless and fluid (`clamp(18rem, min(35vw, height budget × ¾), 31.5rem)`), alpha blending into the hero (no card, fill or ring); both through `getImageProps` + `<picture>` so one source downloads; `priority` for LCP; monogram fallback when no photo exists. Eyebrow chip (`jobTitle` only, `lg+`, anchored to the portrait with a hairline into the opaque figure; hidden below `lg`), H1 (`heroHeadline`) with a gradient accent phrase, rotating-word line (`rotatingWords`, prefixed by a localized ‘I build’; gradient per word so stacked siblings do not clip into each other), lead paragraph (`heroLead`, max 2 lines on desktop), CTAs (primary ‘See my work’ → `#work`, secondary ‘Get in touch’ → `#contact`, tertiary text button with a `>_` icon ‘Open the terminal’, and a small ‘Résumé (PDF)’ link when a file exists), a row of featured links (`placements` includes `hero`, max 5, icon buttons with accessible names and tooltips) and a current-role chip (the experience entry with no end date). Animated background (§5). A scroll cue that fades on scroll and targets `#quote` when a featured quote exists, otherwise `#about`.
+1. **Hero** (`#top`). Server-rendered. Content: the profile photo with art direction — `profile.photo` (square) below `lg` in an accent-ring frame with LQIP; optional `profile.photoLg` (3:4) from `lg` up, frameless and fluid (`clamp(18rem, min(35vw, height budget × ¾), 31.5rem)`), alpha blending into the hero (no card, fill or ring); both through `getImageProps` + `<picture>` so one source downloads; `priority` for LCP; monogram fallback when no photo exists. Eyebrow chip (`jobTitle` only, `lg+`, anchored to the portrait with a hairline into the opaque figure; below `lg` the job title is a small line above the H1), H1 (`displayName` on one line that never wraps or clips, in the profile's `titleFont` or Geist; D67), lead paragraph (`heroLead`, max 120 characters) and CTAs (primary ‘See my work’ → `#work`, secondary ‘Get in touch’ → `#contact`). Animated background (§5). A scroll cue that fades on scroll and targets `#quote` when a featured quote exists, otherwise `#about`.
 2. **Quotes of the moment** (`#quote`). Full-width pull-quote band showing `featuredQuote` (eyebrow heading, large type, gradient quote mark, optional attribution) as semantic `figure` / `blockquote` / `figcaption`. Hidden when empty. Still a single quote; no CMS array.
 3. **About** (`#about`). `bio` as 2–3 short paragraphs on the left; up to 4 count-up metrics (`metrics`) on the right from `lg`. The stats list keeps `id="summary"` so `#summary` still lands here. Facts (`location`, `spokenLanguages`, `focus`) are not rendered in this section.
 4. **Stack** (`#stack`). §7, fed by `technology` and `practice` documents.
@@ -531,13 +531,13 @@ Localized fields are objects `{ en, pt }` (written **L** below). `order` is a nu
 
 **Singletons** (fixed `_id`):
 
-- `profile`: `displayName`, `jobTitle` (L), `heroHeadline` (L), `heroLead` (L), `rotatingWords` (1–6 × L), `photo` (image + `alt` L + focal point; square hero / OG), `photoLg?` (image + `alt` L + focal; 3:4 hero from `lg` up; falls back to `photo`), `bio` (L, Markdown, short paragraphs), `location` (L), `spokenLanguages` (× L), `focus` (L), `metrics` (max 4 × `{ value, label L, countTo?, prefix?, suffix? }`), `featuredQuote` (`{ text L, attribution? L }`).
+- `profile`: `displayName`, `jobTitle` (L), `heroLead` (L, max 120), `titleFont?` (one of ten fixed ids, D67), `photo` (image + `alt` L + focal point; square hero / OG), `photoLg?` (image + `alt` L + focal; 3:4 hero from `lg` up; falls back to `photo`), `bio` (L, Markdown, short paragraphs), `location` (L), `spokenLanguages` (× L), `focus` (L), `metrics` (max 4 × `{ value, label L, countTo?, prefix?, suffix? }`), `featuredQuote` (`{ text L, attribution? L }`).
 - `contact`: `email`, `phone?`, `showPhone` (default false), `bookingUrl?`, `ctaHeading` (L), `ctaText` (L).
 - `resume`: `file.en` and `file.pt` (Sanity file assets) and `updatedAt`.
 
 **Collections:**
 
-- `featuredLink`: `label` (L), `url` (https or `mailto:`), `kind` (`social` | `site` | `other`), `icon` (a Simple Icons slug, a Lucide key or `link`), `placements` (any of `hero`, `contact`, `footer`), `isOwnProfile` (adds `rel='me'` and feeds JSON-LD `sameAs`), `order`, `visible`.
+- `featuredLink`: `label` (L), `url` (https or `mailto:`), `kind` (`social` | `site` | `other`), `icon` (a Simple Icons slug, a Lucide key or `link`), `placements` (any of `header`, `contact`, `footer`; `header` shows up to three icons), `isOwnProfile` (adds `rel='me'` and feeds JSON-LD `sameAs`), `order`, `visible`.
 - `recommendedProfile`: `name`, `role` (L), `note` (L, ≤ 140 chars), `avatar` (image; alt derived from the name), `url` (https), `order`, `visible`.
 - `project`: the fields of §8.1 plus `body` (L, Markdown), `gallery` (images with L alt and caption), `previousSlugs`, `featured`, `visible`, `order`.
 - `experience`: `company`, `companyUrl?`, `location` (L), `roles` (× `{ title L, start 'YYYY-MM', end? 'YYYY-MM', summary L, bullets × L }`), `techIds`, `collapsedByDefault`, `order`, `visible`.

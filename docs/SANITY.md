@@ -47,6 +47,14 @@ SANITY_WRITE_TOKEN=…
 2. `bun run sanity:schema` prints the declaration;
 3. deploy it to `development` and `production` with Sanity's MCP `deploy_schema` (workspace `default`), or wire `schemaTypes` into a Studio and run `sanity schema deploy`.
 
+### Migration 2026-11 (D67)
+
+Redeploy the schema, then for each dataset (`development`, then `production`):
+
+- Profile: `unset: ["heroHeadline", "rotatingWords"]`. Set `heroLead` to a value of at most 120 characters in both languages (for example EN “I design and build web software, end to end.”, PT “Projeto e construo software web de ponta a ponta.”) when the current one is longer. Optionally set `titleFont` (one of the ids in `src/lib/content/taxonomy.ts`).
+- Every `featuredLink` whose `placements` contains `"hero"`: set `placements` to the same array with `"hero"` replaced by `"header"` (the header shows at most three).
+- Query `*[_type == "featuredLink" && "hero" in placements]` again: it must return nothing. Until then the reader skips those links and a profile with a longer lead.
+
 ### Running a Studio (optional)
 
 The admin area is the intended editor. If you also want Sanity Studio, run it as a separate app; the repository ships what it needs in `sanity/studio.ts` (D65):

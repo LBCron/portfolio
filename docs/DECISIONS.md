@@ -383,6 +383,8 @@ Latest stable unless noted. Majors are pinned with `^`; exact versions come from
 
 ### D47 — Hero art direction and concise headline
 
+_The headline and rotating-word parts are superseded by D67 (the H1 is now the name)._
+
 - **Context.** The owner supplied a square jpg and a 3:4 png for the hero, asked for a shorter H1, and the rotating line was stacking every word because `text-gradient` (`background-clip: text`) lived on the shared grid wrapper.
 - **Decision.** Profile gains optional `photoLg`. Fixtures encode `profile-photo.jpg` → 800×800 WebP and the transparent 3:4 PNG (`julio_retrato_fundo_transparente_degrade.png`) → 720×964 WebP with alpha preserved; authored specs skip SVG generation. Hero uses `getImageProps` + `<picture>` (`min-width: 1024px` → lg, else square) with `priority` and sizes for LCP; square accent-ring frame below `lg`; from `lg` up the 3:4 `photoLg` is frameless, fluid (`clamp` on width, 18rem–31.5rem), and blends into the hero (alpha, no card). Headline copy is “Messy problems, reliable software.” / “Problemas bagunçados, software confiável.” Gradient moves onto each rotating word; the wrapper is a clipped `h-[1.2em]` slot. Owner photos are real identity (same bucket as name/title/city) but still flow only through `getContent()`.
 - **Consequence.** One hero image downloads per viewport. OG/JSON-LD keep the square `photo`. `fixtures:generate` no longer wipes the portrait masters. Sanity needs a `photoLg` field (optional) for the same art direction in production.
@@ -552,6 +554,18 @@ Latest stable unless noted. Majors are pinned with `^`; exact versions come from
 - **Decision.** Transposed: frame-time scaling (`k = min(gap, 50 ms) / 16.67 ms`) for spin, hover easing, dim lerp and friction; pointer travel accumulates in `pending` and is consumed once per frame; stationary-hold decay; a stalled frame cannot inflate the release coast; a flick released between frames seeds the coast; second pointers and non-primary mouse buttons are ignored, and window blur ends a touch drag; the stage size comes from the ResizeObserver, never from a pointer handler; the loop stops itself when hidden, off-screen or zero-sized and restarts from the visibility, intersection and resize observers. The math is pure in `src/lib/tech-cloud/motion.ts` (unit-tested at 60/90/120/144 Hz).
 - **Not transposed.** `touch-action: none` and `overscroll-behavior: none`: the geoid is a full-bleed stage inside a scrolling page, so it keeps `touch-pan-y` and the separate yaw-only touch path (D37). Pointer Events for touch are therefore not used either. The prototype's `will-change` cleanup does not apply (no `will-change` on the items); the existing change-detection writes, back-hemisphere frame skipping and 4-frame cadence already cover its "cached geometry" point.
 - **Consequence.** Same feel at any refresh rate; fewer wake-ups while idle. Release-coast distance is equal across rates within discretization (about 5%).
+
+### D67 — Name as the hero title, selectable title font, header links
+
+- **Context.** The owner wanted a quieter hero before release: the H1 should be his name in a font he picks, without the rotating line, the long lead, the résumé and terminal CTAs or the current-role line. The profile icons and the terminal entry belong in the header.
+- **Decision.**
+  - H1 = `displayName`, on one line. `heroHeadline` and `rotatingWords` are removed from the contract and both datasets; `heroLead` shrinks to 120 characters, which is under the 70-character floor of `pickDescription` for the meta description, so the home page uses `meta.siteDescription` (intended).
+  - `profile.titleFont` picks one of ten Google fonts (Amita, Courgette, Euphoria Script, Kaushan Script, Lobster, Pacifico, Princess Sofia, Redressed, Rock Salt, Sacramento); unset is Geist. They are loaded through `next/font/google`, so they are self-hosted at build time: CSP stays `font-src 'self'`, no request to Google at runtime, no extra privacy surface. Free-form names would break both.
+  - `preload: false`: preloading would download all ten. Only the chosen font's class is rendered, so only its file is fetched, after first paint; the size-adjusted fallback limits the swap shift. Rock Salt has no latin-ext subset (accents fall back).
+  - One-line fitting: `title-fit` sizes the title from the character count in CSS (container query units), and `FitTitle` measures the real text (also after `document.fonts.ready`) and sets `--fit`. It shrinks, never wraps, clips or scrolls the page.
+  - Featured-link placement `hero` is renamed `header` (max three icons, from `md`; inside the mobile menu below). The terminal toggle is a primary button with a visible label, icon-only from `md` to `lg`; its `aria-label` still contains the visible word (WCAG 2.5.3).
+  - The wordmark name in the header is hidden while the hero is in view (IntersectionObserver in `HeaderFrame`, with a CSS rule so the home page does not flash it).
+- **Consequence.** Sanity needs the schema redeployed and the data migrated (docs/SANITY.md): the reader skips a profile with a longer lead and a link still placed in `hero`. Adding a font is a taxonomy id, a loader call and a schema redeploy. The a11y suite (axe 4.14) also required the gallery and tech-chip button names to contain their visible text.
 
 ## 5. Contradictions found in the spec and how they are resolved
 

@@ -60,15 +60,17 @@ Click **Save and publish**. If something is wrong, a summary at the top lists ea
 
 ## Other areas
 
-| Area                   | Notes                                                                                                                                          |
-| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| Profile                | Hero headline, rotating words, lead, bio, facts, metrics, quote and photo (square, plus an optional 3:4 for large screens)                     |
-| Links                  | Featured links and where each shows (hero, footer, contact); "own profile" adds `rel="me"` and feeds the structured data                       |
-| Recommended            | People worth following; a note of up to 140 characters                                                                                         |
-| Experience / Education | Timeline entries; "collapsed by default" folds older jobs                                                                                      |
-| Practices              | Text chips shown in the List view of the stack                                                                                                 |
-| Contact                | Email (shown obfuscated), the phone (only when "show phone" is on), the booking URL and the call-to-action text                                |
-| Résumé                 | One PDF per language, up to 10 MB, checked for scripts. Without a file the download buttons hide and the terminal says it is not available yet |
+| Area                   | Notes                                                                                                                                                            |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Profile                | Display name, lead (up to 120 characters), title font, bio, facts, metrics, quote and photo (square, plus an optional 3:4 for large screens)                     |
+| Links                  | Featured links and where each shows (header, footer, contact; the header shows three icons at most); "own profile" adds `rel="me"` and feeds the structured data |
+| Recommended            | People worth following; a note of up to 140 characters                                                                                                           |
+| Experience / Education | Timeline entries; "collapsed by default" folds older jobs                                                                                                        |
+| Practices              | Text chips shown in the List view of the stack                                                                                                                   |
+| Contact                | Email (shown obfuscated), the phone (only when "show phone" is on), the booking URL and the call-to-action text                                                  |
+| Résumé                 | One PDF per language, up to 10 MB, checked for scripts. Without a file the download buttons hide and the terminal says it is not available yet                   |
+
+**Title font.** Your display name is the hero title. In Profile, "Title font" picks one of ten script fonts, or "Geist (default)". To offer another one: add its id and label in `src/lib/content/taxonomy.ts`, a loader call in `src/styles/title-fonts.ts`, and redeploy the Sanity schema.
 
 ## What the owner still has to supply
 
