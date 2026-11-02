@@ -6,6 +6,7 @@ import { getTranslations } from 'next-intl/server';
 
 import { TechIcon } from '@/components/content/tech-icon';
 import { Markdown } from '@/components/markdown/markdown';
+import { CoverTransition } from '@/components/portfolio/cover-transition';
 import { DeviceFrame } from '@/components/portfolio/device-frame';
 import { Gallery } from '@/components/portfolio/gallery';
 import { GeneratedCover } from '@/components/portfolio/generated-cover';
@@ -170,29 +171,31 @@ export default async function ProjectPage({
               </div>
             </div>
             <DeviceFrame kind={project.kind}>
-              {project.cover ? (
-                <Image
-                  src={project.cover.url}
-                  width={project.cover.width}
-                  height={project.cover.height}
-                  alt={project.cover.alt}
-                  sizes="(min-width: 1024px) 448px, 100vw"
-                  preload
-                  fetchPriority="high"
-                  placeholder={project.cover.lqip ? 'blur' : 'empty'}
-                  blurDataURL={project.cover.lqip}
-                  className="size-full object-cover"
-                  style={
-                    project.cover.focal
-                      ? {
-                          objectPosition: `${project.cover.focal.x * 100}% ${project.cover.focal.y * 100}%`,
-                        }
-                      : undefined
-                  }
-                />
-              ) : (
-                <GeneratedCover slug={project.slug} kind={project.kind} />
-              )}
+              <CoverTransition slug={project.slug}>
+                {project.cover ? (
+                  <Image
+                    src={project.cover.url}
+                    width={project.cover.width}
+                    height={project.cover.height}
+                    alt={project.cover.alt}
+                    sizes="(min-width: 1024px) 448px, 100vw"
+                    preload
+                    fetchPriority="high"
+                    placeholder={project.cover.lqip ? 'blur' : 'empty'}
+                    blurDataURL={project.cover.lqip}
+                    className="size-full object-cover"
+                    style={
+                      project.cover.focal
+                        ? {
+                            objectPosition: `${project.cover.focal.x * 100}% ${project.cover.focal.y * 100}%`,
+                          }
+                        : undefined
+                    }
+                  />
+                ) : (
+                  <GeneratedCover slug={project.slug} kind={project.kind} />
+                )}
+              </CoverTransition>
             </DeviceFrame>
           </header>
 

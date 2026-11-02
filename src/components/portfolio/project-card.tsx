@@ -9,6 +9,7 @@ import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/cn';
 import type { ProjectStatus, ProjectSummary } from '@/lib/content';
 
+import { CoverTransition } from './cover-transition';
 import { GeneratedCover } from './generated-cover';
 
 const MAX_CHIPS = 4;
@@ -59,33 +60,35 @@ export async function ProjectCard({
           )}
         >
           <div className="relative aspect-[16/10] overflow-hidden border-b border-line">
-            {project.cover ? (
-              <Image
-                src={project.cover.url}
-                width={project.cover.width}
-                height={project.cover.height}
-                alt={project.cover.alt}
-                sizes="(min-width: 1100px) 384px, (min-width: 768px) 50vw, 100vw"
-                loading={eager ? 'eager' : 'lazy'}
-                fetchPriority={lcp ? 'high' : undefined}
-                placeholder={project.cover.lqip ? 'blur' : 'empty'}
-                blurDataURL={project.cover.lqip}
-                className="size-full object-cover transition-transform duration-500 ease-out-expo group-hover/card:scale-[1.04]"
-                style={
-                  project.cover.focal
-                    ? {
-                        objectPosition: `${project.cover.focal.x * 100}% ${project.cover.focal.y * 100}%`,
-                      }
-                    : undefined
-                }
-              />
-            ) : (
-              <GeneratedCover
-                slug={project.slug}
-                kind={project.kind}
-                className="transition-transform duration-500 ease-out-expo group-hover/card:scale-[1.04]"
-              />
-            )}
+            <CoverTransition slug={project.slug}>
+              {project.cover ? (
+                <Image
+                  src={project.cover.url}
+                  width={project.cover.width}
+                  height={project.cover.height}
+                  alt={project.cover.alt}
+                  sizes="(min-width: 1100px) 384px, (min-width: 768px) 50vw, 100vw"
+                  loading={eager ? 'eager' : 'lazy'}
+                  fetchPriority={lcp ? 'high' : undefined}
+                  placeholder={project.cover.lqip ? 'blur' : 'empty'}
+                  blurDataURL={project.cover.lqip}
+                  className="size-full object-cover transition-transform duration-500 ease-out-expo group-hover/card:scale-[1.04]"
+                  style={
+                    project.cover.focal
+                      ? {
+                          objectPosition: `${project.cover.focal.x * 100}% ${project.cover.focal.y * 100}%`,
+                        }
+                      : undefined
+                  }
+                />
+              ) : (
+                <GeneratedCover
+                  slug={project.slug}
+                  kind={project.kind}
+                  className="transition-transform duration-500 ease-out-expo group-hover/card:scale-[1.04]"
+                />
+              )}
+            </CoverTransition>
             <div className="absolute inset-x-3 top-3 flex items-start justify-between gap-2">
               <span className="rounded-sm border border-line-strong glass px-2 py-1 font-label text-text-1">
                 {t(`kinds.${project.kind}`)}

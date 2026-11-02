@@ -71,6 +71,9 @@ export default async function LocaleLayout({
     <html
       lang={localeTags[locale]}
       className={fontVariables}
+      // Lets Next turn off our smooth scrolling for route changes, so a new
+      // page starts at the top at once (and the cover morph measures it).
+      data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
       <body suppressHydrationWarning>

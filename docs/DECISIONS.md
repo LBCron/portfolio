@@ -164,7 +164,7 @@ Latest stable unless noted. Majors are pinned with `^`; exact versions come from
 ### D16 — View Transitions deferred
 
 - **Context.** Next 16 documents React `<ViewTransition>`; it depends on React canary/experimental features at the time of writing.
-- **Decision.** Phase 3 ships a CSS cross-fade between routes. The card → detail morph is Phase 10 and only if `<ViewTransition>` is available in stable React 19.3 without experimental flags.
+- **Decision.** Phase 3 ships a CSS cross-fade between routes. The card → detail morph is Phase 10 and only if `<ViewTransition>` is available in stable React 19.3 without experimental flags. (Done in Phase 10: React 19.3 ships `<ViewTransition>` stable, see D62.)
 
 ### D17 — Smaller interpretations
 
@@ -508,6 +508,15 @@ Latest stable unless noted. Majors are pinned with `^`; exact versions come from
   - The Firefox pass found test-harness problems only, fixed in the tests: the terminal helpers pressed the toggle shortcut repeatedly, so a slow mount closed the window again (`tests/e2e/hydration.ts` now waits for React hydration, then gives each press 5 s); a window drag left the viewport, where synthetic pointer moves are not reported; one test measured scroll across two page loads. Two checks are adjusted per browser with a stated reason: Firefox empties `clipboardData` on synthetic paste events (the multi-line paste test is skipped there), and headless Firefox keeps focus on the last tab stop when Tab leaves the page (the idle-Tab test asserts that the default action is not prevented).
   - Visual snapshots (`tests/e2e/visual.spec.ts`): the hero and the first project card at 375, 768 and 1440 px, Chromium only, reduced motion, animations disabled, `maxDiffPixelRatio: 0.01`. Baselines live in `tests/e2e/__screenshots__/` (Linux). They run in CI and locally only with `VISUAL=1`; the manual `Visual baselines` workflow regenerates them on the CI image and uploads them as an artifact.
 - **Consequence.** The first baselines were generated under WSL Linux with the self-hosted fonts; if CI's rendering differs beyond the tolerance, run the workflow once and commit its PNGs. Manual checks on real Safari/iOS 16 and Edge remain in the launch checklist (README).
+
+### D62 — Card → detail cover morph (Phase 10)
+
+- **Context.** §5.10 asks for a View Transitions morph from a card cover into the detail hero when the installed Next.js supports it stably. React 19.3 exports `<ViewTransition>` from its stable build (client and `react-server`), and Next 16.4 starts the transition for App Router navigations without a config flag.
+- **Decision.**
+  - `CoverTransition` (`src/components/portfolio/cover-transition.tsx`) wraps the cover `img` (or the generated art) in `<ViewTransition name="project-cover-<slug>" share="project-cover" default="none">`, both in `ProjectCard` and inside the detail `DeviceFrame`. Only a shared pair animates; unrelated navigations, exits and enters stay `none`. A slug appears at most once per page (the detail page lists related projects other than itself; previous/next are text links), because duplicate names abort the browser transition.
+  - `globals.css` gives `::view-transition-group(.project-cover)` 420 ms on `--ease-out-expo`, lets clicks pass through `::view-transition`, and sets `animation: none` on every view-transition pseudo-element for `prefers-reduced-motion` and for `html[data-motion='reduced']` (Pause animations). Without browser support the navigation just happens; without JavaScript the card is a plain link. The existing CSS route fade stays.
+  - `<html data-scroll-behavior="smooth">`: Next only turns our `scroll-behavior: smooth` off during route changes when this attribute is present. Without it a new page smooth-scrolled up from the previous scroll offset (a visible ~1 s scroll on every card click), and React measured the hero off screen, so the pair never formed.
+- **Consequence.** React names only elements inside the viewport, so a card whose counterpart is below the fold (a related card on the next page) fades out instead of flying off screen. The morph plays when the detail page is already prefetched (cards are in view, so it usually is); otherwise the page appears without it. Checked on Chromium in `tests/e2e/view-transition.spec.ts` (pair animates, reduced motion is instant, no-JS link works).
 
 ## 5. Contradictions found in the spec and how they are resolved
 

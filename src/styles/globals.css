@@ -345,6 +345,34 @@ html[data-motion='reduced'] *::after {
   }
 }
 
+/*
+ * Card → detail cover morph (React <ViewTransition share="project-cover">,
+ * D62). The overlay never swallows clicks; reduced motion and the "Pause
+ * animations" toggle make every view transition instant.
+ */
+::view-transition {
+  pointer-events: none;
+}
+
+::view-transition-group(.project-cover) {
+  animation-duration: 420ms;
+  animation-timing-function: var(--ease-out-expo);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+html[data-motion='reduced']::view-transition-group(*),
+html[data-motion='reduced']::view-transition-old(*),
+html[data-motion='reduced']::view-transition-new(*) {
+  animation: none !important;
+}
+
 /* Delayed entrances must not wait out their delay with reduced motion. */
 @media (prefers-reduced-motion: reduce) {
   .reveal-word > span,
