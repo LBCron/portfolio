@@ -23,6 +23,11 @@ export const TITLE_BAR_HEIGHT = 40;
 export const MIN_VISIBLE = 96;
 /** Pointer distance from a viewport edge that arms snapping. */
 export const SNAP_THRESHOLD = 8;
+/**
+ * An armed snap holds until the pointer is this far from its edge, so a
+ * pointer hovering at the threshold cannot make the preview flicker.
+ */
+export const SNAP_RELEASE = 32;
 /** Below this width the window becomes a bottom sheet. */
 export const SHEET_BREAKPOINT = 640;
 
@@ -83,10 +88,29 @@ export function snapRect(side: SnapSide, viewport: Viewport): Rect {
   };
 }
 
+function edgeDistance(
+  side: SnapSide,
+  pointer: { x: number; y: number },
+  viewport: Viewport,
+) {
+  if (side === 'top') return pointer.y;
+  if (side === 'left') return pointer.x;
+  return viewport.width - pointer.x;
+}
+
+/**
+ * The edge a drag would snap to. `armed` is the side already previewed: it
+ * stays armed within `SNAP_RELEASE` (hysteresis), new sides arm within
+ * `SNAP_THRESHOLD`.
+ */
 export function snapSideAt(
   pointer: { x: number; y: number },
   viewport: Viewport,
+  armed: SnapSide | null = null,
 ): SnapSide | null {
+  if (armed && edgeDistance(armed, pointer, viewport) <= SNAP_RELEASE) {
+    return armed;
+  }
   // The window is clamped below the header, so only the pointer can reach 0.
   if (pointer.y <= SNAP_THRESHOLD) return 'top';
   if (pointer.x <= SNAP_THRESHOLD) return 'left';

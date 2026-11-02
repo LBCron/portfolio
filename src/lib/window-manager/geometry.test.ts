@@ -8,6 +8,7 @@ import {
   maximizedRect,
   resizeRect,
   snapRect,
+  SNAP_RELEASE,
   snapSideAt,
   TITLE_BAR_HEIGHT,
   type Viewport,
@@ -100,6 +101,26 @@ describe('snapping', () => {
     expect(snapSideAt({ x: 2, y: 400 }, viewport)).toBe('left');
     expect(snapSideAt({ x: 1278, y: 400 }, viewport)).toBe('right');
     expect(snapSideAt({ x: 600, y: 400 }, viewport)).toBeNull();
+  });
+
+  it('keeps an armed side until the pointer leaves the release band', () => {
+    expect(snapSideAt({ x: 20, y: 400 }, viewport)).toBeNull();
+    expect(snapSideAt({ x: 20, y: 400 }, viewport, 'left')).toBe('left');
+    expect(snapSideAt({ x: SNAP_RELEASE, y: 400 }, viewport, 'left')).toBe(
+      'left',
+    );
+    expect(
+      snapSideAt({ x: SNAP_RELEASE + 1, y: 400 }, viewport, 'left'),
+    ).toBeNull();
+    expect(snapSideAt({ x: 1250, y: 400 }, viewport, 'right')).toBe('right');
+    expect(snapSideAt({ x: 600, y: 30 }, viewport, 'top')).toBe('top');
+    expect(snapSideAt({ x: 600, y: 40 }, viewport, 'top')).toBeNull();
+  });
+
+  it('an armed side wins over a corner, and a new edge can take over', () => {
+    expect(snapSideAt({ x: 2, y: 3 }, viewport, 'left')).toBe('left');
+    expect(snapSideAt({ x: 2, y: 3 }, viewport)).toBe('top');
+    expect(snapSideAt({ x: 1278, y: 400 }, viewport, 'left')).toBe('right');
   });
 });
 

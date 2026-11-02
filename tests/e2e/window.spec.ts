@@ -180,6 +180,49 @@ test.describe('desktop window', () => {
     ).toBeVisible();
   });
 
+  test('the snap preview holds near the edge and disarms away from it', async ({
+    page,
+  }) => {
+    await openTerminal(page);
+    const viewport = page.viewportSize()!;
+    const before = await box(windowOf(page));
+    const overlay = page.locator('[data-snap-overlay=terminal]');
+
+    const release = await dragTitleBar(page, 120, { x: 2, y: 300 });
+    await expect(overlay).toHaveAttribute('data-snap-preview', 'left');
+    await expect
+      .poll(async () => box(overlay))
+      .toEqual({
+        x: 0,
+        y: 64,
+        width: viewport.width / 2,
+        height: viewport.height - 64,
+      });
+    // Hysteresis: a pointer just past the arming threshold keeps it armed.
+    await page.mouse.move(24, 300, { steps: 2 });
+    await expect(overlay).toHaveAttribute('data-snap-preview', 'left');
+    await page.mouse.move(viewport.width / 2, 300, { steps: 4 });
+    await expect(overlay).not.toHaveAttribute('data-snap-preview');
+    await expect(overlay).toBeHidden();
+    await release();
+    await expect
+      .poll(async () => (await box(windowOf(page))).width)
+      .toBe(before.width);
+  });
+
+  test('the snap preview animates unless motion is reduced', async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await openTerminal(page);
+    const overlay = page.locator('[data-snap-overlay=terminal]');
+    const duration = () =>
+      overlay.evaluate((el) => getComputedStyle(el).transitionDuration);
+    expect(await duration()).toMatch(/^0\.2s/);
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    expect(parseFloat(await duration())).toBeLessThan(0.01);
+  });
+
   test('Escape cancels a drag', async ({ page }) => {
     await openTerminal(page);
     const before = await box(windowOf(page));

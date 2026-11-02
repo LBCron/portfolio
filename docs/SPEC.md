@@ -38,6 +38,7 @@ Where this list and the body below disagree, this list wins. Rationale for each 
 - Admin access (Phase 7): fixed `/admin`, proxy gate, session with an extra `ses` claim, `Secure`/`__Host-` following the https site URL, in-memory rate limiter only (no Upstash), light dashboard; the secret terminal flow loads lazily and `su` always prompts [D51, D52].
 - Admin write path (Phase 8): an `AdminStore` with fixtures and Sanity adapters behind a validating service, optimistic concurrency, uploads with sanitizers, the signed revalidation webhook, and admin URLs that use the uuid part of ids [D53–D55].
 - Phase 10: the card → detail cover morph uses React `<ViewTransition>` (shared pair only, instant for reduced motion and Pause animations), and `<html data-scroll-behavior="smooth">` lets Next disable smooth scrolling during route changes [D62].
+- Phase 10: the snap preview is DOM-driven, grows out of the window and fades (instant for reduced motion), with arming hysteresis (8 px to arm, 32 px to release) [D63].
 - About (`#about`) is a two-column block: bio on the left, up to 4 count-up metrics on the right (`#summary` stays on the stats so old hashes resolve). Facts (`location`, `spokenLanguages`, `focus`) stay out of this section (terminal / résumé) [D48].
 
 ## 0. Operating instructions (to the agent)

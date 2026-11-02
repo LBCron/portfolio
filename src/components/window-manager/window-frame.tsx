@@ -22,6 +22,7 @@ import {
   type SnapSide,
   snapRect,
   snapSideAt,
+  type Viewport,
 } from '@/lib/window-manager/geometry';
 import { useWindowStore } from '@/stores/window-store';
 
@@ -58,6 +59,39 @@ function applyRect(el: HTMLElement, rect: Rect) {
   el.style.transform = `translate3d(${rect.x}px, ${rect.y}px, 0)`;
   el.style.width = `${rect.width}px`;
   el.style.height = `${rect.height}px`;
+}
+
+/**
+ * Drives the snap preview straight on the DOM (no React state during a
+ * drag). Arming grows it out of the window's current rect into the snap
+ * area while it fades in; switching sides glides between areas; disarming
+ * shrinks it back onto the window and fades it out. Releasing a snap only
+ * fades it, while the window itself grows into the area. CSS transitions do
+ * the motion, so reduced motion and Pause animations make it instant.
+ */
+function setSnapPreview(
+  el: HTMLElement | null,
+  side: SnapSide | null,
+  from: Rect,
+  viewport: Viewport,
+) {
+  if (!el) return;
+  const armed = el.dataset['snapPreview'] ?? null;
+  if (side === armed) return;
+  if (!side) {
+    delete el.dataset['snapPreview'];
+    applyRect(el, from);
+    return;
+  }
+  if (!armed) {
+    el.style.transition = 'none';
+    applyRect(el, from);
+    // Commit the start rect before transitioning out of it.
+    el.getBoundingClientRect();
+    el.style.transition = '';
+  }
+  el.dataset['snapPreview'] = side;
+  applyRect(el, snapRect(side, viewport));
 }
 
 function Control({
@@ -115,8 +149,8 @@ export function WindowFrame({
   const win = useWindowStore((state) => state.windows[id]);
   const viewport = useWindowStore((state) => state.viewport);
   const outerRef = useRef<HTMLDivElement>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
   const hintId = useId();
-  const [snap, setSnap] = useState<SnapSide | null>(null);
   const [tall, setTall] = useState(false);
 
   const sheet = viewport.width < SHEET_BREAKPOINT;
@@ -188,7 +222,8 @@ export function WindowFrame({
       target.removeEventListener('pointercancel', onCancel);
       window.removeEventListener('keydown', onKey);
       delete outer.dataset['gesture'];
-      setSnap(null);
+      const preview = previewRef.current;
+      if (preview) delete preview.dataset['snapPreview'];
       const current = useWindowStore.getState().windows[id];
       if (commitGesture && latest) commit(latest);
       else if (current) applyRect(outer, current.rect);
@@ -213,12 +248,17 @@ export function WindowFrame({
     track(
       event,
       (dx, dy, pointer) => {
-        side = snapSideAt({ x: pointer.clientX, y: pointer.clientY }, bounds);
-        setSnap(side);
-        return clampRect(
+        const next = clampRect(
           { ...start, x: start.x + dx, y: start.y + dy },
           bounds,
         );
+        side = snapSideAt(
+          { x: pointer.clientX, y: pointer.clientY },
+          bounds,
+          side,
+        );
+        setSnapPreview(previewRef.current, side, next, bounds);
+        return next;
       },
       (next) => {
         if (side) store.snap(id, side);
@@ -263,23 +303,21 @@ export function WindowFrame({
       : win.status === 'closed'
         ? 'scale(0.96)'
         : 'none';
-  const snapBox = snap ? snapRect(snap, viewport) : null;
-
   return (
     <>
-      {snapBox ? (
+      {sheet ? null : (
         <div
+          ref={previewRef}
           aria-hidden="true"
-          data-snap-preview={snap}
-          className="decorative pointer-events-none fixed top-0 left-0 rounded-[14px] border border-accent-2/60 bg-accent-2/10"
-          style={{
-            transform: `translate3d(${snapBox.x}px, ${snapBox.y}px, 0)`,
-            width: snapBox.width,
-            height: snapBox.height,
-            zIndex: 'calc(var(--z-window) - 1)',
-          }}
+          data-snap-overlay={id}
+          className={cn(
+            'decorative pointer-events-none invisible fixed top-0 left-0 rounded-[14px] border border-accent-2/60 bg-accent-2/10 opacity-0 shadow-[inset_0_0_0_1px_rgb(76_201_240/0.15),0_0_32px_rgb(76_201_240/0.12)]',
+            'transition-[transform,width,height,opacity,visibility] duration-200 ease-out-expo',
+            'data-snap-preview:visible data-snap-preview:opacity-100',
+          )}
+          style={{ zIndex: 'calc(var(--z-window) - 1)' }}
         />
-      ) : null}
+      )}
       <div
         ref={outerRef}
         role="dialog"
