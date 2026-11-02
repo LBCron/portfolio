@@ -349,15 +349,9 @@
   },
   "hero": {
     "eyebrow": "{jobTitle}",
-    "rotatingPrefix": "Eu crio",
-    "rotatingSentence": "Eu crio {list}.",
     "seeWork": "Ver meus projetos",
     "getInTouch": "Fale comigo",
-    "resume": "Currículo (PDF)",
-    "currentRole": "Hoje: {title} na {company}",
-    "linksLabel": "Perfis e links",
-    "scrollCue": "Rolar até a próxima seção",
-    "openTerminal": "Abrir o terminal"
+    "scrollCue": "Rolar até a próxima seção"
   },
   "quote": {
     "eyebrow": "Frases do momento"

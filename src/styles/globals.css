@@ -275,28 +275,6 @@ html[data-motion='reduced'] *::after {
   }
 }
 
-/* Word-by-word masked reveal. Runs without JS too: content ends visible. */
-.reveal-word {
-  display: inline-block;
-  overflow: clip;
-  overflow-clip-margin: 0.1em;
-  vertical-align: bottom;
-  padding-bottom: 0.08em;
-  margin-bottom: -0.08em;
-}
-
-.reveal-word > span {
-  display: inline-block;
-  animation: word-up 700ms var(--ease-out-expo) both;
-  animation-delay: calc(var(--word-index, 0) * 60ms);
-}
-
-@keyframes word-up {
-  from {
-    transform: translateY(105%);
-  }
-}
-
 @keyframes cue-bob {
   50% {
     transform: translateY(4px);
@@ -412,13 +390,12 @@ html[data-motion='reduced']::view-transition-new(*) {
 
 /* Delayed entrances must not wait out their delay with reduced motion. */
 @media (prefers-reduced-motion: reduce) {
-  .reveal-word > span,
   .route-fade {
     animation: none !important;
   }
 }
 
-html[data-motion='reduced'] :is(.reveal-word > span, .route-fade) {
+html[data-motion='reduced'] .route-fade {
   animation: none !important;
 }
 
@@ -434,6 +411,26 @@ html[data-motion='reduced'] :is(.reveal-word > span, .route-fade) {
     opacity: 0;
     transform: translateY(14px);
   }
+}
+
+@property --title-max {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0px;
+}
+
+/* One-line hero title: never wraps, shrinks to fit (see FitTitle). */
+@utility title-fit {
+  --title-max: clamp(2.75rem, 1.8rem + 2.8vw, 5rem);
+  white-space: nowrap;
+  /* Script fonts have tall ascenders and swashes that 1.02 would clip. */
+  line-height: 1.15;
+  padding-block: 0.05em;
+  /* Estimate before hydration: about 0.62em per glyph. */
+  font-size: var(
+    --fit,
+    min(var(--title-max), calc(100cqi / var(--chars) / 0.62))
+  );
 }
 
 @utility container-page {

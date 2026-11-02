@@ -90,7 +90,6 @@ export default async function HomePage() {
     content.getPractices(locale),
   ]);
   const featured = featuredProjects(projects);
-  const hasResume = Boolean(resume?.files[locale]);
   const listId = `${absoluteUrl(localizedPath(locale))}#work`;
   const nextSection = profile?.featuredQuote?.text
     ? 'quote'
@@ -119,14 +118,7 @@ export default async function HomePage() {
   return (
     <>
       <JsonLd data={jsonLd} />
-      <Hero
-        locale={locale}
-        profile={profile}
-        links={links}
-        experience={experience}
-        hasResume={hasResume}
-        nextSection={nextSection}
-      />
+      <Hero locale={locale} profile={profile} nextSection={nextSection} />
       <Quote quote={profile?.featuredQuote} />
       {profile ? <About locale={locale} profile={profile} /> : null}
       {technologies.length > 0 ? (

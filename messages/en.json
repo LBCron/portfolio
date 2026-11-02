@@ -349,15 +349,9 @@
   },
   "hero": {
     "eyebrow": "{jobTitle}",
-    "rotatingPrefix": "I build",
-    "rotatingSentence": "I build {list}.",
     "seeWork": "See my work",
     "getInTouch": "Get in touch",
-    "resume": "Résumé (PDF)",
-    "currentRole": "Now: {title} at {company}",
-    "linksLabel": "Profiles and links",
-    "scrollCue": "Scroll to the next section",
-    "openTerminal": "Open the terminal"
+    "scrollCue": "Scroll to the next section"
   },
   "quote": {
     "eyebrow": "Quotes of the moment"
