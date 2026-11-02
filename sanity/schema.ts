@@ -3,7 +3,8 @@
  * `sanity` dependency. It mirrors the storage shape written by
  * `src/lib/content/sanity/documents.ts`; validation lives in the zod schemas.
  * Deployed as an MCP-managed workspace schema; print the declaration with
- * `bun run sanity:schema`.
+ * `bun run sanity:schema`. A Studio should use `studioSchemaTypes` from
+ * `./studio.ts`, which adds previews, orderings and zod-backed validation.
  */
 
 type Field = Record<string, unknown> & { name: string; type: string };
@@ -78,6 +79,7 @@ const objects: SchemaType[] = [
   },
   {
     name: 'metric',
+    title: 'Metric',
     type: 'object',
     fields: [
       field('value', 'string'),
@@ -89,6 +91,7 @@ const objects: SchemaType[] = [
   },
   {
     name: 'experienceRole',
+    title: 'Role',
     type: 'object',
     fields: [
       localeString('title'),
@@ -112,6 +115,7 @@ const objects: SchemaType[] = [
 const documents: SchemaType[] = [
   {
     name: 'profile',
+    title: 'Profile',
     type: 'document',
     fields: [
       field('displayName', 'string'),
@@ -134,6 +138,7 @@ const documents: SchemaType[] = [
   },
   {
     name: 'contact',
+    title: 'Contact',
     type: 'document',
     fields: [
       field('email', 'string'),
@@ -161,6 +166,7 @@ const documents: SchemaType[] = [
   },
   {
     name: 'featuredLink',
+    title: 'Featured link',
     type: 'document',
     fields: [
       localeString('label'),
@@ -180,6 +186,7 @@ const documents: SchemaType[] = [
   },
   {
     name: 'recommendedProfile',
+    title: 'Recommended profile',
     type: 'document',
     fields: [
       field('name', 'string'),
@@ -192,6 +199,7 @@ const documents: SchemaType[] = [
   },
   {
     name: 'project',
+    title: 'Project',
     type: 'document',
     fields: [
       field('slug', 'slug'),
@@ -242,6 +250,7 @@ const documents: SchemaType[] = [
   },
   {
     name: 'experience',
+    title: 'Experience',
     type: 'document',
     fields: [
       field('company', 'string'),
@@ -255,6 +264,7 @@ const documents: SchemaType[] = [
   },
   {
     name: 'education',
+    title: 'Education',
     type: 'document',
     fields: [
       field('kind', 'string', { options: list(['degree', 'certification']) }),
@@ -268,6 +278,7 @@ const documents: SchemaType[] = [
   },
   {
     name: 'technology',
+    title: 'Technology',
     type: 'document',
     fields: [
       field('name', 'string'),
@@ -298,6 +309,7 @@ const documents: SchemaType[] = [
   },
   {
     name: 'practice',
+    title: 'Practice',
     type: 'document',
     fields: [localeString('label'), ...common],
   },

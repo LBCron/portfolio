@@ -40,6 +40,7 @@ Where this list and the body below disagree, this list wins. Rationale for each 
 - Phase 10: the card → detail cover morph uses React `<ViewTransition>` (shared pair only, instant for reduced motion and Pause animations), and `<html data-scroll-behavior="smooth">` lets Next disable smooth scrolling during route changes [D62].
 - Phase 10: the snap preview is DOM-driven, grows out of the window and fades (instant for reduced motion), with arming hysteresis (8 px to arm, 32 px to release) [D63].
 - Phase 10: the §10.4 easter eggs ship (`fortune`, `cowsay`, `matrix`, `ping`, `ssh`, `sudo`, `rm`, `vim`/`vi`/`nano`/`emacs`); `matrix` is a 4 s CSS rain behind an `effect` action, skipped for reduced motion [D64].
+- Phase 10: `sanity/studio.ts` layers previews, orderings and zod-backed field validation over the plain-data schema for an optional, separately run Studio [D65].
 - About (`#about`) is a two-column block: bio on the left, up to 4 count-up metrics on the right (`#summary` stays on the stats so old hashes resolve). Facts (`location`, `spokenLanguages`, `focus`) stay out of this section (terminal / résumé) [D48].
 
 ## 0. Operating instructions (to the agent)

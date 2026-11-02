@@ -47,7 +47,69 @@ SANITY_WRITE_TOKEN=…
 2. `bun run sanity:schema` prints the declaration;
 3. deploy it to `development` and `production` with Sanity's MCP `deploy_schema` (workspace `default`), or wire `schemaTypes` into a Studio and run `sanity schema deploy`.
 
-To run a Studio later, scaffold one in a separate folder (`bun create sanity@latest`), pass `schemaTypes` from `sanity/schema.ts` to `defineConfig`, and keep it out of the app's dependencies. The admin area (Phase 8) is the intended editor.
+### Running a Studio (optional)
+
+The admin area is the intended editor. If you also want Sanity Studio, run it as a separate app; the repository ships what it needs in `sanity/studio.ts` (D65):
+
+- `studioSchemaTypes`: `schemaTypes` plus list previews (English title, subtitle, image, and `· hidden` for `visible: false`), a "Display order" ordering for collections, and field validation that calls the app's zod schemas, so length limits, slug/URL/colour/date patterns, Markdown without raw HTML and "both English and Portuguese" rules match the admin exactly. Images need an uploaded asset and alt text in both languages.
+- `singletonTypes`: `profile`, `contact` and `resume`, whose `_id` equals their type.
+
+Cross-field and cross-document rules (unique slugs, existing technologies, an icon slug for Simple Icons/Devicon) are not repeated in Studio. A document that breaks them is skipped and logged by the read pipeline, so check the public page after publishing from Studio.
+
+Scaffold the Studio next to (not inside) the app, for example `studio/` with its own `package.json` (`bun create sanity@latest`, then `bun add zod`), and keep the `sanity` package out of the app's dependencies:
+
+```ts
+// studio/sanity.config.ts
+import { defineConfig } from 'sanity';
+import { structureTool } from 'sanity/structure';
+
+import { singletonTypes, studioSchemaTypes } from '../sanity/studio';
+
+const singletons = new Set<string>(singletonTypes);
+
+export default defineConfig({
+  projectId: 'njcnsmax',
+  dataset: 'development',
+  plugins: [
+    structureTool({
+      structure: (S) =>
+        S.list()
+          .title('Content')
+          .items([
+            ...singletonTypes.map((type) =>
+              S.listItem()
+                .title(type)
+                .id(type)
+                .child(S.document().schemaType(type).documentId(type)),
+            ),
+            S.divider(),
+            ...S.documentTypeListItems().filter(
+              (item) => !singletons.has(item.getId() ?? ''),
+            ),
+          ]),
+    }),
+  ],
+  schema: {
+    types: studioSchemaTypes,
+    templates: (templates) =>
+      templates.filter((template) => !singletons.has(template.schemaType)),
+  },
+  document: {
+    actions: (actions, { schemaType }) =>
+      singletons.has(schemaType)
+        ? actions.filter(
+            ({ action }) => action !== 'duplicate' && action !== 'delete',
+          )
+        : actions,
+  },
+});
+```
+
+Notes for Studio editing:
+
+- Studio creates drafts; the site reads `perspective=published`, so nothing shows until you publish. Publishing triggers the revalidation webhook below.
+- New documents get Studio's random ids instead of `<type>.<uuid>`. The site reads them fine (ids only need to match `documentIdSchema`), but the admin's URLs assume `<type>.<uuid>` (D55), so it cannot open a Studio-created document. Create documents in the admin and edit them in either place.
+- The Studio's own origin must be added under API → CORS origins with credentials, and editors sign in with their Sanity account; no app token is involved.
 
 ## Seeding
 

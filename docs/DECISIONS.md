@@ -248,7 +248,7 @@ Latest stable unless noted. Majors are pinned with `^`; exact versions come from
 
 - **Context.** §11.10 asks for `sanity/schema/*.ts` with `defineType`. That requires the `sanity` package (Studio, React peers, styled-components) only to type-check data the app never runs.
 - **Decision.** One plain-data file, `sanity/schema.ts` (`schemaTypes`: 6 object types, 10 document types), mirrors the storage shape, with no `sanity` dependency. The same declaration is deployed to both datasets as the `default` workspace schema, so Sanity's tooling (Content Lake schema, MCP, a future Studio) knows the types; `bun run sanity:schema` prints it. Validation stays in zod. A unit test walks every converted fixture document and fails if a field is missing from the schema.
-- **Consequence.** A separate Studio can later `import { schemaTypes }` into `defineConfig` unchanged. Schema changes mean: edit `sanity/schema.ts` → test → redeploy (`docs/SANITY.md`).
+- **Consequence.** A separate Studio can later `import { schemaTypes }` into `defineConfig` unchanged. Schema changes mean: edit `sanity/schema.ts` → test → redeploy (`docs/SANITY.md`). (Phase 10 adds the Studio layer in `sanity/studio.ts`, D65.)
 
 ### D30 — Datasets and seeding
 
@@ -535,6 +535,16 @@ Latest stable unless noted. Majors are pinned with `^`; exact versions come from
   - `matrix` asks the UI for an effect through a new `actions.effect('matrix' | null)` and waits 4 s with the abortable `ctx.delay`, switching it off in `finally` (Ctrl+C or closing the window ends it). `MatrixRain` is 32 CSS-animated columns of fixed glyphs (deterministic, transforms only, no glyph swapping, so nothing flashes; two React state updates in total). `ctx.reducedMotion` (reduced motion or Pause animations) skips it with a one-line message; the global reduced-motion rule also stops it mid-way.
   - None of the outputs mentions the admin, `su`, sessions or passwords (unit-tested for every egg); `sudo` is public, so the engine test's fake secret command was renamed from `sudoku` to avoid a legitimate "did you mean sudo".
 - **Consequence.** The help list grows by eight lines. The terminal chunk grows by about 2 KB gzip (still under its 20 KB ceiling, D58); strings live in the lazy catalog.
+
+### D65 — Studio-ready schemas (Phase 10, extends D29)
+
+- **Context.** §11.10 asks for Studio-ready `defineType` schemas that mirror the zod contract. D29 kept the schema as plain data (no `sanity` dependency) for the schema API, which cannot store functions; a Studio, however, wants previews, orderings and validation.
+- **Decision.**
+  - `sanity/schema.ts` stays the deployable plain-data declaration (now with titles on every document and object type).
+  - `sanity/studio.ts` exports `studioSchemaTypes` (the same types plus `preview`, a "Display order" `orderings` entry for collections, and `validation` on fields) and `singletonTypes`. Validation is built from the zod schemas in `src/lib/content/schema.ts`: each stored field whose name exists in the zod document shape gets `rule.custom()` running that zod field schema (slugs read `.current`; images need an asset and are checked for alt text; gallery items check alt and caption), plus `rule.required()` when zod rejects `undefined`. Limits and patterns therefore cannot drift. `technologies` (references) and résumé files have no field-level twin and are listed in `UNVALIDATED_FIELDS`.
+  - The Rule type is a two-method structural interface (`required()`, `custom()`), which Sanity's `Rule` satisfies, so the app needs neither `sanity` nor `@sanity/types`. `docs/SANITY.md` has a `sanity.config.ts` with a singleton-aware structure.
+  - Cross-field and cross-document rules are not repeated in Studio; the read pipeline skips and logs a document that breaks them.
+- **Consequence.** A separately scaffolded Studio needs `zod` and a relative import of `sanity/studio.ts`. Documents created in Studio get random ids, which the admin's `<type>.<uuid>` URLs (D55) cannot open; create in the admin, edit in either. `src/lib/content/sanity/studio.test.ts` proves every seeded document passes, every zod-backed field is validated, the main rules reject bad input, and previews/orderings exist.
 
 ## 5. Contradictions found in the spec and how they are resolved
 
