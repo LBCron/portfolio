@@ -433,6 +433,12 @@ html[data-motion='reduced'] .route-fade {
   );
 }
 
+/* No flash of the wordmark name on the home page: hidden until JS says the
+   hero left the viewport (data-hero="false"). */
+:root:has(#top) header:not([data-hero='false']) [data-header-name] {
+  opacity: 0;
+}
+
 @utility container-page {
   width: var(--container);
   margin-inline: auto;

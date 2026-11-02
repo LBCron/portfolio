@@ -26,7 +26,8 @@ export async function Header() {
           <Monogram />
           <span
             aria-hidden="true"
-            className="hidden text-[0.9375rem] font-semibold tracking-[-0.01em] text-text-1 min-[400px]:inline"
+            data-header-name
+            className="hidden text-[0.9375rem] font-semibold tracking-[-0.01em] text-text-1 transition-opacity duration-300 motion-reduce:transition-none min-[400px]:inline"
           >
             {owner.shortName}
           </span>
