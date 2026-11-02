@@ -17,7 +17,6 @@ export default defineConfig({
     globals: true,
     environment: 'node',
     include: ['src/**/*.test.{ts,tsx}', 'scripts/**/*.test.ts'],
-    setupFiles: ['./tests/setup.ts'],
     restoreMocks: true,
   },
 });

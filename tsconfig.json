@@ -17,7 +17,7 @@
     "verbatimModuleSyntax": false,
     "jsx": "react-jsx",
     "incremental": true,
-    "types": ["node", "vitest/globals", "@testing-library/jest-dom"],
+    "types": ["node", "vitest/globals"],
     "plugins": [{ "name": "next" }],
     "paths": {
       "@/*": ["./src/*"]
