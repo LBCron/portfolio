@@ -1,6 +1,8 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
+import { waitForHydration } from './hydration';
+
 const AXE_TAGS = [
   'wcag2a',
   'wcag2aa',
@@ -142,6 +144,8 @@ test('language switch keeps the route and hash', async ({ page }) => {
   // Looping hero motion keeps WebKit's actionability check from settling.
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/en#top', { waitUntil: 'domcontentloaded' });
+  // The switcher adds the hash once hydrated; an earlier click drops it.
+  await waitForHydration(page);
   const menuButton = page.getByRole('button', { name: 'Open menu' });
   const inMenu = await menuButton.isVisible();
   if (inMenu) await menuButton.click();
