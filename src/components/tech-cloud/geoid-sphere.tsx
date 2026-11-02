@@ -10,6 +10,7 @@ import { cn } from '@/lib/cn';
 import type { TechCategory } from '@/lib/content/taxonomy';
 import type { PublicTechIcon } from '@/lib/content/icon-src';
 import { fibonacciGeoid } from '@/lib/tech-cloud/geoid';
+import { ease, frameScale, stepDrag } from '@/lib/tech-cloud/motion';
 
 import { CloudMark } from './cloud-mark';
 import { geoidStageClassName } from './stage';
@@ -36,7 +37,7 @@ interface GeoidSphereProps {
 
 /** Depth opacity multiplier for icons outside the active category filter. */
 const CATEGORY_DIM = 0.08;
-/** Per-frame lerp toward `CATEGORY_DIM` / 1 (~250ms at 60fps). */
+/** Per-60Hz-frame lerp toward `CATEGORY_DIM` / 1 (~250ms at any refresh rate, D66). */
 const CATEGORY_DIM_LERP = 0.12;
 
 interface ItemRuntime {
@@ -77,9 +78,14 @@ export function GeoidSphere({
   const dragRef = useRef({
     active: false,
     previousX: 0,
+    /** Pointer travel (rad) since the last frame; consumed once per frame. */
+    pending: 0,
+    /** Coast velocity (rad per 60 Hz frame). */
     velocity: 0,
     pointerId: -1,
   });
+  /** Stage size, measured by the ResizeObserver so pointer moves never read layout. */
+  const sizeRef = useRef({ width: 0, height: 0 });
   const pausedRef = useRef(paused);
   const categoryRef = useRef(activeCategory);
   const selectedRef = useRef(selectedId);
@@ -141,23 +147,37 @@ export function GeoidSphere({
     });
 
     let frame = 0;
+    let lastTime = 0;
     let inView = true;
     let visible = document.visibilityState === 'visible';
     let width = stage.clientWidth;
     let height = stage.clientHeight;
+    sizeRef.current = { width, height };
     let reduced =
       document.documentElement.dataset.motion === 'reduced' ||
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+    const canRun = () => inView && visible && width > 0 && height > 0;
+    // The loop stops itself when the stage is hidden or off-screen and is
+    // restarted here, so an idle cloud costs no frames at all.
+    const start = () => {
+      if (frame !== 0 || !canRun()) return;
+      lastTime = 0;
+      frame = requestAnimationFrame(tick);
+    };
+
     const resize = new ResizeObserver(() => {
       width = stage.clientWidth;
       height = stage.clientHeight;
+      sizeRef.current = { width, height };
+      start();
     });
     resize.observe(stage);
 
     const observer = new IntersectionObserver(
       ([entry]) => {
         inView = entry?.isIntersecting ?? false;
+        start();
       },
       { rootMargin: '300px' },
     );
@@ -165,6 +185,7 @@ export function GeoidSphere({
 
     const onVisibility = () => {
       visible = document.visibilityState === 'visible';
+      start();
     };
     const onMotion = () => {
       reduced =
@@ -181,12 +202,28 @@ export function GeoidSphere({
     });
 
     let frameIndex = 0;
-    const tick = (time: number) => {
+    function tick(time: number) {
+      if (!canRun()) {
+        frame = 0;
+        return;
+      }
       frame = requestAnimationFrame(tick);
-      if (!inView || !visible || width <= 0 || height <= 0) return;
+
+      // Everything below is scaled by real frame time (D66): the same speed at
+      // 60, 90 and 144 Hz, and a stalled frame can't jump the scene.
+      const gapMs = lastTime ? time - lastTime : 1000 / 60;
+      lastTime = time;
+      const k = frameScale(gapMs);
 
       const drag = dragRef.current;
-      if (!drag.active) drag.velocity *= 0.95;
+      const step = stepDrag({
+        velocity: drag.velocity,
+        pending: drag.pending,
+        dragging: drag.active,
+        gapMs,
+      });
+      drag.pending = 0;
+      drag.velocity = step.velocity;
 
       const freeze = pausedRef.current || reduced;
       const category = categoryRef.current;
@@ -202,14 +239,11 @@ export function GeoidSphere({
       for (const item of itemsRef.current) {
         const targetMultiplier = item.isHovered || freeze ? 0.05 : 1;
         item.speedMultiplier +=
-          (targetMultiplier - item.speedMultiplier) * 0.08;
+          (targetMultiplier - item.speedMultiplier) * ease(0.08, k);
 
-        if (!freeze) {
-          item.theta +=
-            item.rotationSpeed * item.speedMultiplier + drag.velocity;
-        } else if (drag.active || Math.abs(drag.velocity) > 0.000_01) {
-          item.theta += drag.velocity;
-        }
+        item.theta += freeze
+          ? step.rotation
+          : item.rotationSpeed * item.speedMultiplier * k + step.rotation;
 
         const mul = item.radiusMultiplier;
         const x = rxScale * mul * item.sinPhi * Math.cos(item.theta);
@@ -222,7 +256,7 @@ export function GeoidSphere({
           item.dimMultiplier = dimTarget;
         } else {
           item.dimMultiplier +=
-            (dimTarget - item.dimMultiplier) * CATEGORY_DIM_LERP;
+            (dimTarget - item.dimMultiplier) * ease(CATEGORY_DIM_LERP, k);
         }
         if (!matching) item.isHovered = false;
         if (!inFront) {
@@ -288,11 +322,12 @@ export function GeoidSphere({
           item.el.toggleAttribute('data-interactive', interactive);
         }
       }
-    };
-    frame = requestAnimationFrame(tick);
+    }
+    start();
 
     return () => {
       cancelAnimationFrame(frame);
+      frame = 0;
       hoverAbort.abort();
       resize.disconnect();
       observer.disconnect();
@@ -304,11 +339,17 @@ export function GeoidSphere({
   }, [technologies]);
 
   function onPointerDown(event: ReactPointerEvent<HTMLDivElement>) {
+    // Touch has its own path below (it must keep vertical page scroll).
     if (event.pointerType === 'touch') return;
+    if (event.pointerType === 'mouse' && event.button !== 0) return;
     const drag = dragRef.current;
+    // A second pointer must not hijack a drag in progress.
+    if (drag.active) return;
     drag.active = true;
     drag.previousX = event.clientX;
     drag.pointerId = event.pointerId;
+    drag.pending = 0;
+    drag.velocity = 0;
     event.currentTarget.setPointerCapture(event.pointerId);
   }
 
@@ -317,8 +358,9 @@ export function GeoidSphere({
     if (!drag.active || event.pointerId !== drag.pointerId) return;
     const deltaX = event.clientX - drag.previousX;
     drag.previousX = event.clientX;
-    const width = stageRef.current?.clientWidth || window.innerWidth;
-    drag.velocity = -(deltaX / width) * 2.5;
+    // Travel accumulates and is consumed once per frame, so the same drag turns
+    // the sphere the same amount whatever the pointer's polling rate (D66).
+    drag.pending += -(deltaX / (sizeRef.current.width || 1)) * 2.5;
   }
 
   function onPointerUp(event: ReactPointerEvent<HTMLDivElement>) {
@@ -347,6 +389,8 @@ export function GeoidSphere({
       startY = touch.clientY;
       startTime = performance.now();
       dragRef.current.previousX = touch.clientX;
+      dragRef.current.pending = 0;
+      dragRef.current.velocity = 0;
     };
     const onMove = (event: TouchEvent) => {
       if (!tracking || event.touches.length !== 1) return;
@@ -356,15 +400,20 @@ export function GeoidSphere({
       if (!moved && Math.hypot(dx, dy) > 6) moved = true;
       if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 4) {
         event.preventDefault();
-        const width = stage.clientWidth || window.innerWidth;
-        dragRef.current.velocity =
-          -((touch.clientX - dragRef.current.previousX) / width) * 2.5;
+        dragRef.current.active = true;
+        dragRef.current.pending +=
+          -(
+            (touch.clientX - dragRef.current.previousX) /
+            (sizeRef.current.width || 1)
+          ) * 2.5;
         dragRef.current.previousX = touch.clientX;
       }
     };
     const onEnd = (event: TouchEvent) => {
       if (!tracking) return;
       tracking = false;
+      // Release: the queued travel seeds the coast (D66).
+      dragRef.current.active = false;
       const duration = performance.now() - startTime;
       if (!moved && duration < 250) {
         const target = (event.target as Element | null)?.closest(
@@ -387,7 +436,15 @@ export function GeoidSphere({
     stage.addEventListener('touchmove', onMove, { passive: false });
     stage.addEventListener('touchend', onEnd, { passive: false });
     stage.addEventListener('touchcancel', onEnd);
+    // Losing focus mid-drag must not leave the gesture latched.
+    const release = () => {
+      tracking = false;
+      dragRef.current.active = false;
+      dragRef.current.pointerId = -1;
+    };
+    window.addEventListener('blur', release);
     return () => {
+      window.removeEventListener('blur', release);
       stage.removeEventListener('touchstart', onStart);
       stage.removeEventListener('touchmove', onMove);
       stage.removeEventListener('touchend', onEnd);
