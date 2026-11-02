@@ -2,7 +2,14 @@
 
 import { Menu, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { type CSSProperties, useEffect, useId, useRef, useState } from 'react';
+import {
+  type CSSProperties,
+  type ReactNode,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from 'react';
 
 import { Link, usePathname } from '@/i18n/navigation';
 
@@ -14,7 +21,7 @@ import { NAV_SECTIONS } from './nav-items';
  * Full-screen menu below 768px. A native modal `<dialog>` gives the focus
  * trap, Esc and inert background; the page scroll is locked only while open.
  */
-export function MobileMenu() {
+export function MobileMenu({ links }: { links?: ReactNode }) {
   const t = useTranslations('header');
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -112,6 +119,7 @@ export function MobileMenu() {
         </nav>
 
         <div className="container-page flex shrink-0 flex-wrap items-center justify-between gap-3 border-t border-line py-5 safe-bottom">
+          {links}
           <LanguageSwitcher />
           <MotionToggle />
         </div>

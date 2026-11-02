@@ -27,7 +27,8 @@
     "dockMinimized": "(minimizado)",
     "hint": "Experimente o terminal: digite help",
     "toggle": "Alternar terminal",
-    "error": "Não foi possível carregar o terminal. Recarregue a página e tente de novo."
+    "error": "Não foi possível carregar o terminal. Recarregue a página e tente de novo.",
+    "buttonLabel": "Terminal"
   },
   "terminal": {
     "inputLabel": "Entrada de comando, {prompt}",
@@ -345,7 +346,8 @@
     "languageShort": {
       "en": "EN",
       "pt": "PT"
-    }
+    },
+    "linksLabel": "Perfis"
   },
   "hero": {
     "eyebrow": "{jobTitle}",

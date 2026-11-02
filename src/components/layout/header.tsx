@@ -5,6 +5,7 @@ import { Link } from '@/i18n/navigation';
 
 import { DesktopNav } from './desktop-nav';
 import { HeaderFrame } from './header-frame';
+import { HeaderLinks } from './header-links';
 import { LanguageSwitcher } from './language-switcher';
 import { MobileMenu } from './mobile-menu';
 import { Monogram } from './monogram';
@@ -12,6 +13,7 @@ import { TerminalToggle } from './terminal-toggle';
 
 export async function Header() {
   const t = await getTranslations('header');
+  const links = await HeaderLinks();
 
   return (
     <HeaderFrame>
@@ -33,9 +35,10 @@ export async function Header() {
         <DesktopNav />
 
         <div className="flex items-center gap-2">
+          {links ? <div className="hidden md:block">{links}</div> : null}
           <LanguageSwitcher className="hidden xs:inline-flex" />
           <TerminalToggle />
-          <MobileMenu />
+          <MobileMenu links={links} />
         </div>
       </div>
     </HeaderFrame>
