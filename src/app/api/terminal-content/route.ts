@@ -51,10 +51,9 @@ export async function GET(request: Request) {
       practices,
     }),
     {
-      headers: {
-        'Cache-Control':
-          'public, max-age=0, s-maxage=300, stale-while-revalidate=3600',
-      },
+      // Admin saves cannot purge a CDN copy of this route, so never keep one:
+      // hidden items must disappear at once. The content reads are tag-cached.
+      headers: { 'Cache-Control': 'no-store' },
     },
   );
 }
