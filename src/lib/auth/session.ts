@@ -37,5 +37,6 @@ export async function startSession(start?: number) {
 }
 
 export async function endSession() {
-  (await cookies()).delete(SESSION_COOKIE);
+  // `delete()` omits `Secure`, which browsers reject for `__Host-` cookies.
+  (await cookies()).set(sessionCookie('', 0));
 }
