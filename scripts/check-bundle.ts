@@ -53,6 +53,11 @@ const SERVER_ONLY_VARS = [
 ];
 
 const ADMIN_PATH = /["'`]\/admin(?:[/"'`?]|$)/;
+// The analytics filter in ClickTracker (`url.includes('/admin')`) must ship
+// publicly to drop admin page views; it is not a route reference.
+const ANALYTICS_FILTER = /\.includes\((["'`])\/admin\1\)/g;
+const mentionsAdmin = (text: string) =>
+  ADMIN_PATH.test(text.replace(ANALYTICS_FILTER, ''));
 
 interface RouteStats {
   route: string;
@@ -159,7 +164,7 @@ for (const file of publicChunks) {
   }
 }
 for (const path of jsChunks) {
-  if (!adminChunks.has(normalize(path)) && ADMIN_PATH.test(read(path))) {
+  if (!adminChunks.has(normalize(path)) && mentionsAdmin(read(path))) {
     fail(`${normalize(path)} mentions the admin path outside the admin`);
   }
 }
