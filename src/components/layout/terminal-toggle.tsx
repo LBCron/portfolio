@@ -7,6 +7,7 @@ import { buttonVariants } from '@/components/ui/button';
 import { Kbd } from '@/components/ui/kbd';
 import { Tooltip } from '@/components/ui/tooltip';
 import { toggleTerminal } from '@/components/window-manager/terminal-controls';
+import { track } from '@/lib/analytics';
 import { cn } from '@/lib/cn';
 
 import { useShortcutLabel } from './use-shortcut-label';
@@ -29,7 +30,10 @@ export function TerminalToggle() {
         type="button"
         aria-label={t('toggle')}
         aria-keyshortcuts="Control+/ Meta+/"
-        onClick={toggleTerminal}
+        onClick={() => {
+          track('terminal_open');
+          toggleTerminal();
+        }}
         className={cn(
           buttonVariants({ variant: 'primary', size: 'sm' }),
           'px-4',

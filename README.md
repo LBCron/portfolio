@@ -10,7 +10,7 @@ The initial content is fictional demo data; [docs/ADDING_CONTENT.md](docs/ADDING
 - **Terminal:** a windowed shell (`Ctrl/Cmd + /`) that knows the site: `help`, `ls`, `cd`, `cat`, `tree`, `open`, `goto`, `lang`, `projects`, `resume`, `neofetch`, `git log`, a few harmless easter eggs (`fortune`, `cowsay`, `matrix`, `sudo`…) and more, with history and Tab completion. It can be moved, resized, snapped, minimized and maximized, and becomes a bottom sheet on phones.
 - **Technology cloud:** a rotating geoid of logos with category filters; the List view is the no-JS, reduced-motion and screen-reader equivalent.
 - **Admin:** `su julio` in the terminal opens a session for `/admin`, where every piece of content is edited. Anonymous requests get the same 404 as any unknown URL.
-- **Quality bar:** WCAG 2.2 AA, maximal SEO (metadata, JSON-LD, sitemap, hreflang, OG images), strict security headers, and no third-party requests, trackers or cookies for visitors.
+- **Quality bar:** WCAG 2.2 AA, maximal SEO (metadata, JSON-LD, sitemap, hreflang, OG images), strict security headers, and no third-party requests or cookies for visitors (only cookieless, same-origin Vercel Web Analytics).
 
 ## Stack
 
@@ -94,7 +94,7 @@ A Sanity outage at build time fails the build loudly; at runtime the cached page
 - CSP on every response: a static policy for prerendered public pages (`script-src 'self' 'unsafe-inline'`, no third-party origins) and a per-request nonce policy for the admin; HSTS, `nosniff`, `X-Frame-Options: DENY`, COOP/CORP `same-origin`, a restrictive `Permissions-Policy` (D4, D56).
 - Server-only modules import `server-only`; `check:bundle` fails if a server-only variable's name or value reaches the client.
 - Zod validation at every boundary, sanitized Markdown, URL allowlists, SVG and PDF sanitizers, EXIF stripping (D54).
-- No analytics or visitor cookies beyond the functional `NEXT_LOCALE`, set only on an explicit language switch.
+- Analytics: Vercel Web Analytics only (`@vercel/analytics`): cookieless, served from the site's own origin (`/_vercel/insights`), active in production on Vercel, no visitor identifiers. Custom events (`src/lib/analytics.ts`) carry low-cardinality properties only. No visitor cookies beyond the functional `NEXT_LOCALE`, set only on an explicit language switch.
 
 ## CI
 

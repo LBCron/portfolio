@@ -4,6 +4,7 @@ import { Copy, Mail } from 'lucide-react';
 import { useSyncExternalStore } from 'react';
 
 import { buttonVariants } from '@/components/ui/button';
+import { track } from '@/lib/analytics';
 import { cn } from '@/lib/cn';
 import { toast } from '@/stores/toast-store';
 
@@ -36,6 +37,7 @@ export function EmailActions({ user, domain, labels }: EmailActionsProps) {
   async function copy() {
     try {
       await navigator.clipboard.writeText(address);
+      track('email_copy');
       toast(labels.copied, 'success');
     } catch {
       toast(labels.copyFailed, 'error');

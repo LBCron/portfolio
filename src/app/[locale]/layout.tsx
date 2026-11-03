@@ -8,6 +8,7 @@ import { getMessages, getTranslations } from 'next-intl/server';
 
 import { Footer } from '@/components/layout/footer';
 import { Header } from '@/components/layout/header';
+import { ClickTracker } from '@/components/layout/click-tracker';
 import { LanguageAnnouncer } from '@/components/layout/language-announcer';
 import { MotionInit } from '@/components/layout/motion-init';
 import { MotionProvider } from '@/components/layout/motion-provider';
@@ -79,6 +80,7 @@ export default async function LocaleLayout({
     >
       <body suppressHydrationWarning>
         <MotionInit />
+        <ClickTracker />
         <NextIntlClientProvider messages={clientMessages}>
           <MotionProvider>
             <SkipLink />

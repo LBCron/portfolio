@@ -1,6 +1,7 @@
 import type { AppLocale } from '@/i18n/routing';
 import { saveLocalePreference } from '@/i18n/locale-cookie';
 import type { useRouter } from '@/i18n/navigation';
+import { track } from '@/lib/analytics';
 
 export const LANGUAGE_SWITCH_KEY = 'jm.language-switch';
 
@@ -14,6 +15,7 @@ export function switchLocale(
   target: AppLocale,
 ) {
   saveLocalePreference(target);
+  track('language_switch', { to: target });
   const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
   try {
     sessionStorage.setItem(

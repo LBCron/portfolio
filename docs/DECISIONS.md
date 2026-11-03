@@ -614,3 +614,9 @@ _The headline and rotating-word parts are superseded by D67 (the H1 is now the n
 - HSTS `preload` is not added until the owner confirms.
 - GitHub Actions is available on the repo; Lighthouse CI runs with `@lhci/cli` against `next start`, no LHCI server (temporary public storage disabled; reports kept as artifacts).
 - The real résumé, photo and content will be entered later through the admin; nothing real is seeded.
+
+## Vercel Web Analytics (2026-11-02)
+
+- **Decision.** `@vercel/analytics` is mounted in `src/app/[locale]/layout.tsx`. It is cookieless and loads from `/_vercel/insights/*` on the site's own origin, so the CSP (`'self'` only) is unchanged and no banner is needed. `beforeSend` drops any `/admin` URL; the admin tree is outside `[locale]` anyway.
+- **Events.** `src/lib/analytics.ts` wraps `track` with a typed name list. `ClickTracker` (one delegated listener) covers server-rendered links: `email_click`, `resume_open` (locale), `external_link` (host). Direct calls: `email_copy`, `language_switch` (to), `terminal_open` (fires on toggle, including close). Properties are never user input; terminal commands are not tracked.
+- **Owner step.** Enable Web Analytics in the Vercel project; the script is only served on Vercel deployments.
