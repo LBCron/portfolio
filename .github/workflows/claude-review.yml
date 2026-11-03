@@ -25,6 +25,11 @@ on:
         required: false
         default: ''
         type: string
+      debug:
+        description: Print the full Claude output in the log (may expose file contents)
+        required: false
+        default: false
+        type: boolean
       extra_args:
         description: Extra Claude Code CLI flags (e.g. --fallback-model claude-haiku-5-5)
         required: false
@@ -52,6 +57,7 @@ jobs:
       - uses: anthropics/claude-code-action@4845bacbb38b3c4b15d948f035349786f678e068 # v1.0.267
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          show_full_output: ${{ inputs.debug }}
           prompt: |
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ inputs.pr_number }}
