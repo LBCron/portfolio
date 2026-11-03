@@ -11,7 +11,13 @@ const MAX_KEYS = 5000;
 export interface RateLimiter {
   /** False while the client is locked out or all attempts are paused. */
   check(key: string): Promise<boolean>;
-  fail(key: string): Promise<void>;
+  /**
+   * Atomically checks and counts an attempt as a failure, so concurrent
+   * attempts cannot all pass the check before any failure is recorded.
+   * Returns false (and counts nothing) while locked out or paused.
+   */
+  reserve(key: string): Promise<boolean>;
+  /** Forgets the client's failures, including the one `reserve` counted. */
   succeed(key: string): Promise<void>;
 }
 
@@ -42,36 +48,45 @@ export function createMemoryLimiter(now: () => number = Date.now): RateLimiter {
     if (entries.size > MAX_KEYS) entries.clear();
   }
 
+  function allowed(key: string, time: number) {
+    prune(time);
+    if (global.length >= GLOBAL_MAX_FAILURES) return false;
+    return (entries.get(key)?.lockedUntil ?? 0) <= time;
+  }
+
+  function record(key: string, time: number) {
+    global.push(time);
+    const entry = entries.get(key) ?? {
+      failures: [],
+      lockedUntil: 0,
+      strikes: 0,
+    };
+    entry.failures = entry.failures.filter((at) => time - at < WINDOW_MS);
+    entry.failures.push(time);
+    if (entry.failures.length >= MAX_FAILURES) {
+      entry.failures = [];
+      entry.lockedUntil =
+        time + Math.min(LOCKOUT_MS * 2 ** entry.strikes, MAX_LOCKOUT_MS);
+      entry.strikes += 1;
+    }
+    entries.set(key, entry);
+  }
+
   return {
     async check(key) {
-      const time = now();
-      prune(time);
-      if (global.length >= GLOBAL_MAX_FAILURES) return false;
-      return (entries.get(key)?.lockedUntil ?? 0) <= time;
+      return allowed(key, now());
     },
 
-    async fail(key) {
+    // No await between the check and the record: one tick, no interleaving.
+    async reserve(key) {
       const time = now();
-      prune(time);
-      global.push(time);
-      const entry = entries.get(key) ?? {
-        failures: [],
-        lockedUntil: 0,
-        strikes: 0,
-      };
-      entry.failures = entry.failures.filter((at) => time - at < WINDOW_MS);
-      entry.failures.push(time);
-      if (entry.failures.length >= MAX_FAILURES) {
-        entry.failures = [];
-        entry.lockedUntil =
-          time + Math.min(LOCKOUT_MS * 2 ** entry.strikes, MAX_LOCKOUT_MS);
-        entry.strikes += 1;
-      }
-      entries.set(key, entry);
+      if (!allowed(key, time)) return false;
+      record(key, time);
+      return true;
     },
 
     async succeed(key) {
-      entries.delete(key);
+      if (entries.delete(key)) global.pop();
     },
   };
 }

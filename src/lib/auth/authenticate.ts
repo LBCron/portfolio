@@ -31,7 +31,8 @@ export function createAuthenticator(deps: AuthenticatorDeps) {
     const client = await deps.clientKey();
     let ok = false;
 
-    if (await deps.limiter.check(client)) {
+    // The attempt is counted before the slow verify, so a burst cannot slip through.
+    if (await deps.limiter.reserve(client)) {
       if (
         deps.verify &&
         typeof password === 'string' &&
@@ -43,7 +44,6 @@ export function createAuthenticator(deps: AuthenticatorDeps) {
         await deps.limiter.succeed(client);
         deps.log('auth.success', client);
       } else {
-        await deps.limiter.fail(client);
         deps.log('auth.fail', client);
       }
     } else {

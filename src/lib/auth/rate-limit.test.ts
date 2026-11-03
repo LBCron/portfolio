@@ -11,7 +11,7 @@ function setup() {
     limiter,
     advance: (ms: number) => (time += ms),
     fail: async (key: string, times: number) => {
-      for (let i = 0; i < times; i += 1) await limiter.fail(key);
+      for (let i = 0; i < times; i += 1) await limiter.reserve(key);
     },
   };
 }
@@ -28,6 +28,24 @@ describe('memory limiter', () => {
     expect(await limiter.check('a')).toBe(false);
     advance(2);
     expect(await limiter.check('a')).toBe(true);
+  });
+
+  it('counts concurrent attempts before any of them finishes', async () => {
+    const { limiter } = setup();
+    const results = await Promise.all(
+      Array.from({ length: 20 }, () => limiter.reserve('a')),
+    );
+    expect(results.filter(Boolean)).toHaveLength(5);
+    expect(await limiter.check('fresh')).toBe(true);
+  });
+
+  it('refunds the reserved attempt on success', async () => {
+    const { limiter } = setup();
+    for (let i = 0; i < 30; i += 1) {
+      await limiter.reserve('a');
+      await limiter.succeed('a');
+    }
+    expect(await limiter.check('fresh')).toBe(true);
   });
 
   it('doubles the lockout for repeat offenders', async () => {

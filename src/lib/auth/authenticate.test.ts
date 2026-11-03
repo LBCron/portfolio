@@ -52,6 +52,19 @@ describe('authenticate', () => {
     expect(events.at(-1)).toBe('auth.locked');
   });
 
+  it('caps a concurrent burst at the lockout threshold', async () => {
+    let verifies = 0;
+    const { authenticate } = setup({
+      verify: async () => {
+        verifies += 1;
+        await new Promise((resolve) => setTimeout(resolve, 10));
+        return false;
+      },
+    });
+    await Promise.all(Array.from({ length: 20 }, () => authenticate('x')));
+    expect(verifies).toBe(5);
+  });
+
   it('fails generically when the admin is disabled or the input is odd', async () => {
     const disabled = setup({ verify: null });
     expect(await disabled.authenticate('right')).toEqual({ ok: false });
