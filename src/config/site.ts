@@ -4,7 +4,7 @@
  */
 export const owner = {
   name: 'Julio L. Muller',
-  shortName: 'Julio Muller',
+  shortName: 'Julio L. Muller',
   givenName: 'Julio',
   familyName: 'Muller',
   initials: 'JM',
