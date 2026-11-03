@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
 import { addHistory, HISTORY_LIMIT, HistoryNavigator } from './history';
-import { createRegistry, isRecordable, publicCommands } from './registry';
+import {
+  createRegistry,
+  defaultRegistry,
+  isRecordable,
+  isSecretLine,
+  publicCommands,
+} from './registry';
 import type { Command } from './commands/types';
 
 describe('addHistory', () => {
@@ -58,5 +64,12 @@ describe('isRecordable', () => {
     expect(isRecordable(registry, 'unknown-thing')).toBe(true);
     expect(isRecordable(registry, 'hush now')).toBe(false);
     expect(isRecordable(registry, '   ')).toBe(false);
+  });
+
+  it('sees through quoting and escapes of secret names', () => {
+    for (const line of ['"su"', "'admin'", "s''u", '\\admin', 'logout now'])
+      expect(isRecordable(defaultRegistry, line)).toBe(false);
+    expect(isSecretLine(defaultRegistry, '"su"')).toBe(true);
+    expect(isSecretLine(defaultRegistry, 'help')).toBe(false);
   });
 });

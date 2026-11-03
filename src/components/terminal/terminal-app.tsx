@@ -9,12 +9,15 @@ import {
 } from '@/components/window-manager/terminal-controls';
 import type { AppLocale } from '@/i18n/routing';
 import { getSessionStatus, type SessionStatus } from '@/lib/auth/actions';
-import { isSecretName } from '@/lib/terminal/commands/secret/names';
 import { MARK } from '@/lib/terminal/commands/public/explore';
 import { applyCompletion, complete } from '@/lib/terminal/completion';
 import { buildContext, type EngineDeps, execute } from '@/lib/terminal/engine';
 import { text, type Span } from '@/lib/terminal/output';
-import { defaultRegistry, isRecordable } from '@/lib/terminal/registry';
+import {
+  defaultRegistry,
+  isRecordable,
+  isSecretLine,
+} from '@/lib/terminal/registry';
 import { loadSession, saveSession } from '@/lib/terminal/session';
 import { emptySnapshot } from '@/lib/terminal/snapshot';
 import type { TerminalEffect } from '@/lib/terminal/commands/types';
@@ -260,7 +263,7 @@ export default function TerminalApp() {
     stickToBottom.current = true;
     const trimmed = line.trim();
     // Secret lines and their output are never persisted.
-    const volatile = isSecretName(trimmed.split(/\s+/)[0]);
+    const volatile = isSecretLine(defaultRegistry, trimmed);
     echo(line, '', volatile);
     if (!trimmed) return;
     if (options?.multiline)

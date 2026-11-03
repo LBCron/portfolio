@@ -4,6 +4,7 @@ import { exploreCommands } from './commands/public/explore';
 import { fileCommands } from './commands/public/files';
 import { funCommands } from './commands/public/fun';
 import { systemCommands } from './commands/public/system';
+import { tokenize } from './parser';
 import { didYouMean } from './suggest';
 
 export interface Registry {
@@ -39,10 +40,22 @@ export function createRegistry(commands: readonly Command[]): Registry {
   };
 }
 
+/**
+ * Checks the raw first word and the one the engine will actually run, so
+ * `"su"`, `s''u` or `\admin` cannot dodge the secrecy rules.
+ */
+export function isSecretLine(registry: Registry, line: string) {
+  const raw = line.trim().split(/\s+/)[0] ?? '';
+  const tokens = tokenize(line);
+  const parsed = tokens.ok ? tokens.tokens[0] : undefined;
+  return [raw, parsed].some(
+    (name) => isSecretName(name) || (!!name && registry.isSecret(name)),
+  );
+}
+
 /** Secret commands are never recorded in history (nor persisted anywhere). */
 export function isRecordable(registry: Registry, line: string) {
-  const first = line.trim().split(/\s+/)[0] ?? '';
-  return first !== '' && !isSecretName(first) && !registry.isSecret(first);
+  return line.trim() !== '' && !isSecretLine(registry, line);
 }
 
 export const publicCommands: readonly Command[] = [
