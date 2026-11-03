@@ -268,6 +268,35 @@ test.describe('singletons and lists', () => {
     await slow.poll(snapshot(page)).not.toContain('e2e-booking');
   });
 
+  test('pressing Enter in the delete confirmation does not save unsaved edits', async ({
+    page,
+  }) => {
+    const label = `E2E enter ${Math.random().toString(36).slice(2, 7)}`;
+    await signIn(page);
+    await openEditor(page, '/admin/practices/new');
+    await field(page, 'label.en').fill(label);
+    await page.getByRole('button', { name: 'Copy EN → PT' }).click();
+    await page.getByRole('button', { name: 'Save and publish' }).click();
+    await published(page);
+    await expect(page).toHaveURL(/\/admin\/practices\/[0-9a-f-]{36}$/);
+    await hydrated(page);
+
+    await field(page, 'label.en').fill(`${label} edited`);
+    const dialog = await openDeleteDialog(page);
+    const confirmation = dialog.getByLabel('Confirmation text');
+    await confirmation.fill(label);
+    await confirmation.press('Enter');
+    // A wrongly submitted save would have finished by now.
+    await page.waitForTimeout(2_000);
+    await expect(page.getByText('Unsaved changes')).toBeVisible();
+    expect(
+      await (await page.request.get('/api/terminal-content?locale=en')).text(),
+    ).not.toContain(`${label} edited`);
+
+    await dialog.getByRole('button', { name: 'Delete permanently' }).click();
+    await expect(page).toHaveURL(/\/admin\/practices$/);
+  });
+
   test('a practice: create, copy EN to PT, reorder, hide, delete', async ({
     page,
   }) => {

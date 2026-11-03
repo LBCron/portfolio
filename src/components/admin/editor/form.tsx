@@ -402,6 +402,8 @@ function DeleteSection({
           value={typed}
           autoComplete="off"
           onChange={(event) => setTyped(event.target.value)}
+          // The dialog sits inside the editor <form>: Enter would save it.
+          onKeyDown={(event) => event.key === 'Enter' && event.preventDefault()}
         />
         {references.length > 0 ? (
           <div role="alert" className="mt-4 text-small text-danger">
