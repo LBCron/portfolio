@@ -33,7 +33,7 @@ export function stripNulls(value: unknown): unknown {
 function isLocalizedObject(value: PlainObject): boolean {
   if (typeof value.en !== 'string') return false;
   return Object.keys(value).every(
-    (key) => key === 'en' || key === 'pt' || key === '_type',
+    (key) => key === 'en' || key === 'pt' || key === '_type' || key === '_key',
   );
 }
 

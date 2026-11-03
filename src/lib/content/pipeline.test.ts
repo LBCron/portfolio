@@ -12,6 +12,17 @@ describe('content pipeline', () => {
     ).toEqual({ b: [1, { d: 'x' }], e: 0 });
   });
 
+  it('also fills array items that carry a Sanity _key', () => {
+    expect(
+      fillMissingTranslations(
+        { highlights: [{ _key: 'k1', _type: 'localeString', en: 'One' }] },
+        () => {},
+      ),
+    ).toEqual({
+      highlights: [{ _key: 'k1', _type: 'localeString', en: 'One', pt: 'One' }],
+    });
+  });
+
   it('fills missing pt values with en and reports the path', () => {
     const paths: string[] = [];
     const result = fillMissingTranslations(

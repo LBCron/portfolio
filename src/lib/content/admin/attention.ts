@@ -19,7 +19,7 @@ function missingPortuguese(value: unknown): number {
   if (!isBag(value)) return 0;
   const keys = Object.keys(value);
   const localized = keys.every(
-    (key) => key === 'en' || key === 'pt' || key === '_type',
+    (key) => key === 'en' || key === 'pt' || key === '_type' || key === '_key',
   );
   if (localized && !blank(value['en'])) return blank(value['pt']) ? 1 : 0;
   return Object.values(value).reduce<number>(

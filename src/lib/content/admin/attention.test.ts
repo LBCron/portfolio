@@ -34,6 +34,15 @@ describe('findAttention', () => {
     expect(text).toMatch(/no alt text/);
   });
 
+  it('flags a missing translation on array items that carry a _key', () => {
+    const items = findAttention({
+      practice: asDocs([
+        { id: 'practice.1', label: { _key: 'k1', en: 'Testing', pt: '' } },
+      ]),
+    });
+    expect(items[0]?.issue).toMatch(/missing in Portuguese/);
+  });
+
   it('flags thin write-ups and stays quiet about long ones', () => {
     const long = Array.from({ length: 160 }, () => 'word').join(' ');
     const items = findAttention({
