@@ -13,7 +13,6 @@ import { owner } from '@/config/site';
 import type { AppLocale } from '@/i18n/routing';
 import { cn } from '@/lib/cn';
 import type { Profile } from '@/lib/content';
-import { titleFontClass } from '@/styles/title-fonts';
 
 import { FitTitle } from './fit-title';
 
@@ -51,14 +50,16 @@ export async function Hero({ profile, nextSection }: HeroProps) {
           <p className="mb-3 font-label text-text-3 lg:hidden">{jobTitle}</p>
           <FitTitle
             id="hero-title"
-            className={cn(
+            // A CSS variable from the layout: importing the font module here
+            // would split its CSS into a second render-blocking stylesheet.
+            fontFamily={
+              profile?.titleFont && `var(--font-title-${profile.titleFont})`
+            }
+            className={
               profile?.titleFont
-                ? [
-                    'font-normal [font-synthesis:none]',
-                    titleFontClass[profile.titleFont],
-                  ]
-                : 'font-semibold',
-            )}
+                ? 'font-normal [font-synthesis:none]'
+                : 'font-semibold'
+            }
           >
             {profile?.displayName ?? owner.name}
           </FitTitle>

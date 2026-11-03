@@ -13,10 +13,12 @@ import { fitFontSize } from '@/lib/fit-text';
 export function FitTitle({
   id,
   className,
+  fontFamily,
   children,
 }: {
   id?: string;
   className?: string;
+  fontFamily?: string | undefined;
   children: string;
 }) {
   const ref = useRef<HTMLHeadingElement>(null);
@@ -48,7 +50,7 @@ export function FitTitle({
     <h1
       ref={ref}
       id={id}
-      style={{ '--chars': children.length } as CSSProperties}
+      style={{ '--chars': children.length, fontFamily } as CSSProperties}
       className={cn('title-fit', className)}
     >
       {children}

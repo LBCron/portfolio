@@ -20,6 +20,7 @@ import { owner, THEME_COLOR } from '@/config/site';
 import { isAppLocale, localeTags, routing } from '@/i18n/routing';
 import { siteMetadata } from '@/lib/seo/metadata';
 import { fontVariables } from '@/styles/fonts';
+import { titleFontVariables } from '@/styles/title-fonts';
 
 /** Namespaces needed by client components; the rest stays on the server. */
 const CLIENT_NAMESPACES = [
@@ -70,7 +71,7 @@ export default async function LocaleLayout({
   return (
     <html
       lang={localeTags[locale]}
-      className={fontVariables}
+      className={`${fontVariables} ${titleFontVariables}`}
       // Lets Next turn off our smooth scrolling for route changes, so a new
       // page starts at the top at once (and the cover morph measures it).
       data-scroll-behavior="smooth"
