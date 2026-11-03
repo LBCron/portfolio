@@ -129,13 +129,20 @@ export function resizeRect(
   let { x, y, width, height } = start;
   if (edge.includes('e')) width = Math.max(MIN_SIZE.width, start.width + dx);
   if (edge.includes('s')) height = Math.max(MIN_SIZE.height, start.height + dy);
+  // Clamp the size before deriving the position, so clampRect never has to
+  // move the origin and the anchored edge cannot drift.
   if (edge.includes('w')) {
-    width = Math.max(MIN_SIZE.width, start.width - dx);
+    width = clamp(start.width - dx, MIN_SIZE.width, viewport.width);
     x = start.x + start.width - width;
   }
   if (edge.includes('n')) {
-    height = Math.max(MIN_SIZE.height, start.height - dy);
-    y = start.y + start.height - height;
+    const bottom = start.y + start.height;
+    height = clamp(
+      start.height - dy,
+      MIN_SIZE.height,
+      Math.min(bottom - viewport.top, viewport.height - viewport.top),
+    );
+    y = bottom - height;
   }
   return clampRect({ x, y, width, height }, viewport);
 }

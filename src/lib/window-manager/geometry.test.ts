@@ -143,6 +143,20 @@ describe('resizeRect', () => {
     expect(next.height).toBe(450);
   });
 
+  it('keeps the bottom edge anchored when dragging the top edge past the header', () => {
+    for (const edge of ['n', 'ne', 'nw'] as const) {
+      const next = resizeRect(start, edge, 0, -1000, viewport);
+      expect(next.y).toBe(viewport.top);
+      expect(next.y + next.height).toBe(start.y + start.height);
+    }
+  });
+
+  it('keeps the right edge anchored when the width hits the viewport', () => {
+    const next = resizeRect(start, 'w', -5000, 0, viewport);
+    expect(next.width).toBe(viewport.width);
+    expect(next.x + next.width).toBe(start.x + start.width);
+  });
+
   it('respects the minimum size while keeping the anchor', () => {
     const next = resizeRect(start, 'w', 900, 0, viewport);
     expect(next.width).toBe(MIN_SIZE.width);
