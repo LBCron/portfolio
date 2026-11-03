@@ -30,7 +30,7 @@ const GEOMETRY = new Set([
 ]);
 /** Anything that changes how a shape paints is refused, never dropped silently. */
 const PAINT =
-  /^(?:transform|stroke(?:-.*)?|clip-path|mask|filter|opacity|fill-opacity)$/;
+  /^(?:transform|stroke(?:-.*)?|clip-path|clip-rule|fill-rule|mask|filter|opacity|fill-opacity|style|class|display|visibility)$/;
 
 const TAG = /<(\/?)([a-zA-Z][\w:-]*)((?:"[^"]*"|'[^']*'|[^>"'])*?)(\/?)>/g;
 const ATTRIBUTE = /([a-zA-Z_:][\w:.-]*)\s*=\s*(?:"([^"]*)"|'([^']*)')/g;

@@ -153,12 +153,12 @@ describe('sanitizeSvg', () => {
       svg(
         '<script>alert(1)</script><style>*{fill:red}</style><use href="x.svg#a"/>' +
           '<foreignObject><div onclick="x()">hi</div></foreignObject><image href="https://evil/x.png"/>' +
-          '<path d="M0 0h4v4H0Z" onclick="alert(1)" style="fill:red" class="a" id="b"/>',
+          '<path d="M0 0h4v4H0Z" onclick="alert(1)" id="b"/>',
       ),
     );
     expect(result.ok).toBe(true);
     expect(JSON.stringify(result)).not.toMatch(
-      /script|alert|onclick|evil|style|href|foreign/i,
+      /script|alert|onclick|evil|href|foreign/i,
     );
   });
 
@@ -183,6 +183,16 @@ describe('sanitizeSvg', () => {
     expect(
       sanitizeSvg(svg('<g fill="red"><path d="M0 0h4v4H0Z"/></g>')),
     ).toMatchObject({ ok: false });
+    for (const attr of [
+      'fill-rule="evenodd"',
+      'clip-rule="evenodd"',
+      'style="fill:none;stroke:#000"',
+      'class="a"',
+      'display="none"',
+    ])
+      expect(sanitizeSvg(svg(`<path d="M0 0h4v4H0Z" ${attr}/>`))).toMatchObject(
+        { ok: false },
+      );
   });
 
   it('refuses entities, doctype, oversized files and missing pieces', () => {
