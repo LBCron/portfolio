@@ -27,5 +27,5 @@ If the secret or the password is missing or too weak, the admin stays disabled: 
 - Lists have search, filters, a visible toggle (and featured for projects) and reordering with the arrows or by dragging the handle.
 - Editors warn about unsaved changes, show problems in a summary that links to each field, and open a dialog when someone saved a newer version (Reload or Overwrite).
 - Deleting asks you to type the item's name. Hiding is the reversible alternative. A technology that a project or job uses cannot be deleted.
-- Images (JPEG, PNG, WebP, AVIF, up to 8 MB) are re-encoded and stripped of metadata; PDFs (up to 10 MB) are checked for scripts. Custom icons are pasted as SVG and reduced to plain filled shapes.
+- Images (JPEG, PNG, WebP, AVIF, up to 4 MB) are re-encoded and stripped of metadata; PDFs (up to 4 MB) are checked for scripts. Custom icons are pasted as SVG and reduced to plain filled shapes.
 - With demo data in a production build the admin is read-only. Set `ADMIN_FIXTURE_WRITES=1` only for end-to-end tests.

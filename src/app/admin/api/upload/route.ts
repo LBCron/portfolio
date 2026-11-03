@@ -13,6 +13,7 @@ import { getAdminStore } from '@/lib/content/admin';
 
 const allowed = createWindowCounter(60, 10 * 60_000);
 const MULTIPART_OVERHEAD = 64 * 1024;
+const MB = 1024 * 1024;
 
 const fail = (status: number, error: string) =>
   NextResponse.json({ error }, { status });
@@ -34,7 +35,10 @@ export async function POST(request: NextRequest) {
   if (!allowed(String(session.start)))
     return fail(429, 'Too many uploads, try again later');
 
-  const length = Number(request.headers.get('content-length') ?? 0);
+  // A missing length is unknown, not zero: refuse rather than buffer it all.
+  const length = Number(request.headers.get('content-length'));
+  if (!Number.isFinite(length) || length <= 0)
+    return fail(411, 'Content-Length required');
   if (length > MAX_PDF_BYTES + MULTIPART_OVERHEAD)
     return fail(413, 'File too large');
 
@@ -48,7 +52,8 @@ export async function POST(request: NextRequest) {
   if (store.readOnlyReason) return fail(403, store.readOnlyReason);
 
   if (kind === 'pdf') {
-    if (file.size > MAX_PDF_BYTES) return fail(413, 'PDFs can be up to 10 MB');
+    if (file.size > MAX_PDF_BYTES)
+      return fail(413, `PDFs can be up to ${MAX_PDF_BYTES / MB} MB`);
     const bytes = Buffer.from(await file.arrayBuffer());
     const check = checkPdf(bytes);
     if (!check.ok) return fail(415, check.message);
@@ -59,7 +64,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ kind: 'file', asset });
   }
 
-  if (file.size > MAX_IMAGE_BYTES) return fail(413, 'Images can be up to 8 MB');
+  if (file.size > MAX_IMAGE_BYTES)
+    return fail(413, `Images can be up to ${MAX_IMAGE_BYTES / MB} MB`);
   const input = Buffer.from(await file.arrayBuffer());
   const format = sniffImage(input);
   if (!format) return fail(415, 'Use a JPEG, PNG, WebP or AVIF image');

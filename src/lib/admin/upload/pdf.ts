@@ -1,4 +1,5 @@
-export const MAX_PDF_BYTES = 10 * 1024 * 1024;
+// Vercel rejects request bodies above 4.5 MB before our code runs.
+export const MAX_PDF_BYTES = 4 * 1024 * 1024;
 
 const ACTIVE = /\/(?:JavaScript|JS|Launch)(?![A-Za-z0-9])/;
 

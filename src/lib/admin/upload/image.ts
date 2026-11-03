@@ -1,6 +1,7 @@
 import sharp from 'sharp';
 
-export const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
+// Vercel rejects request bodies above 4.5 MB before our code runs.
+export const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
 export const MAX_SIDE = 4000;
 
 export type ImageKind = 'jpeg' | 'png' | 'webp' | 'avif';

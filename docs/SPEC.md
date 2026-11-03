@@ -642,7 +642,7 @@ Shared editor patterns (build once, reuse everywhere):
 
 ### 12.7 Uploads and sanitization
 
-- `POST /admin/api/upload` (session required, Origin check, rate-limited) accepts `multipart/form-data`. Limits: images ≤ 8 MB, PDFs ≤ 10 MB. Allowed images: JPEG, PNG, WebP, AVIF, verified by magic bytes, never by extension or declared MIME alone. SVG is never accepted as an asset.
+- `POST /admin/api/upload` (session required, Origin check, rate-limited) accepts `multipart/form-data`. Limits: images ≤ 4 MB, PDFs ≤ 4 MB (Vercel caps request bodies at 4.5 MB, D-R3). Allowed images: JPEG, PNG, WebP, AVIF, verified by magic bytes, never by extension or declared MIME alone. SVG is never accepted as an asset.
 - Images are re-encoded with `sharp` before `client.assets.upload`: apply the EXIF orientation, **strip all metadata including GPS**, cap the longest side at 4000 px, keep alpha. Filenames are normalized. Return the asset id and metadata.
 - PDFs must start with `%PDF-`; reject files whose scan finds `/JavaScript`, `/JS` or `/Launch` actions.
 - Verify the effective body-size limits of Server Actions and Route Handlers for the installed Next.js version and configure them explicitly.

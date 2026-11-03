@@ -41,7 +41,7 @@ A project can only reference technologies that exist. In **Technologies**, check
 | Full write-up (optional)  | Markdown. Headings, lists, links, code and gallery pictures (`![alt](gallery:1)`). Raw HTML and scripts are removed       | Under 150 words per language is flagged as a thin page on the dashboard |
 | Live URL / Repository URL | `https://` links only                                                                                                     | Live adds the "Visit app" button                                        |
 | Technologies              | Pick from the list (step 2)                                                                                               | Up to 24                                                                |
-| Cover image               | JPEG, PNG, WebP or AVIF up to 8 MB. Alt text in both languages is required. Set the focal point so crops keep the subject | Without a cover a generated one is used                                 |
+| Cover image               | JPEG, PNG, WebP or AVIF up to 4 MB. Alt text in both languages is required. Set the focal point so crops keep the subject | Without a cover a generated one is used                                 |
 | Gallery                   | Up to 12 images, each with alt text and an optional caption                                                               | Opens in the lightbox                                                   |
 
 Click **Save and publish**. If something is wrong, a summary at the top lists each problem and links to the field. On success the message "Published · public pages refreshed" appears, and the project is live at `/en/projects/<slug>` and `/pt/projects/<slug>`.
@@ -68,7 +68,7 @@ Click **Save and publish**. If something is wrong, a summary at the top lists ea
 | Experience / Education | Timeline entries; "collapsed by default" folds older jobs                                                                                                        |
 | Practices              | Text chips shown in the List view of the stack                                                                                                                   |
 | Contact                | Email (shown obfuscated), the phone (only when "show phone" is on), the booking URL and the call-to-action text                                                  |
-| Résumé                 | One PDF per language, up to 10 MB, checked for scripts. Without a file the download buttons hide and the terminal says it is not available yet                   |
+| Résumé                 | One PDF per language, up to 4 MB, checked for scripts. Without a file the download buttons hide and the terminal says it is not available yet                    |
 
 **Title font.** Your display name is the hero title. In Profile, "Title font" picks one of ten script fonts, or "Geist (default)". To offer another one: add its id and label in `src/lib/content/taxonomy.ts`, a loader call in `src/styles/title-fonts.ts`, and redeploy the Sanity schema.
 

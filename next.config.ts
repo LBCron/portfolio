@@ -63,7 +63,7 @@ const nextConfig: NextConfig = {
   experimental: {
     globalNotFound: true,
     // Uploads go through the proxy, which buffers bodies up to this size.
-    proxyClientMaxBodySize: '12mb',
+    proxyClientMaxBodySize: '5mb',
     serverActions: { bodySizeLimit: '2mb' },
   },
   turbopack: {
