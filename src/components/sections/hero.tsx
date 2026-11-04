@@ -22,7 +22,7 @@ const HERO_SIZES =
 interface HeroProps {
   locale: AppLocale;
   profile: Profile | null;
-  nextSection: 'quote' | 'about' | 'stack';
+  nextSection: 'about' | 'stack';
 }
 
 export async function Hero({ profile, nextSection }: HeroProps) {
@@ -65,7 +65,7 @@ export async function Hero({ profile, nextSection }: HeroProps) {
           </FitTitle>
 
           {profile?.heroLead ? (
-            <p className="mt-5 max-w-[60ch] text-[1.0625rem] text-text-2 lg:text-lg">
+            <p className="mt-8 max-w-[60ch] text-[1.0625rem] text-text-2 lg:text-lg">
               {profile.heroLead}
             </p>
           ) : null}

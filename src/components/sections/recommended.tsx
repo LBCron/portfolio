@@ -23,7 +23,7 @@ export async function Recommended({
     <section
       id="recommended"
       aria-labelledby="recommended-title"
-      className="border-y border-line bg-bg-1 section-y"
+      className="section-y"
     >
       <div className="container-page">
         <SectionHeader

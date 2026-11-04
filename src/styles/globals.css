@@ -421,7 +421,7 @@ html[data-motion='reduced'] .route-fade {
 
 /* One-line hero title: never wraps, shrinks to fit (see FitTitle). */
 @utility title-fit {
-  --title-max: clamp(2.75rem, 1.8rem + 2.8vw, 5rem);
+  --title-max: clamp(3.3rem, 2.16rem + 3.36vw, 6rem);
   white-space: nowrap;
   /* Script fonts have tall ascenders and swashes that 1.02 would clip. */
   line-height: 1.15;

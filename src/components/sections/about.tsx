@@ -74,7 +74,7 @@ export async function About({
               <ul
                 id="summary"
                 aria-label={tSummary('metricsLabel')}
-                className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-line bg-line"
+                className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-line bg-line lg:grid-cols-1"
               >
                 {metrics.map((metric) => (
                   <li key={metric.label} className="bg-surface-1 p-5 sm:p-6">
