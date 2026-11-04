@@ -8,7 +8,7 @@ import { fieldId } from '@/lib/admin/path';
 import { toast } from '@/stores/toast-store';
 
 import { LocalizedField } from './fields';
-import { useForm } from './form';
+import { SESSION_EXPIRED, useForm } from './form';
 import { hintClass, labelClass, smallButton } from './styles';
 
 async function upload(file: File, kind: 'image' | 'pdf') {
@@ -20,6 +20,11 @@ async function upload(file: File, kind: 'image' | 'pdf') {
     asset?: Record<string, unknown>;
     error?: string;
   };
+  // Only the route answers with JSON; a bare 400/404/405 is the proxy's 404
+  // page, i.e. no session.
+  if (!data.error && [400, 404, 405].includes(response.status)) {
+    throw new Error(SESSION_EXPIRED);
+  }
   if (!response.ok || !data.asset) {
     throw new Error(data.error ?? 'Upload failed');
   }
@@ -170,7 +175,7 @@ export function ImageField({
               width={asset.width}
               height={asset.height}
               alt=""
-              unoptimized
+              sizes="448px"
               draggable={false}
               className="h-auto w-full select-none"
             />

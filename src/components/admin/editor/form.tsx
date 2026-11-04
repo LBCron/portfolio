@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog } from '@/components/ui/dialog';
 import { deleteDocumentAction, saveDocumentAction } from '@/lib/admin/actions';
 import { fieldId, getIn, setIn } from '@/lib/admin/path';
+import { getSessionStatus, renewSession } from '@/lib/auth/actions';
 import type { FieldErrors } from '@/lib/content/admin/normalize';
 import type { Reference } from '@/lib/content/admin/types';
 import type { DocumentType } from '@/lib/content/schema';
@@ -27,6 +28,12 @@ import { idToSegment } from '../areas';
 import { inputClass } from './styles';
 
 type Values = Record<string, unknown>;
+
+export const SESSION_EXPIRED =
+  'Your session expired. Sign in again in another tab, then retry. Your edits are kept here.';
+
+/** Renewing on a timer keeps long edits from outliving the 30 min idle limit. */
+const KEEP_ALIVE_MS = 10 * 60_000;
 
 export interface FormApi {
   values: Values;
@@ -133,6 +140,15 @@ export function DocumentEditor({
     };
   }, [dirty]);
 
+  // Typing sends no requests, so renew the session while edits are pending.
+  useEffect(() => {
+    if (!dirty) return;
+    const timer = window.setInterval(() => {
+      renewSession().catch(() => {});
+    }, KEEP_ALIVE_MS);
+    return () => window.clearInterval(timer);
+  }, [dirty]);
+
   const api = useMemo<FormApi>(
     () => ({
       values,
@@ -189,8 +205,17 @@ export function DocumentEditor({
         toast('This item no longer exists', 'error');
       }
     } catch {
+      // Without a session the action is answered with the 404 page and throws.
+      const signedIn =
+        !navigator.onLine ||
+        (await getSessionStatus().then(
+          (status) => status.isAdmin,
+          () => false,
+        ));
       toast(
-        'Could not save. Check your connection and that you are signed in.',
+        signedIn
+          ? 'Could not save. Check your connection and try again.'
+          : SESSION_EXPIRED,
         'error',
       );
     } finally {

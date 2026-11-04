@@ -275,7 +275,10 @@ test.describe('singletons and lists', () => {
     await signIn(page);
     await openEditor(page, '/admin/practices/new');
     await field(page, 'label.en').fill(label);
-    await page.getByRole('button', { name: 'Copy EN → PT' }).click();
+    await page.getByText('Copy', { exact: true }).first().click();
+    await page
+      .getByRole('button', { name: 'Copy English to Portuguese' })
+      .click();
     await page.getByRole('button', { name: 'Save and publish' }).click();
     await published(page);
     await expect(page).toHaveURL(/\/admin\/practices\/[0-9a-f-]{36}$/);
@@ -304,7 +307,10 @@ test.describe('singletons and lists', () => {
     await signIn(page);
     await openEditor(page, '/admin/practices/new');
     await field(page, 'label.en').fill(label);
-    await page.getByRole('button', { name: 'Copy EN → PT' }).click();
+    await page.getByText('Copy', { exact: true }).first().click();
+    await page
+      .getByRole('button', { name: 'Copy English to Portuguese' })
+      .click();
     await expect(field(page, 'label.pt')).toHaveValue(label);
     await page.getByRole('button', { name: 'Save and publish' }).click();
     await published(page);
@@ -445,6 +451,18 @@ test.describe('singletons and lists', () => {
       .click();
     await expect(page.getByText('Public pages refreshed')).toBeVisible();
   });
+});
+
+test('saving without a session says the session expired and keeps the edits', async ({
+  page,
+}) => {
+  await signIn(page);
+  await openEditor(page, '/admin/practices/new');
+  await field(page, 'label.en').fill('Unsaved edit');
+  await page.context().clearCookies();
+  await page.getByRole('button', { name: 'Save and publish' }).click();
+  await expect(page.getByText(/Your session expired/).first()).toBeVisible();
+  await expect(field(page, 'label.en')).toHaveValue('Unsaved edit');
 });
 
 test.describe('uploads', () => {

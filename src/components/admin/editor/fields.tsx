@@ -1,6 +1,7 @@
 'use client';
 
-import { type ReactNode, useState } from 'react';
+import { ChevronDown } from 'lucide-react';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 
 import { cn } from '@/lib/cn';
 import { fieldId } from '@/lib/admin/path';
@@ -371,6 +372,87 @@ interface LocalizedProps {
   }[];
 }
 
+/** Discreet dropdown that copies one language into the other. */
+function CopyMenu({
+  label,
+  disabled,
+  canCopyToPt,
+  canCopyToEn,
+  onCopyToPt,
+  onCopyToEn,
+}: {
+  label: string;
+  disabled: boolean;
+  canCopyToPt: boolean;
+  canCopyToEn: boolean;
+  onCopyToPt: () => void;
+  onCopyToEn: () => void;
+}) {
+  const ref = useRef<HTMLDetailsElement>(null);
+  useEffect(() => {
+    const close = (event: Event) => {
+      const el = ref.current;
+      if (!el?.open) return;
+      if (event.type === 'keydown') {
+        if ((event as KeyboardEvent).key !== 'Escape') return;
+        el.querySelector('summary')?.focus();
+      } else if (el.contains(event.target as Node)) return;
+      el.open = false;
+    };
+    document.addEventListener('pointerdown', close);
+    document.addEventListener('keydown', close);
+    return () => {
+      document.removeEventListener('pointerdown', close);
+      document.removeEventListener('keydown', close);
+    };
+  }, []);
+  const item =
+    'flex min-h-11 w-full items-center rounded px-3 text-left text-small font-normal text-text-1 hover-fine:bg-surface-2 disabled:opacity-40';
+  const pick = (action: () => void) => () => {
+    action();
+    if (ref.current) ref.current.open = false;
+  };
+  return (
+    <details ref={ref} className="relative ml-auto">
+      <summary
+        aria-label={`${label}: copy between languages`}
+        aria-disabled={disabled || undefined}
+        onClick={(event) => disabled && event.preventDefault()}
+        className={cn(
+          smallButton,
+          'cursor-pointer list-none gap-1 px-2 text-text-2 marker:hidden [&::-webkit-details-marker]:hidden',
+          disabled && 'opacity-40',
+        )}
+      >
+        Copy
+        <ChevronDown aria-hidden className="size-4" />
+      </summary>
+      <div
+        role="group"
+        aria-label={`${label}: copy between languages`}
+        className="absolute right-0 z-10 mt-1 flex w-56 flex-col rounded-md border border-line-strong bg-surface-1 p-1 shadow-lg"
+      >
+        <button
+          type="button"
+          disabled={!canCopyToPt}
+          onClick={pick(onCopyToPt)}
+          className={item}
+        >
+          Copy English to Portuguese
+        </button>
+        <button
+          type="button"
+          disabled={!canCopyToEn}
+          onClick={pick(onCopyToEn)}
+          className={item}
+        >
+          Copy Portuguese to English
+        </button>
+      </div>
+    </details>
+  );
+}
+
 /** English and Portuguese inputs side by side from 1024 px, as tabs below. */
 export function LocalizedField({
   path,
@@ -410,10 +492,18 @@ export function LocalizedField({
         >
           {status}
         </span>
+        <CopyMenu
+          label={label}
+          disabled={form.disabled}
+          canCopyToPt={en.trim() !== ''}
+          canCopyToEn={pt.trim() !== ''}
+          onCopyToPt={() => form.set(`${path}.pt`, en)}
+          onCopyToEn={() => form.set(`${path}.en`, pt)}
+        />
       </legend>
 
       <div
-        className="flex flex-wrap items-center gap-2"
+        className="flex flex-wrap items-center gap-2 lg:hidden"
         role="group"
         aria-label={`${label} language`}
       >
@@ -423,23 +513,11 @@ export function LocalizedField({
             type="button"
             aria-pressed={tab === lang}
             onClick={() => setTab(lang)}
-            className={cn(
-              smallButton,
-              'lg:hidden',
-              tab === lang && 'bg-surface-2',
-            )}
+            className={cn(smallButton, tab === lang && 'bg-surface-2')}
           >
             {lang === 'en' ? 'English' : 'Português'}
           </button>
         ))}
-        <button
-          type="button"
-          disabled={form.disabled || en.trim() === ''}
-          onClick={() => form.set(`${path}.pt`, en)}
-          className={smallButton}
-        >
-          Copy EN → PT
-        </button>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
