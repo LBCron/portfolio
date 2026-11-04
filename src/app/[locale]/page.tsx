@@ -5,7 +5,6 @@ import { getTranslations } from 'next-intl/server';
 import { About } from '@/components/sections/about';
 import { Contact } from '@/components/sections/contact';
 import { Hero } from '@/components/sections/hero';
-import { Quote } from '@/components/sections/quote';
 import { Recommended } from '@/components/sections/recommended';
 import { Resume } from '@/components/sections/resume';
 import { Stack } from '@/components/sections/stack';
@@ -91,11 +90,7 @@ export default async function HomePage() {
   ]);
   const featured = featuredProjects(projects);
   const listId = `${absoluteUrl(localizedPath(locale))}#work`;
-  const nextSection = profile?.featuredQuote?.text
-    ? 'quote'
-    : profile
-      ? 'about'
-      : 'stack';
+  const nextSection = profile ? 'about' : 'stack';
 
   const jsonLd = graph(
     websiteNode(),
@@ -119,7 +114,6 @@ export default async function HomePage() {
     <>
       <JsonLd data={jsonLd} />
       <Hero locale={locale} profile={profile} nextSection={nextSection} />
-      <Quote quote={profile?.featuredQuote} />
       {profile ? <About locale={locale} profile={profile} /> : null}
       {technologies.length > 0 ? (
         <Stack technologies={technologies} practices={practices} />

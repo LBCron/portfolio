@@ -183,9 +183,6 @@ export const profileSchema = z.object({
   spokenLanguages: z.array(localized(60)).min(1).max(6),
   focus: localized(120),
   metrics: z.array(metricSchema).max(4).default([]),
-  featuredQuote: z
-    .object({ text: localized(160), attribution: localized(80).optional() })
-    .optional(),
 });
 
 export const contactSchema = z.object({

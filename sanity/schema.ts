@@ -140,9 +140,6 @@ const documents: SchemaType[] = [
       field('spokenLanguages', 'array', { of: [{ type: 'localeString' }] }),
       localeString('focus'),
       field('metrics', 'array', { of: [{ type: 'metric' }] }),
-      field('featuredQuote', 'object', {
-        fields: [localeString('text'), localeString('attribution')],
-      }),
       common[2] as Field,
     ],
   },

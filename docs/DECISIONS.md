@@ -15,7 +15,7 @@ Resolved against npm and the docs bundled in the published packages on 2026-10-1
 | Content and Sanity          | D7, D8, D9, D14, D25–D30, D53, D65               |
 | Security and admin          | D4, D10, D11, D21, D51, D52, D54–D56             |
 | Tech cloud                  | D13, D22, D37–D45, D59, D66                      |
-| Home, hero, header          | D17, D46–D48, D67                                |
+| Home, hero, header          | D17, D46–D48, D67, D69                           |
 | Window manager and terminal | D49, D50, D52, D63, D64                          |
 | Quality, tests, CI          | D12, D23, D31, D32, D36, D58, D60, D61           |
 | Analytics                   | D68                                              |
@@ -87,10 +87,11 @@ Resolved against npm and the docs bundled in the published packages on 2026-10-1
 ## Home, hero, header
 
 - **D17 — Smaller interpretations** (active). Primary button = solid `text-1` background with `bg-0` label; skip link reads "Skip to main content"; experience VFS slugs derive from `company` (numeric suffix on collision); dev cookie is `jm_session`; admin `lang="en"`; `/dev/ui` calls `notFound()` in production.
-- **D46 — Home order** (active). Hero → Quote → About → Stack → Work → Résumé → Contact → Recommended. Nav: About · Stack · Work · Résumé · Contact. Résumé uses native radio tabs (CSS `:has()` shows the matching panel; works without JS); every job is a `<details>`, current role open; CTAs are the locale PDF and the owner's LinkedIn. `collapsedByDefault` stays in the schema but no longer drives the UI.
+- **D46 — Home order** (superseded in part by D69: the Quote band is gone). Hero → Quote → About → Stack → Work → Résumé → Contact → Recommended. Nav: About · Stack · Work · Résumé · Contact. Résumé uses native radio tabs (CSS `:has()` shows the matching panel; works without JS); every job is a `<details>`, current role open; CTAs are the locale PDF and the owner's LinkedIn. `collapsedByDefault` stays in the schema but no longer drives the UI.
 - **D47 — Hero art direction** (headline/rotating-word parts superseded by D67). Optional `photoLg` (3:4, alpha preserved); `getImageProps` + `<picture>` (`min-width: 1024px` → lg) so one image downloads; OG/JSON-LD keep the square photo.
 - **D48 — About absorbs Summary** (active). One `#about`: bio left, up to 4 metrics as a 2×2 tile right from `lg`; `#summary` stays on the stats list; facts (`location`, `spokenLanguages`, `focus`) are terminal-only.
 - **D67 — Name as the hero title, selectable font, header links** (active). H1 = `displayName` on one line. `heroHeadline` and `rotatingWords` are gone; `heroLead` ≤ 120 chars (so the home meta description uses `meta.siteDescription`, intended). `profile.titleFont` picks one of ten Google fonts via `next/font/google` (self-hosted at build, `preload: false`, each defines `--font-title-<id>`, only the chosen file is fetched). **The hero must not import `styles/title-fonts.ts`** (Turbopack splits `@font-face` into a render-blocking stylesheet that cost `/pt` ~0.03 Lighthouse performance). `FitTitle` measures and sets `--fit`; never wraps or clips. Featured-link placement `hero` → `header` (max three icons from `md`). Terminal button is primary with a visible label. The header wordmark hides while the hero is in view. Migration steps: [SANITY.md](./SANITY.md#migration-2026-11-d67).
+- **D69 — Quote band removed** (active; 2026-11-04, owner request). The "Quotes of the moment" band, `profile.featuredQuote` (schema, repository, Sanity schema/query/mapper, fixtures), its admin fields and the `quote` messages are deleted. Existing Sanity documents may still hold the field; reads ignore it. The hero scroll cue now targets `#about`.
 
 ## Window manager and terminal
 

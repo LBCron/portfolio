@@ -129,12 +129,6 @@ const converters: Converters = {
           suffix: metric.suffix,
         }),
       ),
-      featuredQuote: optional(doc.featuredQuote, (quote) =>
-        compact({
-          text: localeString(quote.text),
-          attribution: optional(quote.attribution, localeString),
-        }),
-      ),
     }),
 
   contact: (doc) =>

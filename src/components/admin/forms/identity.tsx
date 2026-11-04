@@ -108,18 +108,6 @@ export function ProfileForm() {
             </>
           )}
         </ListEditor>
-        <LocalizedField
-          path="featuredQuote.text"
-          label="Highlighted quote"
-          max={160}
-          multiline
-          rows={2}
-        />
-        <LocalizedField
-          path="featuredQuote.attribution"
-          label="Quote attribution (optional)"
-          max={80}
-        />
       </Section>
     </>
   );

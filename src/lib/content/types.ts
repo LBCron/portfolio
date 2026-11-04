@@ -49,7 +49,6 @@ export interface Profile {
   spokenLanguages: string[];
   focus: string;
   metrics: Metric[];
-  featuredQuote?: { text: string; attribution?: string };
   updatedAt: string;
 }
 

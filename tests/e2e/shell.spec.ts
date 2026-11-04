@@ -91,7 +91,6 @@ for (const locale of ['en', 'pt'] as const) {
       const html = await response.text();
       const ids = [
         'top',
-        'quote',
         'about',
         'summary',
         'stack',

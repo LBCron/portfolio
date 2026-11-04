@@ -60,10 +60,4 @@ export const profile: DocumentInput<'profile'> = {
       ),
     },
   ],
-  featuredQuote: {
-    text: L(
-      'Make it work, make it clear, make it kind.',
-      'Faça funcionar, faça ficar claro, faça com gentileza.',
-    ),
-  },
 };

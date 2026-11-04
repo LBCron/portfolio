@@ -19,8 +19,8 @@ const PROFILE_FIELDS = /* groq */ `
   "photo": photo{ ${IMAGE} },
   "photoLg": photoLg{ ${IMAGE} },
   bio, location, spokenLanguages, focus,
-  metrics[]{ value, label, countTo, prefix, suffix },
-  featuredQuote{ text, attribution }`;
+  metrics[]{ value, label, countTo, prefix, suffix }
+`;
 
 const CONTACT_FIELDS = /* groq */ `
   ${META}, email, phone, showPhone, bookingUrl, ctaHeading, ctaText`;

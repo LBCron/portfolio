@@ -179,12 +179,6 @@ export function createRepository(
             suffix: metric.suffix,
           }),
         ),
-        featuredQuote: profile.featuredQuote
-          ? defined({
-              text: pick(profile.featuredQuote.text, locale),
-              attribution: pick(profile.featuredQuote.attribution, locale),
-            })
-          : undefined,
         updatedAt: profile.updatedAt,
       });
     },

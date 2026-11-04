@@ -13,7 +13,7 @@ The admin has no login page and no link anywhere. It is reached through the term
 
 Other secret commands: `logout` ends the session. They are invisible in `help` and completion.
 
-**Session.** 30 minutes idle, 8 hours at most, renewed at most once a minute while you browse the admin. Two minutes before expiry a dialog offers **Stay signed in**. The header also has a **Sign out** button and a **View site** link.
+**Session.** 30 minutes idle, 8 hours at most, renewed at most once a minute while you browse the admin, and every 10 minutes while an editor has unsaved changes. If saving or uploading finds the session gone, the message says so and your edits stay on the page: sign in again in another tab and retry. Two minutes before expiry a dialog offers **Stay signed in**. The header also has a **Sign out** button and a **View site** link.
 
 **Where to sign in.** On whichever deployment you want to edit: local (`localhost:3000`), staging (`next-juliolmuller.vercel.app`, behind a Vercel login) or production (`juliolmuller.vercel.app`). Each has its own password and its own data ([SETUP.md](./SETUP.md#environments-at-a-glance)). Staging edits go to the `development` dataset; **production edits are live immediately**.
 
@@ -40,7 +40,7 @@ Areas (sidebar on desktop, tab bar on phones): **Profile, Links, Recommended, Pr
 How every area behaves:
 
 - Lists have search, filters, a **Visible** toggle (and **Featured** for projects) and reordering by arrows or dragging the handle. Order is used on the public pages.
-- Editors show localized fields side by side (EN | PT) from 1024 px and as tabs below. **Copy EN → PT** fills Portuguese as a starting point — rewrite it in natural Brazilian Portuguese. A badge warns when a translation is missing or identical to the English.
+- Editors show localized fields side by side (EN | PT) from 1024 px and as tabs below. The **Copy** menu next to each field's badge copies English to Portuguese (or the reverse) as a starting point — rewrite it in natural Brazilian Portuguese. A badge warns when a translation is missing or identical to the English.
 - **Save and publish** publishes at once and refreshes the affected public pages ("Published · public pages refreshed"). There are no drafts.
 - Problems appear in a summary at the top that links to each field. Unsaved changes trigger a warning (it cannot intercept the browser's Back button).
 - If someone saved a newer version, a dialog offers **Reload** or **Overwrite**.
@@ -96,7 +96,7 @@ Reorder in the list (arrows or drag); hide with **Visible**; delete from the ite
 | Page section / area             | Edit in                         | Notes                                                                                                                                                       |
 | ------------------------------- | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Hero (name, lead, photo)        | **Profile**                     | The H1 is the display name. Lead ≤ 120 characters. Photo: square, plus an optional 3:4 for large screens. **Title font**: one of ten script fonts or Geist. |
-| Quote band, About, metrics      | **Profile**                     | Featured quote; bio; up to 4 metrics shown as count-up tiles. Facts (location, languages, focus) show only in the terminal.                                 |
+| About, metrics                  | **Profile**                     | Bio; up to 4 metrics shown as count-up tiles. Facts (location, languages, focus) show only in the terminal.                                                 |
 | Header / footer / contact icons | **Links**                       | Choose where each link shows (header, footer, contact; the header shows three at most). "Own profile" adds `rel="me"` and feeds structured data.            |
 | Stack (tech cloud + list)       | **Technologies**, **Practices** | Practices are text chips in the stack's List view.                                                                                                          |
 | Selected work, `/projects`      | **Projects**                    | See §3. Featured projects (max six) appear on Home.                                                                                                         |
@@ -116,7 +116,7 @@ Not editable in the admin (change the code and redeploy):
 
 The site launches with fictional demo data (flagged `isFixture`). Replace all of it:
 
-- [ ] Profile: headline lead, bio, facts, metrics, quote, portrait.
+- [ ] Profile: headline lead, bio, facts, metrics, portrait.
 - [ ] Projects: real projects with covers, bilingual alt text and technologies. Delete or hide the demo ones (`orbit-dashboard`, `pocket-ledger`, `tidy-desk`, `invoice-bot`, `pay-bridge`, `lint-kit`, `scratch-pad`).
 - [ ] Experience and education: real employers, roles, dates, outcomes.
 - [ ] Links: real GitHub and LinkedIn URLs (flag them "own profile"); remove demo links.
