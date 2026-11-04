@@ -1,8 +1,8 @@
 # Setup guide
 
-How to run the site locally and how to set up staging (Vercel Preview) and production (Vercel Production) from scratch. Each section can be followed on its own; the [checklists](#checklists) at the end summarize them.
+How to run the site locally and how to wire up every external service: **GitHub**, **Sanity** and **Vercel**. Each part can be followed on its own; the [checklists](#checklists) at the end summarize them.
 
-Related guides: [SANITY.md](./SANITY.md) (datasets, tokens, webhook), [ADMIN.md](./ADMIN.md) (password and session), [SEO.md](./SEO.md) and [ACCESSIBILITY.md](./ACCESSIBILITY.md) (launch checks), [ADDING_CONTENT.md](./ADDING_CONTENT.md) (editing).
+Related: [USAGE.md](./USAGE.md) (signing in and editing content) · [SANITY.md](./SANITY.md) (datasets, tokens, webhook, seeding) · [ARCHITECTURE.md](./ARCHITECTURE.md) · [AI.md](./AI.md) (Claude PR review setup).
 
 ## Environments at a glance
 
@@ -13,12 +13,12 @@ Related guides: [SANITY.md](./SANITY.md) (datasets, tokens, webhook), [ADMIN.md]
 | Content                   | fixtures, or Sanity `development` | Sanity `development`                           | Sanity `production`               |
 | Indexed by search         | no                                | no (`noindex` unless `VERCEL_ENV=production`)  | yes                               |
 | HSTS and `__Host-` cookie | no (http)                         | yes (https site URL)                           | yes                               |
-| Admin                     | optional                          | yes, its own password and secret               | yes, its own password and secret  |
+| Admin                     | optional                          | yes, own password and secret                   | yes, own password and secret      |
 | Access                    | you                               | Vercel Authentication (Deployment Protection)  | public                            |
 
 Rules that hold everywhere:
 
-- **Each environment gets its own secrets**: Sanity tokens, `SESSION_SECRET`, admin password and webhook secret. Then a leaked value can be revoked without touching the others.
+- **Each environment gets its own secrets**: Sanity tokens, `SESSION_SECRET`, admin password and webhook secret. A leaked value can then be revoked alone.
 - **Only production writes to the `production` dataset.** Local work and previews use `development`. `admin:smoke` and `sanity:seed` refuse `production` (seeding needs `--force`).
 - **`NEXT_PUBLIC_SITE_URL` and the security headers are fixed at build time.** After changing any variable in Vercel, redeploy.
 
@@ -31,14 +31,9 @@ Rules that hold everywhere:
 | Git     | any recent version                   | Husky installs a pre-commit hook (`lint-staged`) |
 | OpenSSL | any                                  | generating secrets (`openssl rand`)              |
 
-You also need these accounts:
+Accounts: **GitHub** (repository `juliolmuller/juliolmuller.github.io`), **Sanity** (project `njcnsmax`, organization `ow3ahfjbr`), **Vercel**, and DNS access for `juliolmuller.com` only if you later adopt the custom domain (§6.6).
 
-- **GitHub**, for the repository `juliolmuller/juliolmuller.github.io`.
-- **Sanity**, with access to project `njcnsmax` (organization `ow3ahfjbr`).
-- **Vercel**, for the account or team that will own the project.
-- Access to the DNS provider for `juliolmuller.com`, only if you later move to the custom domain (§5.5).
-
-**Windows:** use WSL2 and keep the clone inside the Linux filesystem (`~/…`, not `/mnt/c/…`). Turbopack and file watching are much slower across the boundary.
+**Windows:** use WSL2 and keep the clone inside the Linux filesystem (`~/…`, not `/mnt/c/…`); Turbopack and file watching are much slower across the boundary.
 
 ## 2. Local development
 
@@ -53,9 +48,9 @@ cp .env.example .env.local
 
 ### 2.2 Choose a content source
 
-**A. Fixtures (no accounts needed).** Leave every Sanity variable empty. The site runs on the in-memory demo data. The admin can sign in, but in a production build it is read-only.
+**A. Fixtures (no accounts needed).** Leave every Sanity variable empty. The site runs on the in-memory fictional demo data. The admin can sign in and edit in memory (changes vanish on restart); in a production build it is read-only.
 
-**B. Sanity `development`.** Use this to work against real content storage or to try admin writes. Create a **local** Viewer token and Editor token ([SANITY.md → Tokens](./SANITY.md#tokens)), then set:
+**B. Sanity `development`.** For real content storage or to try admin writes. Create a **local** Viewer and Editor token ([SANITY.md → Tokens](./SANITY.md#tokens)) and set:
 
 ```dotenv
 CONTENT_SOURCE=sanity
@@ -66,20 +61,16 @@ SANITY_READ_TOKEN=<local viewer token>
 SANITY_WRITE_TOKEN=<local editor token>
 ```
 
-If the `development` dataset is empty, seed it once with `bun run sanity:seed` (see [SANITY.md → Seeding](./SANITY.md#seeding)).
-
-Never put `SANITY_DATASET=production` in `.env.local`.
+If `development` is empty, seed it once with `bun run sanity:seed`. **Never** put `SANITY_DATASET=production` in `.env.local`.
 
 ### 2.3 Admin (optional)
 
 ```sh
-openssl rand -base64 48                      # → SESSION_SECRET
+openssl rand -base64 48                               # → SESSION_SECRET
 bun run admin:hash "<a password of 16+ characters>"   # → ADMIN_PASSWORD_HASH
 ```
 
-Put both values in `.env.local`. For a quick local try, a plain `ADMIN_PASSWORD` works too. Then press `Ctrl + /`, type `su julio`, enter the password, and type `admin`.
-
-If either value is missing or too weak, the admin stays disabled and the server logs a warning naming the variable.
+Put both in `.env.local` (a plain `ADMIN_PASSWORD` also works for a quick local try). Then press `Ctrl + /`, type `su julio`, enter the password, type `admin`. If either value is missing or weak, the admin stays disabled and the server logs a warning naming the variable. Full flow: [USAGE.md](./USAGE.md).
 
 ### 2.4 Run
 
@@ -95,23 +86,45 @@ bun run format:check && bun run lint && bun run typecheck
 bun run test && bun run i18n:check && bun run icons:audit
 bun run build && bun run check:bundle && bun run check:seo
 bunx playwright install --with-deps chromium webkit firefox   # once
-bun run test:e2e                     # needs the build; starts its own server on :3100
+bun run test:e2e                     # needs the build; own server on :3100
 bun run lhci                         # optional, slow
 ```
 
 - The e2e server always uses fixtures and test credentials (`playwright.config.ts`), whatever `.env.local` says.
-- Visual snapshots are skipped locally. Run them with `VISUAL=1 bun run test:e2e visual.spec.ts`. The baselines are Linux PNGs.
-- `bun run test:e2e` reuses a server that is already listening on :3100. Stop stale servers by their PID (`lsof -ti:3100`), not with `pkill -f "next start"`.
+- Visual snapshots are skipped locally; run them with `VISUAL=1 bun run test:e2e visual.spec.ts`. Baselines are Linux PNGs.
+- `test:e2e` reuses a server already listening on :3100. Stop stale ones by PID (`lsof -ti:3100`), not `pkill -f "next start"`.
 - **Lighthouse under WSL** leaves `C:\Users\…\lighthouse.*` folders in the repo root. They are git-ignored, but the next build crashes until you delete them: `rm -rf ./C:*`.
 
-## 3. Sanity (one-time, shared by staging and production)
+## 3. Environment variables
 
-Full details are in [SANITY.md](./SANITY.md). In short:
+All live in [.env.example](../.env.example) and are validated at boot by `src/env.ts` (names only in errors). Only `NEXT_PUBLIC_SITE_URL` is public. Local values go in `.env.local`; Vercel values go in the dashboard.
 
-1. **Datasets:** `development` and `production` must both exist and both be **private**. Do not add CORS origins; the browser never calls Sanity.
+| Variable                                             | Production                        | Preview                                | Purpose                                                                                                |
+| ---------------------------------------------------- | --------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `NEXT_PUBLIC_SITE_URL`                               | `https://juliolmuller.vercel.app` | `https://next-juliolmuller.vercel.app` | Canonical origin. An https URL also enables HSTS, `upgrade-insecure-requests` and the `__Host-` cookie |
+| `CONTENT_SOURCE`                                     | `sanity`                          | `sanity`                               | `sanity` or `fixtures`; inferred from the Sanity variables when empty                                  |
+| `SANITY_PROJECT_ID`                                  | `njcnsmax`                        | `njcnsmax`                             |                                                                                                        |
+| `SANITY_DATASET`                                     | `production`                      | `development`                          |                                                                                                        |
+| `SANITY_API_VERSION`                                 | `2026-10-01`                      | `2026-10-01`                           | Pinned API date                                                                                        |
+| `SANITY_READ_TOKEN`                                  | `production-read`                 | `preview-read`                         | Viewer token for reads                                                                                 |
+| `SANITY_WRITE_TOKEN`                                 | `production-write`                | `preview-write`                        | Editor token for admin writes and seeding                                                              |
+| `SANITY_WEBHOOK_SECRET`                              | own `openssl rand -hex 32`        | own (only with a staging webhook)      | Signs `POST /api/revalidate`                                                                           |
+| `SESSION_SECRET`                                     | own `openssl rand -base64 48`     | own                                    | 32+ chars; rotating signs everyone out                                                                 |
+| `ADMIN_PASSWORD_HASH`                                | `bun run admin:hash`              | a different password's hash            | Preferred over `ADMIN_PASSWORD` (16+ chars in production); the hash wins when both are set             |
+| `GOOGLE_SITE_VERIFICATION`, `BING_SITE_VERIFICATION` | after launch                      | empty                                  | Search console ownership tags                                                                          |
+| `ADMIN_FIXTURE_WRITES`                               | **never**                         | **never**                              | E2E only: lets the admin write demo data in a production build                                         |
+| `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | empty                             | empty                                  | Reserved; the rate limiter is in memory (D51)                                                          |
+
+`VERCEL_ENV` is set by Vercel and keeps previews `noindex`; never override it. Fill-in copies of the production and preview columns can be kept as `.env.production` / `.env.preview` in the repo root (git-ignored by `.env*`; Next.js loads them only in a matching `next build/start`, so treat them as scratch files and don't leave real secrets in them longer than needed).
+
+## 4. Sanity (one-time, shared by staging and production)
+
+Details in [SANITY.md](./SANITY.md). Summary:
+
+1. **Datasets:** `development` and `production` exist and are both **private** (verified 2026-11-04). Add no CORS origins; the browser never calls Sanity.
 2. **Schema:** deploy `sanity/schema.ts` to both datasets ([SANITY.md → Schema](./SANITY.md#schema)).
-3. **Seed `development`** with the fictional data: `bun run sanity:seed`. Then check it with `bun run content:smoke`.
-4. **Tokens:** create a Viewer and Editor pair for each environment, and name them so you can tell them apart:
+3. **Seed `development`:** `bun run sanity:seed`, then `bun run content:smoke`.
+4. **Tokens:** a Viewer + Editor pair per environment, named so they can be told apart:
 
    | Token name                             | Role            | Goes into           |
    | -------------------------------------- | --------------- | ------------------- |
@@ -119,17 +132,25 @@ Full details are in [SANITY.md](./SANITY.md). In short:
    | `preview-read` / `preview-write`       | Viewer / Editor | Vercel → Preview    |
    | `production-read` / `production-write` | Viewer / Editor | Vercel → Production |
 
-   A Viewer token can read every dataset in the project. Restricting a token to one dataset requires a custom role, which needs an Enterprise plan ([SANITY.md](./SANITY.md#tokens)).
+   A Viewer token can read every dataset in the project; restricting it needs an Enterprise custom role.
 
-5. **`production` content:** the `production` dataset starts empty. The pages tolerate missing content (sections hide and the default meta description is used), so an empty dataset should still render. You can enter content in two ways:
-   - **Through the admin on the production deployment.** This is the intended path; see §5.3.
-   - Or seed the demo data with `bun run sanity:seed --dataset production --force`, then replace it item by item (checklist in [ADDING_CONTENT.md](./ADDING_CONTENT.md#what-the-owner-still-has-to-supply)). Use this only before any real content exists, because `--force` overwrites documents with the same ids.
+5. **Production content:** `production` starts empty and pages tolerate that (sections hide, default meta description). Enter real content through the admin on the production deployment (intended), or seed the demo data with `bun run sanity:seed --dataset production --force` and replace it item by item — only before any real content exists, because `--force` overwrites documents with the same ids.
 
-## 4. Vercel project (one-time)
+## 5. GitHub
 
-### 4.1 Create and link
+- **Repository:** `juliolmuller/juliolmuller.github.io`. The name is historical (a GitHub Pages user site); hosting is Vercel (D11). Branches: `next` is the working/staging branch, `main` is production. `main` still holds the **old static portfolio** until the launch merge (§6.4). Remote branches today: `main`, `next` (plus a stale `master`).
+- **CI** (`.github/workflows/ci.yml`): runs on **push** to `main` and `next` (not on pull requests): frozen install, format, lint, typecheck, unit tests, i18n and icon audits, build, `check:bundle`, `check:seo`, Playwright (Chromium, WebKit, mobile, Firefox smoke, visual), Lighthouse CI (reports as artifacts); `bun audit` runs as a separate job. It needs no secrets: it uses fixtures and test-only credentials. Runners are pinned to `ubuntu-24.04` (Playwright WebKit does not start on 26.04); bump together with Playwright. Actions are pinned to commit SHAs.
+- **Dependabot** (`.github/dependabot.yml`): grouped weekly updates on Mondays; review release notes for the `framework` group (Next.js + React together).
+- **Visual baselines** (`visual-baselines.yml`, manual): Actions → _Visual baselines_ → Run workflow, download the artifact and commit the PNGs under `tests/e2e/__screenshots__/`.
+- **Claude PR review** (`claude-review.yml`, manual): needs the `CLAUDE_CODE_OAUTH_TOKEN` repository secret. Setup in [AI.md](./AI.md#claude-pr-review-workflow).
+- **GitHub Pages:** while `main` is the old site, Pages serves it. See §6.4 for what to do at launch.
+- **Husky** runs `lint-staged` (ESLint with `--max-warnings=0`, Prettier) before each commit.
 
-1. In Vercel, choose **Add New → Project** and import `juliolmuller/juliolmuller.github.io`. Use the account or team you want to own it; a personal portfolio usually belongs on the personal (Hobby) account.
+## 6. Vercel
+
+### 6.1 Create and link (one-time)
+
+1. **Add New → Project**, import `juliolmuller/juliolmuller.github.io` into the account that should own it (a personal portfolio usually belongs on the personal Hobby account).
 2. Build settings:
 
    | Setting          | Value                                               |
@@ -138,137 +159,104 @@ Full details are in [SANITY.md](./SANITY.md). In short:
    | Root directory   | `./`                                                |
    | Install command  | from `vercel.json`: `bun install --frozen-lockfile` |
    | Build command    | default (`bun run build`)                           |
-   | Output directory | default                                             |
    | Node.js version  | 24.x                                                |
    | Bun runtime      | from `vercel.json`: `bunVersion: "1.4.x"`           |
 
-3. **Settings → Git:** set the production branch to `main`. Every other branch, including `next`, then deploys as a Preview.
-4. **Settings → Deployment Protection:** keep **Vercel Authentication** on with **Standard Protection**. Previews, including the staging domain, then require a Vercel login, and production stays public.
-5. Don't import the first deployment with empty variables. Set up §4.2 first, or expect to redeploy once the variables are in.
+3. **Settings → Git:** production branch `main`; every other branch (including `next`) deploys as a Preview.
+4. **Settings → Deployment Protection:** keep **Vercel Authentication** on (Standard Protection): previews, including staging, need a Vercel login; production stays public.
+5. Set the environment variables (§6.2) _before_ the first real deployment, or expect to redeploy once.
+6. **Enable Web Analytics** in the project (Analytics tab). The script is served only on Vercel deployments, cookieless, from `/_vercel/insights` (D68).
 
-### 4.2 Environment variables
+### 6.2 Environment variables
 
-In **Settings → Environment Variables**, add each variable to the right target. Fill-in copies of both columns live in `.vercel/.env.production` and `.vercel/.env.preview`; they are git-ignored, and Next.js never loads them from there. Mark every value except `NEXT_PUBLIC_SITE_URL` as **Sensitive**. Leave "Development" unchecked: local work reads `.env.local`, not Vercel.
+**Settings → Environment Variables**, using the table in §3. Mark every value except `NEXT_PUBLIC_SITE_URL` as **Sensitive**; leave "Development" unchecked (local work reads `.env.local`).
 
-| Variable                   | Production                                  | Preview                                     |
-| -------------------------- | ------------------------------------------- | ------------------------------------------- |
-| `NEXT_PUBLIC_SITE_URL`     | `https://juliolmuller.vercel.app`           | `https://next-juliolmuller.vercel.app`      |
-| `CONTENT_SOURCE`           | `sanity`                                    | `sanity`                                    |
-| `SANITY_PROJECT_ID`        | `njcnsmax`                                  | `njcnsmax`                                  |
-| `SANITY_DATASET`           | `production`                                | `development`                               |
-| `SANITY_API_VERSION`       | `2026-10-01`                                | `2026-10-01`                                |
-| `SANITY_READ_TOKEN`        | `production-read`                           | `preview-read`                              |
-| `SANITY_WRITE_TOKEN`       | `production-write`                          | `preview-write`                             |
-| `SANITY_WEBHOOK_SECRET`    | its own `openssl rand -hex 32`              | its own value (only if you add the webhook) |
-| `SESSION_SECRET`           | its own `openssl rand -base64 48`           | its own value                               |
-| `ADMIN_PASSWORD_HASH`      | `bun run admin:hash` with a strong password | a different password's hash                 |
-| `GOOGLE_SITE_VERIFICATION` | from Search Console (after launch)          | leave empty                                 |
-| `BING_SITE_VERIFICATION`   | from Bing Webmaster Tools (after launch)    | leave empty                                 |
-| `ADMIN_FIXTURE_WRITES`     | **never set**                               | **never set**                               |
-| `UPSTASH_REDIS_REST_*`     | leave empty (reserved, D51)                 | leave empty                                 |
+- Without `NEXT_PUBLIC_SITE_URL`, previews fall back to `http://localhost:3000`: canonicals and `og:image` point to localhost and HSTS / `__Host-` cookie are off. Setting the Preview value to the staging URL fixes it for every branch (feature-branch previews then point to staging; harmless, previews are never indexed).
+- `ADMIN_PASSWORD_HASH` has no `$` characters (`scrypt:N:r:p:salt:hash`), so shells and env files don't mangle it.
+- The build reads Sanity. A wrong token or dataset fails the build loudly by design; the previous deployment stays live.
 
-Notes:
+### 6.3 Domains
 
-- `VERCEL_ENV` is set by Vercel. It is what keeps previews `noindex`; don't override it.
-- **Preview site URL.** Without `NEXT_PUBLIC_SITE_URL`, previews fall back to `http://localhost:3000`. Canonical links and `og:image` then point to localhost, and HSTS and the `__Host-` cookie are off. Setting the Preview value to the staging URL fixes this for every branch.
-  - On feature-branch previews, absolute URLs then point to staging. That is harmless, because previews are never indexed.
-- **Password hash.** `ADMIN_PASSWORD_HASH` contains `$` characters. Paste it into the Vercel UI as-is. If you use `vercel env add`, read it from stdin so the shell doesn't expand it.
-- **The build reads Sanity.** A wrong token or dataset fails the build loudly, by design; the previous deployment stays live.
+Both URLs are free one-level `*.vercel.app` names (certificates don't cover `a.b.vercel.app`), so no DNS is needed.
 
-### 4.3 Domains
-
-Both URLs are free `*.vercel.app` domains, so no DNS records are needed. These names are one level deep only; `vercel.app` certificates don't cover a name like `a.b.vercel.app`.
-
-1. **Production:** in **Settings → Domains**, make sure `juliolmuller.vercel.app` is listed and serves Production. Vercel adds it automatically when the project is named `juliolmuller`.
-   - If Vercel says the name is taken, another project already owns it. One candidate: there is a project called `juliolmuller` under the `lacussolutions` team. Remove the domain there first, or rename that project.
-2. **Staging:** **Add** `next-juliolmuller.vercel.app`, and in its settings choose **Git branch: `next`**. Every push to `next` then updates staging.
+1. **Production:** **Settings → Domains**, ensure `juliolmuller.vercel.app` serves Production. Vercel adds it automatically if the project is named `juliolmuller`. If the name is taken: another project owns it — a project called `juliolmuller` exists under the `lacussolutions` team (checked 2026-11-04, Vercel MCP). Remove the domain there or rename that project first.
+2. **Staging:** add `next-juliolmuller.vercel.app` and set **Git branch: `next`**. Every push to `next` updates staging.
 3. Redeploy `next` so the build picks up the Preview variables.
 
-## 5. Production launch
+### 6.4 Production launch (one-time)
 
-**Read this first.** The repository is a GitHub Pages user site (`juliolmuller.github.io`), and `main` still holds the old static portfolio. Merging `next` into `main` makes GitHub Pages rebuild from the Next.js source, which breaks the old portfolio at `juliolmuller.github.io` (and at `juliolmuller.com`, if that domain points there). Step 3 of §5.1 keeps the old site up.
+**Read first.** `main` still holds the old static site served by GitHub Pages. Merging `next` into `main` makes Pages rebuild from the Next.js source and breaks the old portfolio.
 
-### 5.1 Before the merge
+Before the merge:
 
-1. Make sure CI on `next` is green, including the `audit` job.
-   - **Blocker today:** `bun audit` reports two critical advisories in Next 16.4.0 (GHSA-2464-fhr4-w9xw and GHSA-673q-mjm6-r5xr). Upgrade Next.js before going live.
-2. Check staging at `https://next-juliolmuller.vercel.app`: browse both locales, sign in to the admin, edit something in `development` and see it on the page.
-3. Keep the old site serving: copy the current `main` to its own branch, then point GitHub Pages at it.
+1. CI on `next` is green, including the `audit` job. (The earlier Next.js 16.4.0 advisories were fixed by upgrading; re-check `bun audit` anyway.)
+2. Check staging: both locales, sign in to the admin, edit something in `development` and see it on the page.
+3. Keep the old site up (skip if you no longer need it, and turn Pages off instead):
 
    ```sh
    git push origin origin/main:refs/heads/legacy-pages
    ```
 
-   Then go to **GitHub → Settings → Pages → Build and deployment**, choose **Deploy from a branch**, and pick **`legacy-pages`** / root.
+   Then **GitHub → Settings → Pages → Build and deployment → Deploy from a branch → `legacy-pages` / root**.
 
-   If you no longer need the old site, turn Pages off instead.
+Launch:
 
-### 5.2 First production deployment
-
-1. Merge `next` into `main` (pull request, CI green). Vercel builds production and serves it at `https://juliolmuller.vercel.app`.
-2. Open that URL in a private window. It must load **without** a Vercel login prompt. If it asks for one, adjust **Settings → Deployment Protection** so the production domain is public, while previews stay protected.
-3. If the build fails, check the Sanity variables first. The pages tolerate missing content, so an empty `production` dataset should build, but that has not been tried against Sanity yet.
-
-### 5.3 Content and checks
-
-1. Sign in to the admin on `https://juliolmuller.vercel.app` (`su julio` in the terminal) and enter the real content. If you seeded demo data, replace it.
-2. Configure the Sanity webhook for `production` with the production `SANITY_WEBHOOK_SECRET`, pointing to `https://juliolmuller.vercel.app/api/revalidate` ([SANITY.md → Revalidation webhook](./SANITY.md#revalidation-webhook)). The admin refreshes pages by itself; the webhook only matters for edits made outside it.
-3. Run the remote SEO crawl. An empty `SESSION_SECRET` skips the admin check, which needs the production secret:
+1. Merge `next` into `main` (PR, CI green). Vercel builds production at `https://juliolmuller.vercel.app`.
+2. Open it in a private window: it must load **without** a Vercel login. If it asks for one, make the production domain public in Deployment Protection.
+3. Sign in to the admin there and enter real content (replace any demo data).
+4. Configure the production Sanity webhook ([SANITY.md → Webhook](./SANITY.md#revalidation-webhook)).
+5. Remote SEO crawl (empty `SESSION_SECRET` skips the admin check, which needs the production secret):
 
    ```sh
    SESSION_SECRET= SEO_BASE_URL=https://juliolmuller.vercel.app bun run check:seo
    ```
 
-4. Check the headers: `curl -sI https://juliolmuller.vercel.app/en` must show `strict-transport-security`, `content-security-policy` and no `x-robots-tag`. Any preview URL must carry `noindex`.
-5. Work through the launch checklists in [SEO.md](./SEO.md) (Search Console, Bing, sitemap submission) and the manual screen-reader pass in [ACCESSIBILITY.md](./ACCESSIBILITY.md). For a `vercel.app` domain, use a **URL-prefix** property in Search Console, verified with the HTML tag (`GOOGLE_SITE_VERIFICATION`).
+6. `curl -sI https://juliolmuller.vercel.app/en` must show `strict-transport-security`, `content-security-policy` and no `x-robots-tag`; any preview URL must carry `noindex`.
+7. Work through [SEO.md](./SEO.md) (Search Console URL-prefix property verified with the HTML tag, Bing, sitemap) and the manual screen-reader pass in [ACCESSIBILITY.md](./ACCESSIBILITY.md).
 
-### 5.4 Rolling back
+### 6.5 Rolling back
 
-- **Code:** in Vercel → Deployments, choose an earlier production deployment and select **Instant Rollback**. Content is not affected.
-- **Content:** Sanity keeps document history. Restore it from the document's history in Manage, or re-save the previous values in the admin.
-- **Old portfolio:** it keeps running from `legacy-pages` on GitHub Pages until you turn Pages off.
+- **Code:** Vercel → Deployments → pick an earlier production deployment → **Instant Rollback**. Content is unaffected.
+- **Content:** Sanity keeps document history (Manage → document history), or re-save the old values in the admin.
+- **Old portfolio:** keeps running from `legacy-pages` until you turn Pages off.
 
-### 5.5 Moving to a custom domain later (optional)
+### 6.6 Custom domain later (optional)
 
-The canonical URL, sitemap, Open Graph links and HSTS all follow `NEXT_PUBLIC_SITE_URL`. Moving to `juliolmuller.com` is therefore a configuration change plus a redeploy:
+Canonical URL, sitemap, Open Graph and HSTS all follow `NEXT_PUBLIC_SITE_URL`, so `juliolmuller.com` is configuration plus a redeploy:
 
 1. A day ahead, lower the domain's DNS TTL to 300 s.
 2. In GitHub → Settings → Pages, remove the custom domain if Pages still claims it.
-3. In Vercel → Domains, add `juliolmuller.com`, plus `www.juliolmuller.com` redirecting to the apex with a 308. Create the DNS records Vercel lists, usually `A @ 76.76.21.21` and `CNAME www → cname.vercel-dns.com`. Wait for the certificate.
-4. Set the Production `NEXT_PUBLIC_SITE_URL=https://juliolmuller.com` and **redeploy**, because the value is fixed at build time.
-5. Make `juliolmuller.vercel.app` redirect to `juliolmuller.com` with a 308, so old links and indexed pages carry over.
-6. Point the Sanity webhook at the new URL, add the new property in Search Console and Bing, and submit the new sitemap.
-7. Once everything works, turn GitHub Pages off and raise the DNS TTL back.
+3. Vercel → Domains: add `juliolmuller.com`, plus `www` redirecting to the apex (308). Create the DNS records Vercel lists (usually `A @ 76.76.21.21`, `CNAME www → cname.vercel-dns.com`) and wait for the certificate.
+4. Set Production `NEXT_PUBLIC_SITE_URL=https://juliolmuller.com` and **redeploy**.
+5. Redirect `juliolmuller.vercel.app` → `juliolmuller.com` (308).
+6. Re-point the Sanity webhook, add the new property in Search Console and Bing, submit the new sitemap.
+7. When stable, turn GitHub Pages off and raise the TTL.
 
-## 6. Staging webhook (optional)
+### 6.7 Staging webhook (optional)
 
-Edits in the admin on staging already refresh staging. A `development` webhook only matters if someone edits `development` outside the admin. Because Deployment Protection blocks unauthenticated requests to previews:
-
-1. In Vercel → Settings → Deployment Protection, create a **Protection Bypass for Automation** secret.
-2. In Sanity, create a second webhook:
-   - URL: `https://next-juliolmuller.vercel.app/api/revalidate`
-   - Dataset: `development`
-   - HTTP header: `x-vercel-protection-bypass: <bypass secret>`
-   - Webhook secret: the Preview `SANITY_WEBHOOK_SECRET`
+Admin edits on staging already refresh staging. A `development` webhook only matters for edits made outside the admin. Because Deployment Protection blocks unauthenticated requests: create a **Protection Bypass for Automation** secret in Vercel, then add a second Sanity webhook to `https://next-juliolmuller.vercel.app/api/revalidate` (dataset `development`, header `x-vercel-protection-bypass: <secret>`, the Preview `SANITY_WEBHOOK_SECRET`).
 
 ## 7. Ongoing operations
 
-| Task                        | How                                                                                                               |
-| --------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| Ship a change               | Branch from `next`, open a PR to `next` (preview build plus CI), then merge `next` into `main` to release         |
-| Dependency updates          | Dependabot opens grouped PRs on Mondays. Review release notes for the `framework` group (Next.js, React together) |
-| Rotate the admin password   | `bun run admin:hash`, update `ADMIN_PASSWORD_HASH` in Vercel, redeploy                                            |
-| Sign everyone out           | Change `SESSION_SECRET` and redeploy                                                                              |
-| Rotate a Sanity token       | Create the new token, update Vercel, redeploy, then delete the old token in Sanity                                |
-| Regenerate visual baselines | Actions → **Visual baselines** → Run workflow, then commit the PNGs it produces                                   |
-| Debug production            | Vercel → Deployments → Runtime Logs. Content warnings log document paths, never values                            |
+| Task                        | How                                                                                                        |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Ship a change               | Branch from `next`, PR to `next` (preview build; CI runs on the push), merge `next` → `main` to release    |
+| Dependency updates          | Dependabot PRs on Mondays; `bun run update` bumps everything to latest (keeps ESLint 9 and TypeScript 6.0) |
+| Rotate the admin password   | `bun run admin:hash`, update `ADMIN_PASSWORD_HASH` in Vercel, redeploy                                     |
+| Sign everyone out           | Change `SESSION_SECRET`, redeploy                                                                          |
+| Rotate a Sanity token       | Create the new token, update Vercel, redeploy, then delete the old token                                   |
+| Change the Sanity schema    | See [SANITY.md → Schema](./SANITY.md#schema)                                                               |
+| Regenerate visual baselines | Actions → _Visual baselines_                                                                               |
+| Debug production            | Vercel → Deployments → Runtime Logs. Content warnings log document paths, never values                     |
+
+Self-hosting works with `bun run build && bun run start` behind a reverse proxy that terminates TLS, compresses responses and **overwrites** `X-Forwarded-For` (the login rate limiter trusts its first entry). If the proxy rewrites the host, set `serverActions.allowedOrigins`.
 
 ## Checklists
 
 **Local**
 
-- [ ] Bun 1.4 and Node 24 installed; repository cloned inside WSL's filesystem on Windows
-- [ ] `bun install`, `.env.local` created from `.env.example`
+- [ ] Bun 1.4 and Node 24 installed; clone inside WSL's filesystem on Windows
+- [ ] `bun install`, `.env.local` from `.env.example`
 - [ ] Content: fixtures (empty Sanity variables), or `development` with local tokens
 - [ ] Optional admin: `SESSION_SECRET` and `ADMIN_PASSWORD_HASH`
 - [ ] `bun run dev` serves `/en` and `/pt`
@@ -276,18 +264,18 @@ Edits in the admin on staging already refresh staging. A `development` webhook o
 **Staging**
 
 - [ ] Vercel project imported, production branch `main`, Node 24.x, Vercel Authentication on
-- [ ] Preview variables set (dataset `development`, preview tokens, its own secrets)
-- [ ] `juliolmuller.vercel.app` serves Production; `next-juliolmuller.vercel.app` assigned to branch `next`
-- [ ] Redeployed; admin works; pages carry `noindex`
+- [ ] Preview variables set (dataset `development`, preview tokens, own secrets)
+- [ ] `next-juliolmuller.vercel.app` assigned to branch `next`; redeployed
+- [ ] Admin works; pages carry `noindex`
 
 **Production**
 
-- [ ] Next.js upgraded past the critical advisories; CI green including `audit`
-- [ ] Production variables set (dataset `production`, production tokens, its own secrets)
-- [ ] `main` copied to `legacy-pages` and GitHub Pages pointed at it (or Pages turned off)
-- [ ] `next` merged into `main`; production build succeeded
-- [ ] `https://juliolmuller.vercel.app` loads without a Vercel login
+- [ ] Production variables set (dataset `production`, production tokens, own secrets)
+- [ ] `juliolmuller.vercel.app` serves Production (name conflict with the `lacussolutions` project resolved)
+- [ ] `main` copied to `legacy-pages` and Pages pointed at it (or Pages off)
+- [ ] CI green incl. `audit`; `next` merged into `main`; production build succeeded
+- [ ] Loads without a Vercel login; Web Analytics enabled
 - [ ] Real content entered; demo data gone
 - [ ] Sanity webhook for `production`
-- [ ] `check:seo` against the live URL, headers checked
+- [ ] `check:seo` against the live URL; headers checked
 - [ ] SEO and accessibility launch checklists done

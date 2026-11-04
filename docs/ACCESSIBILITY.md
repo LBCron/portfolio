@@ -31,7 +31,6 @@ Run once before launch and after any large UI change. Mark each cell with the da
 | Home: skip link, landmarks, heading outline (one `h1`)                               |                |                            |                          |                   |
 | Header nav: `aria-current`, language switch keeps route and hash                     |                |                            |                          |                   |
 | Mobile menu: opens as a modal, focus trapped, Esc closes and restores focus          |                |                            |                          |                   |
-| Rotating words: the sentence is read once as a whole, not per word                   |                |                            |                          |                   |
 | Tech stack: List view read as grouped lists; the sphere is silent                    |                |                            |                          |                   |
 | Project filter (radiogroup) and pagination, also with JavaScript off                 |                |                            |                          |                   |
 | Project card: "View details about {title}", "Visit app" as its own stop              |                |                            |                          |                   |

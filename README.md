@@ -2,32 +2,21 @@
 
 Personal portfolio of Julio L. Muller, Senior Full Stack Software Engineer in Curitiba, Brazil. Bilingual (English and Brazilian Portuguese), dark only, server-rendered, with a working terminal, a 3D technology cloud and a private admin reachable only from that terminal.
 
-The initial content is fictional demo data; [docs/ADDING_CONTENT.md](docs/ADDING_CONTENT.md) explains how to replace it.
+The initial content is fictional demo data; [docs/USAGE.md](docs/USAGE.md) explains how to replace it.
 
 ## Features
 
-- **Public site:** Home (hero, about, stack, selected work, résumé, contact, recommended people), `/projects` with a crawlable filter and pagination, project detail pages with a gallery lightbox, a résumé PDF route, and an accessibility statement, all in `/en` and `/pt`.
-- **Terminal:** a windowed shell (`Ctrl/Cmd + /`) that knows the site: `help`, `ls`, `cd`, `cat`, `tree`, `open`, `goto`, `lang`, `projects`, `resume`, `neofetch`, `git log`, a few harmless easter eggs (`fortune`, `cowsay`, `matrix`, `sudo`…) and more, with history and Tab completion. It can be moved, resized, snapped, minimized and maximized, and becomes a bottom sheet on phones.
+- **Public site:** Home (hero, about, stack, selected work, résumé, contact, recommended people), `/projects` with a crawlable filter and pagination, project pages with a gallery lightbox, a résumé PDF route and an accessibility statement, all in `/en` and `/pt`.
+- **Terminal:** a windowed shell (`Ctrl/Cmd + /`) that knows the site (`help`, `ls`, `cd`, `cat`, `open`, `goto`, `lang`, `projects`, `resume`, `neofetch`, `git log`, a few harmless easter eggs…), with history and Tab completion. It can be moved, resized, snapped, minimized and maximized, and becomes a bottom sheet on phones.
 - **Technology cloud:** a rotating geoid of logos with category filters; the List view is the no-JS, reduced-motion and screen-reader equivalent.
 - **Admin:** `su julio` in the terminal opens a session for `/admin`, where every piece of content is edited. Anonymous requests get the same 404 as any unknown URL.
-- **Quality bar:** WCAG 2.2 AA, maximal SEO (metadata, JSON-LD, sitemap, hreflang, OG images), strict security headers, and no third-party requests or cookies for visitors (only cookieless, same-origin Vercel Web Analytics).
+- **Quality bar:** WCAG 2.2 AA, maximal SEO, strict security headers, no third-party requests or visitor cookies (only cookieless same-origin Vercel Web Analytics).
 
 ## Stack
 
-|                     |                                                                                               |
-| ------------------- | --------------------------------------------------------------------------------------------- |
-| Framework           | Next.js 16.4 (App Router, Turbopack, `src/proxy.ts`), React 19.3                              |
-| Language            | TypeScript 6.0 (strict)                                                                       |
-| Styling             | Tailwind CSS 4.3, Geist and JetBrains Mono (self-hosted)                                      |
-| i18n                | next-intl 4 (precompiled ICU messages)                                                        |
-| Motion              | Motion 14 (`LazyMotion`), CSS animations                                                      |
-| Content             | Sanity (server-only HTTP API and `@sanity/client` for writes) or in-memory fixtures           |
-| Auth                | HS256 JWT session (`jose`), scrypt password hashes                                            |
-| Images              | `next/image`, `sharp` for uploads and fixtures                                                |
-| Tests               | Vitest + Testing Library, Playwright (Chromium, WebKit, Firefox, mobile) + axe, Lighthouse CI |
-| Runtime and tooling | Bun 1.4 (package manager and Next runtime), Node 24 (ESLint, Vitest, Playwright)              |
+Next.js 16.4 (App Router, Turbopack, `src/proxy.ts`) · React 19.3 · TypeScript 6.0 · Tailwind CSS 4.3 · next-intl 4 · Motion 14 · Sanity (server-only) or in-memory fixtures · zod 4 · `jose` sessions · Vitest, Playwright + axe, Lighthouse CI · Bun 1.4 (package manager and Next runtime), Node 24 (ESLint, Vitest, Playwright) · hosted on Vercel. Details in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
-## Getting started
+## Quick start
 
 ```sh
 bun install
@@ -35,85 +24,50 @@ cp .env.example .env.local   # every variable is optional for a fixtures run
 bun run dev                  # http://localhost:3000 → /en
 ```
 
-With no Sanity variables the site runs on the fixtures adapter (`CONTENT_SOURCE=fixtures`). To try the admin locally, set `SESSION_SECRET` (32+ characters) and `ADMIN_PASSWORD`, open the terminal and type `su julio`.
+With no Sanity variables the site runs on fixtures. To try the admin locally set `SESSION_SECRET` (32+ characters) and `ADMIN_PASSWORD` (or `ADMIN_PASSWORD_HASH` from `bun run admin:hash`), press `Ctrl + /`, type `su julio`, then `admin`. Full setup for local, GitHub, Sanity and Vercel: [docs/SETUP.md](docs/SETUP.md).
 
 ## Scripts
 
-| Script                                          | What it does                                                                                     |
-| ----------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| `dev` / `build` / `start`                       | Next.js development server, production build, production server                                  |
-| `lint`, `format`, `format:check`, `typecheck`   | ESLint (jsx-a11y strict), Prettier, `tsc` after route type generation                            |
-| `test`, `test:watch`                            | Vitest unit and component tests                                                                  |
-| `test:e2e`                                      | Playwright against the production build on port 3100 (run `build` first)                         |
-| `check:seo`                                     | §13.10 crawl of every sitemap URL with JavaScript off, plus admin and API header checks          |
-| `check:bundle`                                  | First-load and lazy-chunk budgets, admin isolation, server-only secret leaks (run after `build`) |
-| `lhci`                                          | Lighthouse CI on Home, `/projects` and a detail page in both locales (mobile, 3 runs)            |
-| `i18n:check`                                    | Message catalogs and fixture translations: same keys, no blanks, matching placeholders           |
-| `icons:audit`                                   | Every technology resolves to an icon or a deliberate monogram                                    |
-| `audit:deps`                                    | `bun audit` at high severity                                                                     |
-| `admin:hash`                                    | Prints an `ADMIN_PASSWORD_HASH` for a password                                                   |
-| `admin:smoke`                                   | Write-path smoke test against the Sanity `development` dataset (never production)                |
-| `sanity:seed`, `sanity:schema`, `content:smoke` | Seed a dataset with the fictional data, print the schema, read-path smoke test                   |
-| `fixtures:generate`                             | Regenerates the fixture images and their metadata                                                |
+| Script                                          | What it does                                                                                   |
+| ----------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `dev` / `build` / `start`                       | Development server, production build, production server                                        |
+| `lint`, `format`, `format:check`, `typecheck`   | ESLint (jsx-a11y strict, zero warnings), Prettier, `tsc` after route type generation           |
+| `test`, `test:watch`                            | Vitest unit tests                                                                              |
+| `test:e2e`                                      | Playwright against the production build on port 3100 (run `build` first)                       |
+| `check:seo`                                     | Crawl of every sitemap URL with JavaScript off, plus admin and API header checks               |
+| `check:bundle`                                  | First-load and lazy-chunk budgets, admin isolation, server-only secret leaks (after `build`)   |
+| `lhci`                                          | Lighthouse CI on Home, `/projects` and a detail page in both locales                           |
+| `i18n:check`, `icons:audit`                     | Catalog/fixture parity; every technology resolves to an icon or a deliberate monogram          |
+| `audit:deps`, `update`                          | `bun audit` at high severity; upgrade everything to latest (keeps ESLint 9 and TypeScript 6.0) |
+| `admin:hash`                                    | Prints an `ADMIN_PASSWORD_HASH` for a password                                                 |
+| `admin:smoke`                                   | Write-path smoke test against the Sanity `development` dataset (never production)              |
+| `sanity:seed`, `sanity:schema`, `content:smoke` | Seed a dataset with the fictional data, print the schema, read-path smoke test                 |
+| `fixtures:generate`                             | Regenerates the fixture images and metadata                                                    |
 
 Visual snapshots run in CI; locally use `VISUAL=1 bun run test:e2e visual.spec.ts`.
 
-## Environment variables
+## Environments
 
-All are documented in [.env.example](.env.example). Only `NEXT_PUBLIC_SITE_URL` is public; everything else is server-only and validated at boot (`src/env.ts`).
-
-| Variable                                                    | Required in production | Purpose                                                                                                            |
-| ----------------------------------------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `NEXT_PUBLIC_SITE_URL`                                      | yes                    | Canonical origin. An https URL also switches on HSTS, `upgrade-insecure-requests` and the `__Host-` session cookie |
-| `CONTENT_SOURCE`                                            | no                     | `sanity` or `fixtures`; inferred from the Sanity variables when empty                                              |
-| `SANITY_PROJECT_ID`, `SANITY_DATASET`, `SANITY_API_VERSION` | yes (Sanity)           | Project `njcnsmax`, dataset `production`                                                                           |
-| `SANITY_READ_TOKEN`, `SANITY_WRITE_TOKEN`                   | yes (Sanity)           | Viewer token for reads, Editor token for admin writes                                                              |
-| `SANITY_WEBHOOK_SECRET`                                     | recommended            | Signs the `POST /api/revalidate` webhook                                                                           |
-| `SESSION_SECRET`                                            | for the admin          | 32+ random characters; rotating it signs everyone out                                                              |
-| `ADMIN_PASSWORD_HASH` or `ADMIN_PASSWORD`                   | for the admin          | `bun run admin:hash` output (preferred) or a 16+ character password                                                |
-| `GOOGLE_SITE_VERIFICATION`, `BING_SITE_VERIFICATION`        | no                     | Search console ownership tags                                                                                      |
-| `ADMIN_FIXTURE_WRITES`                                      | never                  | E2E only: lets the admin write demo data in a production build                                                     |
-| `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`        | no                     | Reserved; the login rate limiter is in memory (D51)                                                                |
-
-## Deployment (Vercel)
-
-The full walkthrough for local, staging (Vercel Preview) and production, including the GitHub Pages cutover, is [docs/SETUP.md](docs/SETUP.md). In short:
-
-1. Import the repository; Vercel reads `vercel.json` (Bun install, frozen lockfile). The build command is the default `bun run build`.
-2. Set the variables above for **Production** (dataset `production`) and **Preview** (dataset `development`, its own tokens). Previews are never indexed (pages carry a `noindex` robots meta unless `VERCEL_ENV` is `production`).
-3. Set `NEXT_PUBLIC_SITE_URL=https://juliolmuller.vercel.app` for Production and `https://next-juliolmuller.vercel.app` for Preview (staging, assigned to the `next` branch).
-4. Configure the Sanity webhook to `https://juliolmuller.vercel.app/api/revalidate` with `SANITY_WEBHOOK_SECRET` (steps in [docs/SANITY.md](docs/SANITY.md)).
-5. Run the launch checklists in [docs/SEO.md](docs/SEO.md) and the manual screen-reader pass in [docs/ACCESSIBILITY.md](docs/ACCESSIBILITY.md).
-
-Self-hosting works with `bun run build && bun run start` behind a reverse proxy that terminates TLS, compresses responses and **overwrites** `X-Forwarded-For` (the login rate limiter trusts its first entry). If the proxy rewrites the host, set `serverActions.allowedOrigins`.
-
-A Sanity outage at build time fails the build loudly; at runtime the cached pages keep being served.
-
-## Security and privacy
-
-- CSP on every response: a static policy for prerendered public pages (`script-src 'self' 'unsafe-inline'`, no third-party origins) and a per-request nonce policy for the admin; HSTS, `nosniff`, `X-Frame-Options: DENY`, COOP/CORP `same-origin`, a restrictive `Permissions-Policy` (D4, D56).
-- Server-only modules import `server-only`; `check:bundle` fails if a server-only variable's name or value reaches the client.
-- Zod validation at every boundary, sanitized Markdown, URL allowlists, SVG and PDF sanitizers, EXIF stripping (D54).
-- Analytics: Vercel Web Analytics only (`@vercel/analytics`): cookieless, served from the site's own origin (`/_vercel/insights`), active in production on Vercel, no visitor identifiers. Custom events (`src/lib/analytics.ts`) carry low-cardinality properties only. No visitor cookies beyond the functional `NEXT_LOCALE`, set only on an explicit language switch.
-
-## CI
-
-GitHub Actions (`.github/workflows/ci.yml`) on pull requests and pushes to `main` and `next`: frozen install, format, lint, typecheck, unit tests, i18n and icon audits, build, `check:bundle`, `check:seo`, Playwright (Chromium, WebKit, mobile, Firefox smoke, visual), Lighthouse CI with reports as artifacts, and `bun audit` in a separate job. Dependabot opens grouped weekly updates. `Visual baselines` is a manual workflow that regenerates the screenshot baselines.
+`next` → Vercel Preview at `https://next-juliolmuller.vercel.app` (Sanity `development`, `noindex`, behind Vercel login); `main` → production at `https://juliolmuller.vercel.app` (Sanity `production`). `main` still serves the old static portfolio through GitHub Pages until the launch merge — read [docs/SETUP.md §6.4](docs/SETUP.md#64-production-launch-one-time) before merging. All environment variables are listed in [docs/SETUP.md §3](docs/SETUP.md#3-environment-variables) and `.env.example`.
 
 ## Documentation
 
-- [docs/SETUP.md](docs/SETUP.md): local, staging and production setup, cutover and operations.
-- [docs/SPEC.md](docs/SPEC.md): the product and engineering specification.
-- [docs/DECISIONS.md](docs/DECISIONS.md): architecture, resolved versions and every decision (D1–D61), contradictions and risks.
-- [docs/ADDING_CONTENT.md](docs/ADDING_CONTENT.md): editing guide and what the owner still has to supply.
-- [docs/ADMIN.md](docs/ADMIN.md): secret commands, password and session setup, security notes.
-- [docs/SANITY.md](docs/SANITY.md): project, datasets, tokens, webhook, seeding, smoke runs.
-- [docs/SEO.md](docs/SEO.md): what is emitted, how it is verified, launch checklist.
-- [docs/ACCESSIBILITY.md](docs/ACCESSIBILITY.md): automated coverage and the manual screen-reader checklist.
+| Doc                                                                         | Audience and content                                                                                     |
+| --------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| [docs/SETUP.md](docs/SETUP.md)                                              | Local, GitHub, Sanity and Vercel setup; env vars; launch, rollback, operations                           |
+| [docs/USAGE.md](docs/USAGE.md)                                              | Signing in to the admin; updating page content; adding a portfolio item; troubleshooting                 |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)                                | How the system works now: rendering, content layer, auth, terminal, security, quality gates, limitations |
+| [docs/DECISIONS.md](docs/DECISIONS.md)                                      | Why: every decision (D1–D68), spec contradictions, risks, assumptions                                    |
+| [docs/PRODUCT.md](docs/PRODUCT.md)                                          | Purpose, signature features, non-goals, content rules, definition of done                                |
+| [docs/SANITY.md](docs/SANITY.md)                                            | Project, datasets, tokens, schema, webhook, seeding, optional Studio                                     |
+| [docs/SEO.md](docs/SEO.md) · [docs/ACCESSIBILITY.md](docs/ACCESSIBILITY.md) | What is emitted and verified; launch and manual checklists                                               |
+| [docs/AI.md](docs/AI.md)                                                    | AI-assisted development history, Claude PR review workflow, lessons learned                              |
+| [AGENTS.md](AGENTS.md) / [CLAUDE.md](CLAUDE.md)                             | Rules and conventions for AI agents (and humans)                                                         |
+| [docs/archive/SPEC.md](docs/archive/SPEC.md)                                | Original implementation prompt, kept for history                                                         |
 
 ## Known limitations
 
-- Performance, LCP and TBT are enforced at regression floors, not at the §16 targets; initial JS is ~191 KB gzip against a 150 KB goal (D58, D60).
+- Lighthouse performance, LCP and TBT are enforced at regression floors, not at the original targets; initial JS is ~191 KB gzip against a 150 KB goal (D58, D60).
 - The login rate limiter is per instance (in memory) and trusts `X-Forwarded-For`.
 - PDF scanning does not inspect compressed object streams.
 - The admin's unsaved-changes guard cannot intercept the browser's Back button.

@@ -1,5 +1,7 @@
 # Julio L. Muller — Personal Portfolio Site
 
+> **Archived (2026-11-04).** This is the original implementation prompt (Cursor Agent, Claude Opus 5.5), kept for history. It is **not** the current source of truth: the amendments list below, [DECISIONS.md](../DECISIONS.md) and the owner's later changes (D37–D48, D67) override it, and it still says `pnpm` and `.cursor/rules`. Current docs: [PRODUCT.md](../PRODUCT.md) (intent and non-negotiables), [ARCHITECTURE.md](../ARCHITECTURE.md), [AGENTS.md](../../AGENTS.md). Section numbers (`§13.10`, …) cited in code comments refer to this file.
+
 **Implementation prompt for Cursor · Agent mode · Claude Opus 5.5**
 
 ## How to use this document

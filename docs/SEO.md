@@ -26,7 +26,7 @@ Unit tests cover the JSON-LD builders (required properties, resolvable `@id`s, a
 
 ## Launch checklist
 
-1. Set `NEXT_PUBLIC_SITE_URL=https://juliolmuller.vercel.app` in production. Canonicals, the sitemap, OG URLs, HSTS and the `__Host-` cookie depend on it. A later move to `juliolmuller.com` is described in [SETUP.md §5.5](./SETUP.md#55-moving-to-a-custom-domain-later-optional).
+1. Set `NEXT_PUBLIC_SITE_URL=https://juliolmuller.vercel.app` in production. Canonicals, the sitemap, OG URLs, HSTS and the `__Host-` cookie depend on it. A later move to `juliolmuller.com` is described in [SETUP.md §6.6](./SETUP.md#66-custom-domain-later-optional).
 2. Add `GOOGLE_SITE_VERIFICATION` and `BING_SITE_VERIFICATION`, redeploy, and verify both properties.
 3. Submit `https://juliolmuller.vercel.app/sitemap.xml` in Search Console and Bing Webmaster Tools.
 4. URL Inspection on `/en`, `/pt`, `/en/projects` and one project per locale: indexable, canonical as declared, rendered HTML complete.

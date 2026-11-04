@@ -1,6 +1,6 @@
 # Sanity
 
-Sanity is the content store. The app talks to it only from the server, through `@/lib/content` (D25–D30).
+Sanity is the content store. The app talks to it only from the server, through `@/lib/content` (D25–D30). Setup order: [SETUP.md §4](./SETUP.md#4-sanity-one-time-shared-by-staging-and-production).
 
 ## Project and datasets
 
@@ -17,10 +17,10 @@ Both datasets are **private**: nothing is readable without a token, so hidden it
 
 Create them in [sanity.io/manage](https://www.sanity.io/manage/project/njcnsmax) → API → Tokens. Paste each value straight into `.env.local` (locally) or the Vercel project settings, and never anywhere else.
 
-| Variable             | Role   | Used by                               |
-| -------------------- | ------ | ------------------------------------- |
-| `SANITY_READ_TOKEN`  | Viewer | public reads (`sanity/http.ts`)       |
-| `SANITY_WRITE_TOKEN` | Editor | admin writes (Phase 8), `sanity:seed` |
+| Variable             | Role   | Used by                         |
+| -------------------- | ------ | ------------------------------- |
+| `SANITY_READ_TOKEN`  | Viewer | public reads (`sanity/http.ts`) |
+| `SANITY_WRITE_TOKEN` | Editor | admin writes, `sanity:seed`     |
 
 Use one token pair per environment (local, preview, production) so a leaked token can be revoked alone. A Viewer token can read every dataset in the project. If previews must never read `production`, add a custom role scoped to `development`. Custom roles need an Enterprise plan; otherwise accept the risk.
 
@@ -139,19 +139,17 @@ After seeding `development`, run `bun run content:smoke`. It reads every reposit
 
 Last run, 2026-11-02, on `development`: `--reset` deleted 145 fixture documents (renamed technologies had left stale copies, e.g. `HTML5` next to `HTML`), then 136 documents and 16 assets were seeded; `content:smoke` passed, with all 24 reads matching. A plain re-seed never deletes, so use `--reset` after fixture ids change.
 
-## Webhook (Phase 8)
+## Writes and revalidation
 
-`POST /api/revalidate` with `SANITY_WEBHOOK_SECRET`, for edits made outside the admin (e.g. a Studio). It maps the document type to `content:*` tags (`tagsForDocument`) and calls `revalidateTag(tag, { expire: 0 })` (D9). Configure it in sanity.io/manage → API → Webhooks with the projection `{ _type, "slug": slug.current, previousSlugs }`, and filter to the dataset the deployment reads.
-
-## Admin writes (Phase 8)
+### Admin writes
 
 The admin (`/admin`) is the editor: it writes through `src/lib/content/admin/` with `SANITY_WRITE_TOKEN` (an Editor token), documents are written already published, and every change calls `updateTag` for the affected `content:*` tags (D53).
 
 ### Revalidation webhook
 
-Edits made outside the admin (Studio, the Sanity Manage UI) reach the site through `POST /api/revalidate`. After deploying:
+Edits made outside the admin (Studio, the Sanity Manage UI) reach the site through `POST /api/revalidate`, which maps the document type to `content:*` tags (`tagsForDocument`) and calls `revalidateTag(tag, { expire: 0 })` (D9). After deploying:
 
-1. In [sanity.io/manage](https://www.sanity.io/manage/project/njcnsmax) → API → Webhooks, add a webhook to `https://<your-domain>/api/revalidate`, method POST, dataset `production` (and one for `development` if previews matter).
+1. In [sanity.io/manage](https://www.sanity.io/manage/project/njcnsmax) → API → Webhooks, add a webhook to `https://<your-domain>/api/revalidate`, method POST, dataset `production` (and one for `development` if previews matter; see [SETUP.md §6.7](./SETUP.md#67-staging-webhook-optional)).
 2. Filter: `_type in ["profile","contact","resume","featuredLink","recommendedProfile","project","experience","education","technology","practice"]`. Projection: `{_type, "slug": slug.current}`. Trigger on create, update and delete; drafts off.
 3. Set a secret and put the same value in `SANITY_WEBHOOK_SECRET`. Anything unsigned, stale (over 10 minutes) or malformed gets a bare 404.
 
