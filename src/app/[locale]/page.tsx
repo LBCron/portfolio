@@ -117,7 +117,7 @@ export default async function HomePage(): Promise<React.JSX.Element> {
   return (
     <>
       <JsonLd data={jsonLd} />
-      <Hero locale={locale} profile={profile} nextSection={nextSection} />
+      <Hero profile={profile} nextSection={nextSection} />
       {profile ? <About locale={locale} profile={profile} /> : null}
       {technologies.length > 0 ? <Stack technologies={technologies} practices={practices} /> : null}
       {featured.length > 0 ? <Work projects={featured} technologies={technologies} /> : null}

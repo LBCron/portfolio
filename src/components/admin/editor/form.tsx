@@ -5,7 +5,7 @@ import {
   createContext,
   type FormEvent,
   type ReactNode,
-  useContext,
+  use,
   useEffect,
   useMemo,
   useRef,
@@ -49,7 +49,7 @@ const noSubscription = () => (): void => {};
 const FormContext = createContext<FormApi | null>(null);
 
 export function useForm(): FormApi {
-  const api = useContext(FormContext);
+  const api = use(FormContext);
 
   if (!api) throw new Error('Fields must be inside a DocumentEditor');
 
@@ -249,7 +249,7 @@ export function DocumentEditor({
   const errorEntries = Object.entries(errors);
 
   return (
-    <FormContext.Provider value={api}>
+    <FormContext value={api}>
       <form onSubmit={onSubmit} noValidate data-hydrated={hydrated} className="mx-auto max-w-4xl">
         <h1 className="text-h2">{title}</h1>
         {readOnlyReason ? (
@@ -357,7 +357,7 @@ export function DocumentEditor({
           </Button>
         </div>
       </Dialog>
-    </FormContext.Provider>
+    </FormContext>
   );
 }
 

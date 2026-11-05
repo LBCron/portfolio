@@ -10,7 +10,6 @@ import { ScrollCue } from '@/components/motion/scroll-cue';
 import { ButtonAnchor } from '@/components/ui/button';
 import { Chip } from '@/components/ui/chip';
 import { owner } from '@/config/site';
-import { type AppLocale } from '@/i18n/routing';
 import { cn } from '@/lib/cn';
 import { type Profile } from '@/lib/content';
 
@@ -20,7 +19,6 @@ const HERO_SIZES =
   '(min-width: 1440px) 504px, (min-width: 1280px) 448px, (min-width: 1024px) 360px, 96px';
 
 interface HeroProps {
-  locale: AppLocale;
   nextSection: 'about' | 'stack';
   profile: null | Profile;
 }

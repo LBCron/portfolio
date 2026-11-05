@@ -3,12 +3,7 @@
 import { RotateCcw } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
-export default function LocaleError({
-  retry,
-}: {
-  error: { digest?: string } & Error;
-  retry: () => void;
-}): React.JSX.Element {
+export default function LocaleError({ retry }: { retry: () => void }): React.JSX.Element {
   const t = useTranslations('errors');
   const locale = useLocale();
 
