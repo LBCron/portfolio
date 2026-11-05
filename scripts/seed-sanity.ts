@@ -105,7 +105,7 @@ async function uploadAssets(fixtures: ReturnType<typeof createFixtureDataset>) {
   for (const url of files.keys()) {
     await upload('file', url, 'application/pdf');
   }
-  console.log(`Assets: ${images.size} images, ${files.size} files.`);
+  console.info(`Assets: ${images.size} images, ${files.size} files.`);
 
   const resolver: AssetResolver = {
     image: (asset) => ids.get(asset.url) ?? fail(`No asset for ${asset.url}`),
@@ -133,7 +133,7 @@ async function reset() {
   const ids = await client.fetch<string[]>('*[isFixture == true && !(_id in path("_.**"))]._id');
 
   if (ids.length === 0) {
-    console.log('Reset: no fixture documents.');
+    console.info('Reset: no fixture documents.');
 
     return;
   }
@@ -144,7 +144,7 @@ async function reset() {
   );
 
   if (dryRun) {
-    console.log(`Reset (dry run): would delete ${ids.length} documents.`);
+    console.info(`Reset (dry run): would delete ${ids.length} documents.`);
 
     return;
   }
@@ -152,11 +152,11 @@ async function reset() {
   const transaction = client.transaction();
   for (const id of ids) transaction.delete(id);
   await transaction.commit({ tag: 'seed.reset' });
-  console.log(`Reset: deleted ${ids.length} fixture documents.`);
+  console.info(`Reset: deleted ${ids.length} fixture documents.`);
 }
 
 async function main() {
-  console.log(
+  console.info(
     `Seeding project ${env.SANITY_PROJECT_ID}, dataset "${dataset}"${dryRun ? ' (dry run)' : ''}.`,
   );
 
@@ -167,7 +167,7 @@ async function main() {
   const documents = toSanityDocuments(fixtures, resolver);
 
   if (dryRun) {
-    console.log(`Would write ${documents.length} documents.`);
+    console.info(`Would write ${documents.length} documents.`);
 
     return;
   }
@@ -176,7 +176,7 @@ async function main() {
   for (const document of documents) transaction.createOrReplace(document);
   const result = await transaction.commit({ tag: 'seed', visibility: 'sync' });
 
-  console.log(`Wrote ${documents.length} documents (transaction ${result.transactionId}).`);
+  console.info(`Wrote ${documents.length} documents (transaction ${result.transactionId}).`);
 }
 
 await main().catch((error: unknown) => {

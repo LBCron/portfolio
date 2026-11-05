@@ -63,12 +63,12 @@ async function main() {
   for (const { resolved } of rows) {
     bySource.set(resolved.source, (bySource.get(resolved.source) ?? 0) + 1);
   }
-  console.log(
+  console.info(
     `Resolved ${rows.length} technologies: ${[...bySource]
       .map(([source, count]) => `${source} ${count}`)
       .join(', ')}.`,
   );
-  console.log('Contact sheet: .cache/icons-audit.html (and .png)');
+  console.info('Contact sheet: .cache/icons-audit.html (and .png)');
 
   if (failures.length > 0) {
     for (const { tech } of failures) {

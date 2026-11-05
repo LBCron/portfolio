@@ -106,12 +106,12 @@ const clientFiles = walk(STATIC_DIR).filter((path) => /\.(js|css|json|txt|map)$/
 const jsChunks = clientFiles.filter((path) => path.endsWith('.js'));
 
 // 1. First-load budgets.
-console.log('First-load JS (gzip):');
+console.info('First-load JS (gzip):');
 for (const { route, firstLoadChunkPaths } of stats) {
   const total = firstLoadChunkPaths.reduce((sum, p) => sum + gzip(p), 0);
   const budget = ROUTE_BUDGETS[route];
 
-  console.log(`  ${route.padEnd(30)} ${kb(total).padStart(10)}${budget ? ` / ${budget} KB` : ''}`);
+  console.info(`  ${route.padEnd(30)} ${kb(total).padStart(10)}${budget ? ` / ${budget} KB` : ''}`);
 
   if (budget && total > budget * KB) {
     fail(`${route} first load is ${kb(total)}, over its ${budget} KB budget`);
@@ -124,7 +124,7 @@ for (const route of Object.keys(ROUTE_BUDGETS)) {
 }
 
 // 2. Lazy chunks.
-console.log('Lazy chunks (gzip):');
+console.info('Lazy chunks (gzip):');
 
 const lazyFiles: Record<string, string[]> = {};
 for (const [name, { marker, budget, exclusive }] of Object.entries(LAZY)) {
@@ -144,7 +144,7 @@ for (const [name, { marker, budget, exclusive }] of Object.entries(LAZY)) {
 
   const total = files.reduce((sum, p) => sum + gzip(p), 0);
 
-  console.log(`  ${name.padEnd(30)} ${kb(total).padStart(10)} / ${budget} KB`);
+  console.info(`  ${name.padEnd(30)} ${kb(total).padStart(10)} / ${budget} KB`);
 
   if (total > budget * KB) {
     fail(`${name} chunk is ${kb(total)}, over its ${budget} KB budget`);
@@ -191,7 +191,7 @@ for (const path of clientFiles) {
     }
   }
 }
-console.log(
+console.info(
   `Scanned ${clientFiles.length} client files for ${SERVER_ONLY_VARS.length} names and ${values.length} values.`,
 );
 
@@ -200,4 +200,4 @@ if (errors.length > 0) {
   process.exit(1);
 }
 
-console.log('\nBundle checks passed.');
+console.info('\nBundle checks passed.');

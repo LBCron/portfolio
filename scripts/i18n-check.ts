@@ -246,7 +246,7 @@ if (errors.length > 0) {
   process.exit(1);
 }
 
-console.log(
+console.info(
   `i18n check passed: ${messageCount ?? 0} messages and ${fieldCount} localized fixture fields in en and pt${
     notices.length ? `, ${notices.length} notice(s).` : '.'
   }`,

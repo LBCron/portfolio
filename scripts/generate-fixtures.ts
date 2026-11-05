@@ -375,7 +375,7 @@ export const fixtureFileAssets: Record<FixturePdfKey, FileAsset> = ${JSON.string
 
   const total = images.reduce((sum, image) => sum + image.bytes, 0);
 
-  console.log(
+  console.info(
     `Generated ${images.length} images (${Math.round(total / 1024)} KB) and ${files.length} PDFs.`,
   );
 }

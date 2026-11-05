@@ -78,7 +78,11 @@ function firstDifference(a: unknown, b: unknown, at = ''): null | string {
 }
 
 const warnings: string[] = [];
-const logger = { warn: (event: string) => { warnings.push(event); } };
+const logger = {
+  warn: (event: string) => {
+    warnings.push(event);
+  },
+};
 const sanity = await read(createRepository(createSanitySource(createSanityHttpFetch()), logger));
 const fixtures = await read(createRepository(createFixtureSource()));
 
@@ -104,4 +108,4 @@ if (failures > 0) {
   process.exit(1);
 }
 
-console.log(`Content smoke test passed: ${sanity.length} reads match.`);
+console.info(`Content smoke test passed: ${sanity.length} reads match.`);

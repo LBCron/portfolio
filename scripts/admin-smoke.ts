@@ -19,7 +19,7 @@ const fail = (message: string): never => {
 const check = (condition: unknown, message: string) => {
   if (!condition) fail(message);
 
-  console.log(`✓ ${message}`);
+  console.info(`✓ ${message}`);
 };
 
 if (env.CONTENT_SOURCE !== 'sanity' && !(env.SANITY_PROJECT_ID && env.SANITY_DATASET)) {
@@ -102,7 +102,7 @@ try {
   if (used) {
     const refs = await store.referencesTo(used.id);
 
-    console.log(`  (first technology is used by ${refs.length} documents)`);
+    console.info(`  (first technology is used by ${refs.length} documents)`);
   }
 
   const png = await sharp({
@@ -129,4 +129,4 @@ try {
   }
 }
 
-console.log('Smoke run finished.');
+console.info('Smoke run finished.');

@@ -7,4 +7,4 @@ if (!password || password.length < 16) {
   process.exit(1);
 }
 
-console.log(await hashPassword(password));
+console.info(await hashPassword(password));

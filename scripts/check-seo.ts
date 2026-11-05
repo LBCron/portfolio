@@ -369,7 +369,7 @@ async function main() {
     process.exit(1);
   }
 
-  console.log(`SEO check passed: sitemap pages and extras look good.`);
+  console.info(`SEO check passed: sitemap pages and extras look good.`);
 }
 
 await main();
