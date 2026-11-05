@@ -22,6 +22,8 @@ export interface ListRow {
   visible: boolean;
 }
 
+const NO_FILTER_COLUMNS: number[] = [];
+
 interface CollectionListProps {
   columns: string[];
   /**
@@ -48,7 +50,7 @@ export function CollectionList({
   columns,
   rows: initial,
   newHref,
-  filterColumns = [],
+  filterColumns = NO_FILTER_COLUMNS,
   hasFeatured,
   readOnly,
 }: CollectionListProps): React.JSX.Element {

@@ -9,6 +9,8 @@ import { slugify } from '@/lib/content/slugify';
 
 import { markdownSchema } from './schema';
 
+const NO_IMAGES: readonly MarkdownImage[] = [];
+
 export interface MarkdownImage {
   alt: string;
   height: number;
@@ -81,7 +83,7 @@ export function Markdown({
   children,
   topHeadingLevel = 2,
   idPrefix = 'md',
-  images = [],
+  images = NO_IMAGES,
   newTabLabel,
   scrollRegionLabel,
   className,
