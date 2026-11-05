@@ -59,25 +59,25 @@ export function InputLine(props: InputLineProps) {
     pendingCaret.current = null;
   }, [value, selection, inputRef]);
 
-  function edit(next: string, caret: number) {
+  function edit(next: string, caret: number): void {
     pendingCaret.current = caret;
     setValue(next);
     setSelection({ start: caret, end: caret });
   }
 
-  function syncSelection(event: SyntheticEvent<HTMLInputElement>) {
+  function syncSelection(event: SyntheticEvent<HTMLInputElement>): void {
     const { selectionStart, selectionEnd } = event.currentTarget;
 
     setSelection({ start: selectionStart ?? 0, end: selectionEnd ?? 0 });
   }
 
-  function submit(line: string, multiline = false) {
+  function submit(line: string, multiline = false): void {
     navigator.current = null;
     edit('', 0);
     props.onSubmit(line, { multiline });
   }
 
-  function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+  function handleKeyDown(event: KeyboardEvent<HTMLInputElement>): void {
     if (event.nativeEvent.isComposing) return;
 
     props.onKey();
@@ -154,7 +154,7 @@ export function InputLine(props: InputLineProps) {
     }
   }
 
-  function handlePaste(event: ClipboardEvent<HTMLInputElement>) {
+  function handlePaste(event: ClipboardEvent<HTMLInputElement>): void {
     if (props.secret) return;
 
     const pasted = event.clipboardData.getData('text');

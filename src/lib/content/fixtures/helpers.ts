@@ -12,7 +12,10 @@ export function L(en: string, pt: string): LocalizedText {
   return { en, pt };
 }
 
-export function meta(type: DocumentType, key: string) {
+export function meta(
+  type: DocumentType,
+  key: string,
+): { id: string; isFixture: boolean; rev: string; updatedAt: string } {
   return {
     id: fixtureId(type, key),
     rev: 'fixture',
@@ -21,7 +24,9 @@ export function meta(type: DocumentType, key: string) {
   };
 }
 
-export function singletonMeta<T extends 'contact' | 'profile' | 'resume'>(type: T) {
+export function singletonMeta<T extends 'contact' | 'profile' | 'resume'>(
+  type: T,
+): { id: T; isFixture: boolean; rev: string; updatedAt: string } {
   return {
     id: type,
     rev: 'fixture',
@@ -44,11 +49,17 @@ export function fixtureImage(
   key: FixtureImageKey,
   alt: LocalizedText,
   focal?: { x: number; y: number },
-) {
+): {
+  alt: { en: string; pt: string };
+  asset: { height: number; lqip?: string | undefined; url: string; width: number };
+  focal?: { x: number; y: number } | undefined;
+} {
   return { asset: imageAsset(key), alt, ...(focal ? { focal } : {}) };
 }
 
-export function fixtureAvatar(key: FixtureImageKey) {
+export function fixtureAvatar(key: FixtureImageKey): {
+  asset: { height: number; lqip?: string | undefined; url: string; width: number };
+} {
   return { asset: imageAsset(key) };
 }
 

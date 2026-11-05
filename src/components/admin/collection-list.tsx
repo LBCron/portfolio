@@ -64,7 +64,7 @@ export function CollectionList({
   );
   const narrowed = filtered.length !== rows.length;
 
-  async function toggle(row: ListRow, field: 'featured' | 'visible') {
+  async function toggle(row: ListRow, field: 'featured' | 'visible'): Promise<void> {
     const next = !row[field];
     const before = rows;
 
@@ -86,7 +86,7 @@ export function CollectionList({
     }
   }
 
-  async function move(id: string, to: number) {
+  async function move(id: string, to: number): Promise<void> {
     const from = rows.findIndex((row) => row.id === id);
 
     if (from === to || to < 0 || to >= rows.length) return;
@@ -253,7 +253,9 @@ export function CollectionList({
                         aria-label={`Featured: ${row.cells[0] ?? row.id}`}
                         checked={row.featured === true}
                         disabled={readOnly}
-                        onChange={() => { toggle(row, 'featured'); }}
+                        onChange={() => {
+                          toggle(row, 'featured');
+                        }}
                         className="size-5 accent-accent-1"
                       />
                     </td>
@@ -264,7 +266,9 @@ export function CollectionList({
                       aria-label={`Visible: ${row.cells[0] ?? row.id}`}
                       checked={row.visible}
                       disabled={readOnly}
-                      onChange={() => { toggle(row, 'visible'); }}
+                      onChange={() => {
+                        toggle(row, 'visible');
+                      }}
                       className="size-5 accent-accent-1"
                     />
                   </td>
@@ -287,7 +291,9 @@ export function CollectionList({
                         type="button"
                         aria-label={`Move ${row.cells[0] ?? row.id} up`}
                         disabled={readOnly || narrowed || index === 0}
-                        onClick={() => { move(row.id, index - 1); }}
+                        onClick={() => {
+                          move(row.id, index - 1);
+                        }}
                         className={smallButton}
                       >
                         ↑
@@ -296,7 +302,9 @@ export function CollectionList({
                         type="button"
                         aria-label={`Move ${row.cells[0] ?? row.id} down`}
                         disabled={readOnly || narrowed || index === rows.length - 1}
-                        onClick={() => { move(row.id, index + 1); }}
+                        onClick={() => {
+                          move(row.id, index + 1);
+                        }}
                         className={smallButton}
                       >
                         ↓

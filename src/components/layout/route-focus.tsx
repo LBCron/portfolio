@@ -9,7 +9,7 @@ import { usePathname } from '@/i18n/navigation';
  * and screen reader users start at the new content (Next's route announcer
  * still runs). Hash-only navigation keeps the browser's own behavior.
  */
-export function RouteFocus() {
+export function RouteFocus(): null {
   const pathname = usePathname();
   const previous = useRef(pathname);
 

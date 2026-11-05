@@ -10,7 +10,7 @@ import { MOTION_INIT_SCRIPT } from '@/lib/motion-init';
  * runs before first paint. The client tree returns `null` — React 19 never
  * executes (or even accepts) a `<script>` created during client render.
  */
-export function MotionInit() {
+export function MotionInit(): null {
   const flushed = useRef(false);
 
   useServerInsertedHTML(() => {

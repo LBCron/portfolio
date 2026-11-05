@@ -62,7 +62,7 @@ function check(schema: z.ZodType, value: unknown): string | true {
   return result.success ? true : message(result.error);
 }
 
-function isRequired(schema: z.ZodType) {
+function isRequired(schema: z.ZodType): boolean {
   return !schema.safeParse(undefined).success;
 }
 
@@ -205,7 +205,14 @@ interface PreviewValues {
 /**
  * List rows show the English title and flag hidden documents.
  */
-function preview(type: DocumentType) {
+function preview(type: DocumentType): {
+  prepare: ({ title, subtitle, media, visible }: PreviewValues) => {
+    media: unknown;
+    subtitle: string;
+    title: string;
+  };
+  select: { media?: string; subtitle?: string; title: string; visible: string };
+} {
   const select = { ...PREVIEWS[type], visible: 'visible' };
 
   return {

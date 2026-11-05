@@ -53,7 +53,7 @@ const COW = [
 export function wrapWords(input: string, width: number): string[] {
   const out: string[] = [];
   let line: string[] = [];
-  const flush = () => {
+  const flush = (): void => {
     out.push(line.join(''));
     line = [];
   };
@@ -89,7 +89,7 @@ export function wrapWords(input: string, width: number): string[] {
 export function cowsay(message: string, width = COW_WIDTH): string[] {
   const rows = wrapWords(message, width);
   const size = Math.max(...rows.map((row) => [...row].length));
-  const pad = (row: string) => row + ' '.repeat(size - [...row].length);
+  const pad = (row: string): string => row + ' '.repeat(size - [...row].length);
   const bubble =
     rows.length === 1
       ? [`< ${pad(rows[0] ?? '')} >`]

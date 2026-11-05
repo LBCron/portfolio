@@ -70,7 +70,8 @@ export const AREAS: AreaMeta[] = [
   },
 ];
 
-export const findArea = (slug: string) => AREAS.find((area) => area.slug === slug);
+export const findArea = (slug: string): AreaMeta | undefined =>
+  AREAS.find((area) => area.slug === slug);
 
 export const ADMIN_NAV = [
   { label: 'Dashboard', href: '/admin' },
@@ -81,8 +82,8 @@ export const ADMIN_NAV = [
  * Document ids look like `recommendedProfile.<uuid>`, but the proxy lowercases
  * every public URL, so admin URLs carry only the uuid part.
  */
-export const idToSegment = (type: DocumentType, id: string) =>
+export const idToSegment = (type: DocumentType, id: string): string =>
   id.startsWith(`${type}.`) ? id.slice(type.length + 1) : id;
 
-export const segmentToId = (type: DocumentType, segment: string) =>
+export const segmentToId = (type: DocumentType, segment: string): string =>
   segment.includes('.') ? segment : `${type}.${segment}`;

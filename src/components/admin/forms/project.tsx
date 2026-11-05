@@ -14,7 +14,7 @@ import { ImageField } from '../editor/image-field';
 import { ListEditor } from '../editor/list-editor';
 import { type Option } from './career';
 
-const blank = () => ({ en: '', pt: '' });
+const blank = (): { en: string; pt: string } => ({ en: '', pt: '' });
 
 const KINDS = ['web', 'mobile', 'desktop', 'automation', 'integration', 'open-source'];
 const STATUSES = [

@@ -132,6 +132,6 @@ export function parseArgs(
   return { positionals, flags, raw: [...tokens] };
 }
 
-export function wantsHelp(args: ParsedArgs) {
+export function wantsHelp(args: ParsedArgs): boolean {
   return Boolean(args.flags['help'] || args.flags['h']);
 }

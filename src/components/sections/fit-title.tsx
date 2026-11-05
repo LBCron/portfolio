@@ -29,7 +29,7 @@ export function FitTitle({
 
     if (!el || !parent) return;
 
-    const fit = () => {
+    const fit = (): void => {
       el.style.removeProperty('--fit');
 
       const style = getComputedStyle(el);
@@ -51,7 +51,7 @@ export function FitTitle({
     observer.observe(parent);
     document.fonts.ready.then(fit);
 
-    return () => observer.disconnect();
+    return (): void => observer.disconnect();
   }, [children]);
 
   return (

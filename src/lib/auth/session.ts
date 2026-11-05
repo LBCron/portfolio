@@ -36,7 +36,7 @@ export async function requireAdmin(): Promise<Session> {
 /**
  * `start` keeps the 8-hour cap across renewals; omit it for a new login.
  */
-export async function startSession(start?: number) {
+export async function startSession(start?: number): Promise<number> {
   const config = getAdminConfig();
 
   if (!config.enabled) throw new Error('admin disabled');
@@ -49,7 +49,7 @@ export async function startSession(start?: number) {
   return exp;
 }
 
-export async function endSession() {
+export async function endSession(): Promise<void> {
   // `delete()` omits `Secure`, which browsers reject for `__Host-` cookies.
   (await cookies()).set(sessionCookie('', 0));
 }

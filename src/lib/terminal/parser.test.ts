@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { parseArgs, tokenize, wantsHelp } from './parser';
 
-const tokens = (input: string) => {
+const tokens = (input: string): string[] => {
   const result = tokenize(input);
 
   if (!result.ok) throw new Error(result.reason);

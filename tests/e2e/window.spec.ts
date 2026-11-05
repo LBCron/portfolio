@@ -11,10 +11,12 @@ test.beforeEach(async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
 });
 
-const windowOf = (page: Page) => page.locator('[data-window=terminal]');
-const toolbarOf = (page: Page) => page.getByRole('toolbar', { name: 'Window controls' });
+const windowOf = (page: Page): Locator => page.locator('[data-window=terminal]');
+const toolbarOf = (page: Page): Locator => page.getByRole('toolbar', { name: 'Window controls' });
 
-async function box(locator: Locator) {
+async function box(
+  locator: Locator,
+): Promise<{ height: number; width: number; x: number; y: number }> {
   const result = await locator.boundingBox();
 
   if (!result) throw new Error('element has no box');
@@ -22,7 +24,7 @@ async function box(locator: Locator) {
   return result;
 }
 
-async function openTerminal(page: Page) {
+async function openTerminal(page: Page): Promise<void> {
   await page.goto('/en', { waitUntil: 'domcontentloaded' });
   // The shortcut listener attaches after hydration; a press before that is a no-op.
   await openWithShortcut(page, windowOf(page));
@@ -44,7 +46,7 @@ async function dragTitleBar(
     steps: 8,
   });
 
-  return () => page.mouse.up();
+  return (): Promise<void> => page.mouse.up();
 }
 
 test.describe('desktop window', () => {
@@ -209,7 +211,8 @@ test.describe('desktop window', () => {
     await openTerminal(page);
 
     const overlay = page.locator('[data-snap-overlay=terminal]');
-    const duration = () => overlay.evaluate((el) => getComputedStyle(el).transitionDuration);
+    const duration = (): Promise<string> =>
+      overlay.evaluate((el) => getComputedStyle(el).transitionDuration);
 
     expect(await duration()).toMatch(/^0\.2s/);
     await page.emulateMedia({ reducedMotion: 'reduce' });

@@ -39,7 +39,7 @@ const securityOptions = {
   https: isHttpsSite(process.env['NEXT_PUBLIC_SITE_URL']),
 };
 
-function notFound(request: NextRequest) {
+function notFound(request: NextRequest): NextResponse<unknown> {
   return NextResponse.rewrite(new URL(NOT_FOUND_PATH, request.url));
 }
 
@@ -54,7 +54,7 @@ const ADMIN_HEADERS = {
  * No valid session means the same global 404 as any unknown path, so these
  * headers (which would reveal the area) are only set on the allowed branch.
  */
-async function guardAdmin(request: NextRequest) {
+async function guardAdmin(request: NextRequest): Promise<NextResponse<unknown>> {
   const secret = process.env['SESSION_SECRET'];
   const token = request.cookies.get(SESSION_COOKIE)?.value;
   const session = isStrongSecret(secret) && token ? await verifySession(secret, token) : null;
@@ -86,7 +86,7 @@ async function guardAdmin(request: NextRequest) {
   return response;
 }
 
-export async function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest): Promise<NextResponse<unknown>> {
   const { pathname, search } = request.nextUrl;
 
   const lowercased = pathname.toLowerCase();

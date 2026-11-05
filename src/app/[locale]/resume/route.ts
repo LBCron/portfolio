@@ -9,7 +9,10 @@ export const revalidate = 86400;
 /**
  * 307 to the current-locale PDF; 404 when that file is missing.
  */
-export async function GET(request: NextRequest, context: RouteContext<'/[locale]/resume'>) {
+export async function GET(
+  request: NextRequest,
+  context: RouteContext<'/[locale]/resume'>,
+): Promise<NextResponse<unknown>> {
   const { locale } = await context.params;
 
   if (!isAppLocale(locale)) notFound();

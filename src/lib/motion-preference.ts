@@ -14,38 +14,38 @@ function subscribe(onChange: () => void) {
   });
   media.addEventListener('change', onChange);
 
-  return () => {
+  return (): void => {
     observer.disconnect();
     media.removeEventListener('change', onChange);
   };
 }
 
-function isPausedSnapshot() {
+function isPausedSnapshot(): boolean {
   return document.documentElement.dataset.motion === 'reduced';
 }
 
 /**
  * Reads the preference right now (system setting or site toggle).
  */
-export function isMotionReduced() {
+export function isMotionReduced(): boolean {
   return isPausedSnapshot() || window.matchMedia(REDUCED_QUERY).matches;
 }
 
 /**
  * True when the visitor paused animations with the site toggle.
  */
-export function useMotionPaused() {
+export function useMotionPaused(): boolean {
   return useSyncExternalStore(subscribe, isPausedSnapshot, () => false);
 }
 
 /**
  * True when motion must be reduced: system preference or site toggle.
  */
-export function useReducedMotionPreference() {
+export function useReducedMotionPreference(): boolean {
   return useSyncExternalStore(subscribe, isMotionReduced, () => false);
 }
 
-export function setMotionPaused(paused: boolean) {
+export function setMotionPaused(paused: boolean): void {
   const root = document.documentElement;
 
   if (paused) root.dataset.motion = 'reduced';

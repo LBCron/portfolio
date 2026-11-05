@@ -17,7 +17,7 @@ interface EmailActionsProps {
   user: string;
 }
 
-const subscribe = () => () => {};
+const subscribe = () => (): void => {};
 
 /**
  * `mailto:` link plus a copy button. The address is assembled after hydration;
@@ -36,7 +36,7 @@ export function EmailActions({ user, domain, labels }: EmailActionsProps) {
     return <span aria-hidden="true" className="block min-h-14" />;
   }
 
-  async function copy() {
+  async function copy(): Promise<void> {
     try {
       await navigator.clipboard.writeText(address);
       track('email_copy');

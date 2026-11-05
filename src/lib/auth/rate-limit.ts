@@ -43,7 +43,7 @@ export function createMemoryLimiter(now: () => number = Date.now): RateLimiter {
   const entries = new Map<string, Entry>();
   let global: number[] = [];
 
-  function prune(time: number) {
+  function prune(time: number): void {
     global = global.filter((at) => time - at < GLOBAL_WINDOW_MS);
 
     if (entries.size <= MAX_KEYS) return;
@@ -57,7 +57,7 @@ export function createMemoryLimiter(now: () => number = Date.now): RateLimiter {
     if (entries.size > MAX_KEYS) entries.clear();
   }
 
-  function allowed(key: string, time: number) {
+  function allowed(key: string, time: number): boolean {
     prune(time);
 
     if (global.length >= GLOBAL_MAX_FAILURES) return false;
@@ -65,7 +65,7 @@ export function createMemoryLimiter(now: () => number = Date.now): RateLimiter {
     return (entries.get(key)?.lockedUntil ?? 0) <= time;
   }
 
-  function record(key: string, time: number) {
+  function record(key: string, time: number): void {
     global.push(time);
 
     const entry = entries.get(key) ?? {
@@ -87,12 +87,12 @@ export function createMemoryLimiter(now: () => number = Date.now): RateLimiter {
   }
 
   return {
-    async check(key) {
+    async check(key): Promise<boolean> {
       return allowed(key, now());
     },
 
     // No await between the check and the record: one tick, no interleaving.
-    async reserve(key) {
+    async reserve(key): Promise<boolean> {
       const time = now();
 
       if (!allowed(key, time)) return false;
@@ -102,7 +102,7 @@ export function createMemoryLimiter(now: () => number = Date.now): RateLimiter {
       return true;
     },
 
-    async succeed(key) {
+    async succeed(key): Promise<void> {
       if (entries.delete(key)) global.pop();
     },
   };

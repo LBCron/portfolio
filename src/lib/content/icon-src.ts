@@ -20,7 +20,7 @@ type SvgIcon = Extract<TechIcon, { paths: readonly string[] }>;
  */
 export function iconHash({ viewBox, paths }: SvgIcon): string {
   const input = `${viewBox}\n${paths.join('\n')}`;
-  const pass = (seed: number) => {
+  const pass = (seed: number): string => {
     let hash = seed;
     for (let index = 0; index < input.length; index++) {
       hash ^= input.charCodeAt(index);
@@ -50,14 +50,14 @@ export function withFill(src: string, color: string): string {
   return match?.[1] ? `${src}?fill=${match[1].toLowerCase()}` : src;
 }
 
-function escapeAttribute(value: string) {
+function escapeAttribute(value: string): string {
   return value.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;');
 }
 
 /**
  * Standalone SVG document; `fill` is six hex digits or black (for masks).
  */
-export function renderIconSvg({ viewBox, paths }: SvgIcon, fill?: string) {
+export function renderIconSvg({ viewBox, paths }: SvgIcon, fill?: string): string {
   const color = fill && HEX.test(fill) ? `#${fill.replace('#', '')}` : '#000';
   const body = paths.map((d) => `<path d="${escapeAttribute(d)}"/>`).join('');
 

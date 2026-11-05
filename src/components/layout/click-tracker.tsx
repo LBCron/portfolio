@@ -12,7 +12,7 @@ import { track } from '@/lib/analytics';
  */
 export function ClickTracker() {
   useEffect(() => {
-    function onClick(event: MouseEvent) {
+    function onClick(event: MouseEvent): void {
       const anchor = (event.target as Element | null)?.closest?.('a[href]');
 
       if (!anchor) return;
@@ -37,7 +37,7 @@ export function ClickTracker() {
     }
     document.addEventListener('click', onClick);
 
-    return () => document.removeEventListener('click', onClick);
+    return (): void => document.removeEventListener('click', onClick);
   }, []);
 
   // Client-side so the admin filter (a function) can be passed as a prop.

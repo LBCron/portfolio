@@ -22,16 +22,16 @@ export function LanguageSwitcher({ className }: { className?: string }) {
   // Roving tabindex needs the arrow-key handler, so the server HTML keeps
   // every link tabbable for keyboard users without JavaScript.
   const hydrated = useSyncExternalStore(
-    () => () => undefined,
+    () => (): undefined => undefined,
     () => true,
     () => false,
   );
 
-  function hrefFor(target: AppLocale) {
+  function hrefFor(target: AppLocale): string {
     return pathname === '/' ? `/${target}` : `/${target}${pathname}`;
   }
 
-  function handleClick(event: MouseEvent<HTMLAnchorElement>, target: AppLocale) {
+  function handleClick(event: MouseEvent<HTMLAnchorElement>, target: AppLocale): void {
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) {
       return;
     }
@@ -45,7 +45,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
 
   // Roving tabindex: the current language is the single tab stop and the
   // arrow keys move between options.
-  function handleKeyDown(event: KeyboardEvent<HTMLAnchorElement>) {
+  function handleKeyDown(event: KeyboardEvent<HTMLAnchorElement>): void {
     if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
 
     const links = Array.from(groupRef.current?.querySelectorAll<HTMLAnchorElement>('a') ?? []);

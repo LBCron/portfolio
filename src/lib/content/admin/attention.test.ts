@@ -4,7 +4,7 @@ import { createFixtureDataset } from '../fixtures/dataset';
 import { findAttention } from './attention';
 import { type AdminDoc } from './types';
 
-const asDocs = <T>(list: T[]) => list as unknown as AdminDoc[];
+const asDocs = <T>(list: T[]): AdminDoc[] => list as unknown as AdminDoc[];
 
 describe('findAttention', () => {
   it('flags a missing translation, a missing alt text and SEO lengths', () => {

@@ -29,7 +29,7 @@ export type SvgResult = { message: string; ok: false } | { ok: true; svg: SvgDat
 
 const fail = (message: string): SvgResult => ({ ok: false, message });
 
-function attributesOf(source: string) {
+function attributesOf(source: string): Map<string, string> {
   const map = new Map<string, string>();
   for (const match of source.matchAll(ATTRIBUTE)) {
     map.set((match[1] as string).toLowerCase(), (match[2] ?? match[3] ?? '').trim());

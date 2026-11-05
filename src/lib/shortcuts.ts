@@ -7,7 +7,7 @@ export const TERMINAL_SHORTCUT = {
   labels: { apple: '⌘ /', other: 'Ctrl /' },
 } as const;
 
-export function isTerminalShortcut(event: KeyboardEvent) {
+export function isTerminalShortcut(event: KeyboardEvent): boolean {
   return (
     event.key === TERMINAL_SHORTCUT.key
     && (event.metaKey || event.ctrlKey)
@@ -16,7 +16,7 @@ export function isTerminalShortcut(event: KeyboardEvent) {
   );
 }
 
-export function isApplePlatform() {
+export function isApplePlatform(): boolean {
   if (typeof navigator === 'undefined') return false;
 
   return /mac|iphone|ipad|ipod/i.test(navigator.platform || navigator.userAgent);

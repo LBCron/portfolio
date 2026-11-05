@@ -46,7 +46,7 @@ export function Reveal({ index = 0, className, style, ...props }: RevealProps) {
 
     observer.observe(element);
 
-    return () => observer.disconnect();
+    return (): void => observer.disconnect();
   }, []);
 
   return (

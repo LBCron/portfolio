@@ -10,7 +10,7 @@ describe('fibonacciGeoid', () => {
 
   it('spreads points with a deterministic seed', () => {
     let i = 0;
-    const random = () => {
+    const random = (): number => {
       i += 1;
 
       return (i % 10) / 10;

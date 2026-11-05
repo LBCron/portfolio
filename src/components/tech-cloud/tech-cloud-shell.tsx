@@ -34,17 +34,17 @@ function toCloudTech(tech: StackTech): CloudTech {
   };
 }
 
-function useMobileCull(technologies: CloudTech[]) {
+function useMobileCull(technologies: CloudTech[]): CloudTech[] {
   const [narrow, setNarrow] = useState(false);
 
   useEffect(() => {
     const media = window.matchMedia('(max-width: 767px)');
-    const update = () => setNarrow(media.matches);
+    const update = (): void => setNarrow(media.matches);
 
     update();
     media.addEventListener('change', update);
 
-    return () => media.removeEventListener('change', update);
+    return (): void => media.removeEventListener('change', update);
   }, []);
 
   return useMemo(() => {
@@ -64,7 +64,7 @@ export function TechCloudShell({
   const t = useTranslations('stack');
   const reduced = useReducedMotionPreference();
   const isClient = useSyncExternalStore(
-    () => () => undefined,
+    () => (): undefined => undefined,
     () => true,
     () => false,
   );
@@ -89,7 +89,7 @@ export function TechCloudShell({
 
     const timer = window.setTimeout(() => setSelected(null), 2500);
 
-    return () => window.clearTimeout(timer);
+    return (): void => window.clearTimeout(timer);
   }, [selected]);
 
   useEffect(() => {
@@ -111,7 +111,7 @@ export function TechCloudShell({
 
     observer.observe(host);
 
-    return () => observer.disconnect();
+    return (): void => observer.disconnect();
   }, [showCloud, near]);
 
   const counts = useMemo(() => {

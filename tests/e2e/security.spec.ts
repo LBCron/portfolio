@@ -28,7 +28,7 @@ async function watchCsp(page: Page) {
     }
   });
 
-  return async () => {
+  return async (): Promise<string[]> => {
     const violations = await page.evaluate(
       () => (window as unknown as { __cspViolations: string[] }).__cspViolations,
     );

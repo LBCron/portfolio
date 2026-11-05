@@ -35,7 +35,7 @@ interface PageMetadataInput {
 
 const TEMPLATE_SUFFIX = ` | ${owner.name}`;
 
-function fitTitle(title: string, withTemplate: boolean) {
+function fitTitle(title: string, withTemplate: boolean): string {
   const budget = TITLE_MAX - (withTemplate ? TEMPLATE_SUFFIX.length : 0);
 
   return truncate(title, budget);

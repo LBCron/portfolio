@@ -11,7 +11,7 @@ export type AnalyticsEvent =
 /**
  * Low-cardinality properties only: never put user input in here.
  */
-export function track(event: AnalyticsEvent, properties?: Record<string, string>) {
+export function track(event: AnalyticsEvent, properties?: Record<string, string>): void {
   try {
     vaTrack(event, properties);
   } catch {

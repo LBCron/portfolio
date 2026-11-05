@@ -4,7 +4,7 @@ import { iconHash, renderIconSvg } from '@/lib/content/icon-src';
 const FILE = /^([0-9a-z]{14})\.svg$/;
 const FILL = /^[0-9a-f]{6}$/;
 
-const notFound = () => new Response(null, { status: 404 });
+const notFound = (): Response => new Response(null, { status: 404 });
 
 /**
  * Content-addressed technology logos (D59). The name is a hash of the paths, so
@@ -12,7 +12,10 @@ const notFound = () => new Response(null, { status: 404 });
  * visible technologies resolve. The document holds nothing but `<path>`
  * elements built from sanitized data (D54), so it cannot carry script.
  */
-export async function GET(request: Request, context: RouteContext<'/tech-icons/[file]'>) {
+export async function GET(
+  request: Request,
+  context: RouteContext<'/tech-icons/[file]'>,
+): Promise<Response> {
   const { file } = await context.params;
   const hash = FILE.exec(file)?.[1];
 

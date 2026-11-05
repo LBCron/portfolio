@@ -22,4 +22,4 @@ export function fixtureId(type: DocumentType, key: string): string {
   return `${type}.${uuid}`;
 }
 
-export const techId = (name: string) => fixtureId('technology', name);
+export const techId = (name: string): string => fixtureId('technology', name);

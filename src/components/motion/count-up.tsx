@@ -38,7 +38,7 @@ export function CountUp({ to, prefix = '', suffix = '', localeTag }: CountUpProp
     const format = new Intl.NumberFormat(localeTag, {
       maximumFractionDigits: Number.isInteger(to) ? 0 : 1,
     });
-    const write = (value: number) => {
+    const write = (value: number): void => {
       element.textContent = `${prefix}${format.format(value)}${suffix}`;
     };
 
@@ -52,7 +52,7 @@ export function CountUp({ to, prefix = '', suffix = '', localeTag }: CountUpProp
         observer.disconnect();
 
         const start = performance.now();
-        const step = (now: number) => {
+        const step = (now: number): void => {
           const progress = Math.min(1, (now - start) / DURATION_MS);
           const eased = 1 - (1 - progress) ** 4;
 
@@ -68,7 +68,7 @@ export function CountUp({ to, prefix = '', suffix = '', localeTag }: CountUpProp
 
     observer.observe(element);
 
-    return () => {
+    return (): void => {
       observer.disconnect();
       cancelAnimationFrame(frame);
       write(to);

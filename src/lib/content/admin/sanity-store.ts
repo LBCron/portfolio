@@ -71,19 +71,19 @@ export function createSanityAdminStore(
     readOnlyReason: options.readOnlyReason ?? null,
     label: `Sanity · ${options.dataset}`,
 
-    async list(type) {
+    async list(type): Promise<AdminDoc[]> {
       const rows = await client.fetch<unknown[]>(adminListQuery(type));
 
       return rows.map((row) => stripNulls(row) as AdminDoc);
     },
 
-    async get(type, id) {
+    async get(type, id): Promise<AdminDoc | null> {
       const row = await client.fetch<unknown>(adminGetQuery(type), { id });
 
       return row ? (stripNulls(row) as AdminDoc) : null;
     },
 
-    async write(type, document, { isNew, expectedRev }) {
+    async write(type, document, { isNew, expectedRev }): Promise<WriteResult> {
       const stored = toSanityDocument(type, document as never, resolver);
 
       if (isNew) {
@@ -103,7 +103,7 @@ export function createSanityAdminStore(
       return attempt(() => patch.set(fields).unset(unset).commit());
     },
 
-    async patch(_type, id, fields, expectedRev) {
+    async patch(_type, id, fields, expectedRev): Promise<WriteResult> {
       const patch = client.patch(id);
 
       if (expectedRev) patch.ifRevisionId(expectedRev);
@@ -111,7 +111,7 @@ export function createSanityAdminStore(
       return attempt(() => patch.set(fields).commit());
     },
 
-    async remove(_type, id, expectedRev) {
+    async remove(_type, id, expectedRev): Promise<WriteResult> {
       const transaction = client.transaction();
 
       // A no-op patch carries the revision check into the same transaction.
@@ -131,7 +131,7 @@ export function createSanityAdminStore(
       });
     },
 
-    async referencesTo(id) {
+    async referencesTo(id): Promise<Reference[]> {
       return client.fetch<Reference[]>(
         `*[references($id)]{ "id": _id, "type": _type, "label": coalesce(title.en, company, _id) }`,
         { id },

@@ -16,7 +16,7 @@ const BASE = (process.env.SEO_BASE_URL ?? `http://127.0.0.1:${PORT}`).replace(/\
 const ADMIN_LEAK = /\/admin(?:[/"'\s]|$)/i;
 
 const errors: string[] = [];
-function fail(message: string) {
+function fail(message: string): void {
   errors.push(message);
   console.error(`✗ ${message}`);
 }
@@ -24,7 +24,7 @@ function fail(message: string) {
 /**
  * Sitemap locs use the build-time origin; fetch them from this server.
  */
-function toFetch(loc: string) {
+function toFetch(loc: string): string {
   if (loc.startsWith('/')) return loc;
 
   const url = new URL(loc);
@@ -32,7 +32,10 @@ function toFetch(loc: string) {
   return `${url.pathname}${url.search}`;
 }
 
-async function fetchText(path: string, init?: RequestInit) {
+async function fetchText(
+  path: string,
+  init?: RequestInit,
+): Promise<{ response: Response; text: string; url: string }> {
   const url = path.startsWith('http') ? path : `${BASE}${path.startsWith('/') ? path : `/${path}`}`;
   const response = await fetch(url, {
     redirect: 'manual',
@@ -44,7 +47,7 @@ async function fetchText(path: string, init?: RequestInit) {
   return { response, text, url };
 }
 
-function all(html: string, regex: RegExp) {
+function all(html: string, regex: RegExp): string[] {
   return [...html.matchAll(regex)].map((match) => match[1] ?? '');
 }
 
@@ -68,7 +71,7 @@ const validator = new HtmlValidate({
   },
 });
 
-async function waitForServer(timeoutMs = 60_000) {
+async function waitForServer(timeoutMs = 60_000): Promise<void> {
   const start = Date.now();
 
   while (Date.now() - start < timeoutMs) {
@@ -108,7 +111,7 @@ async function startServer(): Promise<ChildProcess | undefined> {
   return child;
 }
 
-async function checkRobotsAndSitemap() {
+async function checkRobotsAndSitemap(): Promise<string[]> {
   const robots = await fetchText('/robots.txt');
 
   if (robots.response.status !== 200) fail('robots.txt is not 200');
@@ -142,7 +145,7 @@ async function checkRobotsAndSitemap() {
   return locs;
 }
 
-async function checkPage(loc: string) {
+async function checkPage(loc: string): Promise<void> {
   const path = new URL(loc).pathname;
   const { response, text } = await fetchText(toFetch(loc));
 
@@ -266,7 +269,7 @@ const NOINDEX = /\bnoindex\b/i;
 /**
  * API responses and (with a test session) the admin are never indexable.
  */
-async function checkPrivateHeaders() {
+async function checkPrivateHeaders(): Promise<void> {
   const api = await fetchText('/api/terminal-content?locale=en');
 
   if (!NOINDEX.test(api.response.headers.get('x-robots-tag') ?? '')) {
@@ -302,7 +305,7 @@ async function checkPrivateHeaders() {
   if (!NOINDEX.test(admin.text)) fail('/admin: missing robots meta noindex');
 }
 
-async function extras() {
+async function extras(): Promise<void> {
   const hidden = await fetchText('/en/projects/scratch-pad');
 
   if (hidden.response.status !== 404) {
@@ -352,7 +355,7 @@ async function extras() {
   }
 }
 
-async function main() {
+async function main(): Promise<void> {
   const child = await startServer();
 
   try {

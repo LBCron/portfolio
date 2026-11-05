@@ -18,7 +18,7 @@ export default async function Dashboard() {
     Record<DocumentType, AdminDoc[]>
   >;
   const areaOf = (type: DocumentType) => AREAS.find((area) => area.type === type);
-  const hrefFor = (type: DocumentType, id: string) => {
+  const hrefFor = (type: DocumentType, id: string): string => {
     const area = areaOf(type);
 
     if (!area) return '/admin';

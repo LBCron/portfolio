@@ -61,7 +61,7 @@ export function Field({ path, label, hint, children }: FieldProps) {
   );
 }
 
-const asText = (value: unknown) => (typeof value === 'string' ? value : '');
+const asText = (value: unknown): string => (typeof value === 'string' ? value : '');
 
 export function TextField({
   path,
@@ -399,7 +399,7 @@ function CopyMenu({
   const ref = useRef<HTMLDetailsElement>(null);
 
   useEffect(() => {
-    const close = (event: Event) => {
+    const close = (event: Event): void => {
       const el = ref.current;
 
       if (!el?.open) return;
@@ -416,7 +416,7 @@ function CopyMenu({
     document.addEventListener('pointerdown', close);
     document.addEventListener('keydown', close);
 
-    return () => {
+    return (): void => {
       document.removeEventListener('pointerdown', close);
       document.removeEventListener('keydown', close);
     };
@@ -424,7 +424,7 @@ function CopyMenu({
 
   const item =
     'flex min-h-11 w-full items-center rounded px-3 text-left text-small font-normal text-text-1 hover-fine:bg-surface-2 disabled:opacity-40';
-  const pick = (action: () => void) => () => {
+  const pick = (action: () => void) => (): void => {
     action();
 
     if (ref.current) ref.current.open = false;

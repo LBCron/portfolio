@@ -44,7 +44,7 @@ export interface FormApi {
   values: Values;
 }
 
-const noSubscription = () => () => {};
+const noSubscription = () => (): void => {};
 
 const FormContext = createContext<FormApi | null>(null);
 
@@ -81,7 +81,7 @@ interface DocumentEditorProps {
   type: string;
 }
 
-function humanize(path: string) {
+function humanize(path: string): string {
   return path.replace(/\.(\d+)/g, ' #$1').replace(/\./g, ' · ');
 }
 
@@ -124,10 +124,10 @@ export function DocumentEditor({
   useEffect(() => {
     if (!dirty) return;
 
-    const beforeUnload = (event: BeforeUnloadEvent) => {
+    const beforeUnload = (event: BeforeUnloadEvent): void => {
       event.preventDefault();
     };
-    const onClick = (event: MouseEvent) => {
+    const onClick = (event: MouseEvent): void => {
       const link = (event.target as Element).closest?.('a[href]');
 
       if (!(link instanceof HTMLAnchorElement) || link.target === '_blank') return;
@@ -151,7 +151,7 @@ export function DocumentEditor({
     window.addEventListener('beforeunload', beforeUnload);
     document.addEventListener('click', onClick, true);
 
-    return () => {
+    return (): void => {
       window.removeEventListener('beforeunload', beforeUnload);
       document.removeEventListener('click', onClick, true);
     };
@@ -165,7 +165,7 @@ export function DocumentEditor({
       renewSession().catch(() => {});
     }, KEEP_ALIVE_MS);
 
-    return () => window.clearInterval(timer);
+    return (): void => window.clearInterval(timer);
   }, [dirty]);
 
   const api = useMemo<FormApi>(
@@ -188,7 +188,7 @@ export function DocumentEditor({
     [values, errors, disabled],
   );
 
-  async function save(overwrite = false) {
+  async function save(overwrite = false): Promise<void> {
     setSaving(true);
 
     try {
@@ -240,7 +240,7 @@ export function DocumentEditor({
     }
   }
 
-  function onSubmit(event: FormEvent) {
+  function onSubmit(event: FormEvent): void {
     event.preventDefault();
 
     if (!disabled && dirty) save();
@@ -382,7 +382,7 @@ function DeleteSection({
   const [busy, setBusy] = useState(false);
   const [references, setReferences] = useState<Reference[]>([]);
 
-  async function remove() {
+  async function remove(): Promise<void> {
     setBusy(true);
 
     try {
@@ -460,7 +460,9 @@ function DeleteSection({
         <Button
           className="mt-6"
           disabled={typed !== confirmText || busy}
-          onClick={() => { remove(); }}
+          onClick={() => {
+            remove();
+          }}
         >
           {busy ? 'Deleting…' : 'Delete permanently'}
         </Button>

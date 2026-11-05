@@ -34,7 +34,7 @@ export function MobileMenu({ links }: { links?: ReactNode }) {
 
     if (open) root.style.overflow = 'hidden';
 
-    return () => {
+    return (): void => {
       root.style.overflow = '';
     };
   }, [open]);
@@ -43,14 +43,14 @@ export function MobileMenu({ links }: { links?: ReactNode }) {
     if (!open) return;
 
     const desktop = window.matchMedia('(min-width: 48rem)');
-    const onChange = () => desktop.matches && setOpen(false);
+    const onChange = (): false | void => desktop.matches && setOpen(false);
 
     desktop.addEventListener('change', onChange);
 
-    return () => desktop.removeEventListener('change', onChange);
+    return (): void => desktop.removeEventListener('change', onChange);
   }, [open]);
 
-  const close = () => setOpen(false);
+  const close = (): void => setOpen(false);
 
   return (
     <>

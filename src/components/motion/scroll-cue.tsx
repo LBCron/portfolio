@@ -15,20 +15,20 @@ export function ScrollCue({ href, label }: { href: string; label: string }) {
     if (!element) return;
 
     let frame = 0;
-    const update = () => {
+    const update = (): void => {
       frame = 0;
       const opacity = Math.max(0, 1 - window.scrollY / 240);
       element.style.opacity = `${opacity}`;
       element.style.visibility = opacity === 0 ? 'hidden' : 'visible';
     };
-    const onScroll = () => {
+    const onScroll = (): void => {
       if (!frame) frame = requestAnimationFrame(update);
     };
 
     update();
     window.addEventListener('scroll', onScroll, { passive: true });
 
-    return () => {
+    return (): void => {
       window.removeEventListener('scroll', onScroll);
       cancelAnimationFrame(frame);
     };

@@ -6,7 +6,7 @@ export const DESCRIPTION_MAX = 160;
  * Collapses whitespace and strips Markdown markers, leaving literal `#`, `_`,
  * `~` alone.
  */
-export function plainText(markdown: string) {
+export function plainText(markdown: string): string {
   return markdown
     .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
     .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
@@ -22,7 +22,7 @@ export function plainText(markdown: string) {
 /**
  * Cuts at a word boundary and adds an ellipsis when over `max`.
  */
-export function truncate(text: string, max: number) {
+export function truncate(text: string, max: number): string {
   const clean = plainText(text);
 
   if (clean.length <= max) return clean;
@@ -38,7 +38,7 @@ export function truncate(text: string, max: number) {
  * First candidate that reaches the minimum length, truncated to the maximum.
  * Falls back to the longest candidate, so a description is never empty.
  */
-export function pickDescription(...candidates: Array<string | undefined>) {
+export function pickDescription(...candidates: Array<string | undefined>): string {
   const texts = candidates.filter((text): text is string => Boolean(text?.trim())).map(plainText);
   const good = texts.find((text) => text.length >= DESCRIPTION_MIN);
   const chosen = good ?? texts.reduce((a, b) => (b.length > a.length ? b : a), '');

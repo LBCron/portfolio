@@ -35,7 +35,7 @@ export function periodLabel(
   format: (value: string) => string,
   start?: string,
   end?: string,
-) {
+): string {
   return [start ? format(start) : '', end ? format(end) : ctx.t('resume.present')]
     .filter(Boolean)
     .join(' – ');

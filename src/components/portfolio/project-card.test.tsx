@@ -5,7 +5,7 @@ import { type ProjectSummary } from '@/lib/content';
 
 import { ProjectCard } from './project-card';
 
-const t = (key: string, values?: Record<string, string>) => {
+const t = (key: string, values?: Record<string, string>): string => {
   const table: Record<string, string> = {
     'visitApp': 'Visit app',
     'visitAppLabel': `Visit app: ${values?.title ?? ''} (opens in a new tab)`,
@@ -68,7 +68,7 @@ const base: ProjectSummary = {
   updatedAt: '2026-10-01T12:00:00Z',
 };
 
-async function markup(project: ProjectSummary) {
+async function markup(project: ProjectSummary): Promise<string> {
   return renderToStaticMarkup(await ProjectCard({ project, techNames: ['React'] }));
 }
 

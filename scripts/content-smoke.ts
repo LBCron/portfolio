@@ -30,7 +30,7 @@ function normalize(value: unknown): unknown {
   );
 }
 
-async function read(repository: ContentRepository) {
+async function read(repository: ContentRepository): Promise<Array<[string, unknown]>> {
   const results: Array<[string, unknown]> = [
     ['getResume', await repository.getResume()],
     ['getProjectRoutes', await repository.getProjectRoutes()],

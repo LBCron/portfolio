@@ -16,7 +16,7 @@ const geistRegular = await readFile(
   join(process.cwd(), 'node_modules/geist/dist/fonts/geist-sans/Geist-Regular.ttf'),
 );
 
-async function asDataUrl(url?: string) {
+async function asDataUrl(url?: string): Promise<string | undefined> {
   if (!url) return undefined;
 
   try {
@@ -46,7 +46,11 @@ export interface OgImageInput {
   title: string;
 }
 
-export async function renderOgImage({ title, subtitle, photoUrl }: OgImageInput) {
+export async function renderOgImage({
+  title,
+  subtitle,
+  photoUrl,
+}: OgImageInput): Promise<ImageResponse> {
   const photo = await asDataUrl(photoUrl);
 
   return new ImageResponse(

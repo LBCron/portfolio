@@ -39,7 +39,7 @@ export const SNAP_RELEASE = 32;
  */
 export const SHEET_BREAKPOINT = 640;
 
-function clamp(value: number, min: number, max: number) {
+function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), Math.max(min, max));
 }
 
@@ -96,7 +96,11 @@ export function snapRect(side: SnapSide, viewport: Viewport): Rect {
   };
 }
 
-function edgeDistance(side: SnapSide, pointer: { x: number; y: number }, viewport: Viewport) {
+function edgeDistance(
+  side: SnapSide,
+  pointer: { x: number; y: number },
+  viewport: Viewport,
+): number {
   if (side === 'top') return pointer.y;
 
   if (side === 'left') return pointer.x;

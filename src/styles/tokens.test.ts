@@ -6,7 +6,7 @@ import { contrastRatio } from '@/lib/color';
 const css = readFileSync(join(__dirname, 'globals.css'), 'utf8');
 const themeBlock = /@theme\s*\{([\s\S]*?)\n\}/.exec(css)?.[1] ?? '';
 
-function token(name: string) {
+function token(name: string): string {
   const match = new RegExp(`--color-${name}:\\s*(#[0-9a-f]{6})`, 'i').exec(themeBlock);
 
   if (!match?.[1]) throw new Error(`Missing token --color-${name}`);

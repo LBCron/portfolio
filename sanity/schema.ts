@@ -16,7 +16,9 @@ type SchemaType = {
   type: string;
 } & Record<string, unknown>;
 
-const list = (values: readonly string[]) => ({
+const list = (
+  values: readonly string[],
+): { layout: string; list: Array<{ title: string; value: string }> } => ({
   list: values.map((value) => ({ title: value, value })),
   layout: 'radio',
 });
@@ -27,12 +29,12 @@ const field = (name: string, type: string, extra: object = {}): Field => ({
   ...extra,
 });
 
-const localeString = (name: string, title?: string) =>
+const localeString = (name: string, title?: string): Field =>
   field(name, 'localeString', title ? { title } : {});
-const localeText = (name: string, title?: string) =>
+const localeText = (name: string, title?: string): Field =>
   field(name, 'localeText', title ? { title } : {});
 
-const image = (name: string, extraFields: Field[] = []) =>
+const image = (name: string, extraFields: Field[] = []): Field =>
   field(name, 'image', {
     options: { hotspot: true },
     fields: [localeString('alt', 'Alternative text'), ...extraFields],

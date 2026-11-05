@@ -7,7 +7,7 @@ import { type SanityDocument, toSanityDocuments } from '@/lib/content/sanity/doc
 import { type GroqFetch } from '@/lib/content/sanity/source';
 import { type FileAsset, type ImageAsset } from '@/lib/content/schema';
 
-const sha1 = (value: string) => createHash('sha1').update(value).digest('hex');
+const sha1 = (value: string): string => createHash('sha1').update(value).digest('hex');
 
 /**
  * A Content Lake stand-in: the fixture dataset converted to Sanity storage
@@ -17,7 +17,7 @@ export function createSanityMemoryDataset(dataset: FixtureDataset): SanityDocume
   const assets = new Map<string, SanityDocument>();
 
   const resolver = {
-    image(asset: ImageAsset) {
+    image(asset: ImageAsset): string {
       const id = `image-${sha1(asset.url)}-${asset.width}x${asset.height}-webp`;
 
       assets.set(id, {
@@ -37,7 +37,7 @@ export function createSanityMemoryDataset(dataset: FixtureDataset): SanityDocume
 
       return id;
     },
-    file(asset: FileAsset) {
+    file(asset: FileAsset): string {
       const id = `file-${sha1(asset.url)}-pdf`;
 
       assets.set(id, {

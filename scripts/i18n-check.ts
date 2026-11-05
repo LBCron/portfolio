@@ -73,7 +73,7 @@ function flatten(messages: Messages, prefix = ''): Map<string, string> {
   return out;
 }
 
-function argumentsOf(elements: MessageFormatElement[], out = new Set<string>()) {
+function argumentsOf(elements: MessageFormatElement[], out = new Set<string>()): Set<string> {
   for (const element of elements) {
     switch (element.type) {
       case TYPE.argument:
@@ -101,7 +101,7 @@ function argumentsOf(elements: MessageFormatElement[], out = new Set<string>()) 
   return out;
 }
 
-function icuArguments(key: string, locale: string, message: string) {
+function icuArguments(key: string, locale: string, message: string): null | string {
   try {
     return [...argumentsOf(parse(message))].sort().join(', ');
   } catch (error) {
@@ -118,7 +118,7 @@ function hasTranslatableText(message: string): boolean {
   return /\p{L}{2,}/u.test(message.replace(/\{[^}]*\}/g, ''));
 }
 
-async function checkMessages() {
+async function checkMessages(): Promise<number | undefined> {
   const [en, pt] = await Promise.all(
     LOCALES.map(async (locale) =>
       flatten(
@@ -182,11 +182,11 @@ function isLocalized(value: unknown): value is { en?: unknown; pt?: unknown } {
   );
 }
 
-function checkFixtures() {
+function checkFixtures(): number {
   const dataset = createFixtureDataset();
   let fields = 0;
 
-  const walk = (value: unknown, where: string) => {
+  const walk = (value: unknown, where: string): void => {
     if (Array.isArray(value)) {
       value.forEach((item, index) => walk(item, `${where}[${index}]`));
 

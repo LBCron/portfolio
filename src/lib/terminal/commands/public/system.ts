@@ -156,7 +156,7 @@ const lang: Command = {
     routing.locales.filter((locale) => locale.startsWith(partial)),
   async *run(ctx, args) {
     const target = args.positionals[0]?.toLowerCase();
-    const name = (locale: string) => ctx.t(`header.languageNames.${locale}`);
+    const name = (locale: string): string => ctx.t(`header.languageNames.${locale}`);
 
     if (!target) {
       yield text(ctx.t('terminal.lang.current', { language: name(ctx.locale) }));

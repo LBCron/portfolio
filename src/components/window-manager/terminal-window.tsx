@@ -25,7 +25,7 @@ const HINT_KEY = 'jm.terminal.hint.v1';
 const HINT_DELAY_MS = 1500;
 const HINT_VISIBLE_MS = 6000;
 
-function isTypingOutsideWindow(target: EventTarget | null) {
+function isTypingOutsideWindow(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement) || target.closest('[data-window]')) {
     return false;
   }
@@ -36,7 +36,7 @@ function isTypingOutsideWindow(target: EventTarget | null) {
 /**
  * One-time "type help" hint: once per session, never after an interaction.
  */
-function useDockHint(enabled: boolean) {
+function useDockHint(enabled: boolean): boolean {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -50,7 +50,7 @@ function useDockHint(enabled: boolean) {
 
     let interacted = false;
     let hideTimer: number | undefined;
-    const interact = () => {
+    const interact = (): void => {
       interacted = true;
       setVisible(false);
     };
@@ -70,7 +70,7 @@ function useDockHint(enabled: boolean) {
     const events = ['keydown', 'pointerdown', 'wheel', 'touchstart'] as const;
     for (const name of events) window.addEventListener(name, interact, { once: true });
 
-    return () => {
+    return (): void => {
       window.clearTimeout(showTimer);
       window.clearTimeout(hideTimer);
       for (const name of events) window.removeEventListener(name, interact);
@@ -94,7 +94,7 @@ export function TerminalWindow() {
   const hint = useDockHint(!reduced && !win);
 
   useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
+    const onKeyDown = (event: KeyboardEvent): void => {
       if (!isTerminalShortcut(event) || isTypingOutsideWindow(event.target)) {
         return;
       }
@@ -102,7 +102,7 @@ export function TerminalWindow() {
       event.preventDefault();
       toggleTerminal();
     };
-    const onPointerDown = (event: PointerEvent) => {
+    const onPointerDown = (event: PointerEvent): void => {
       if (!(event.target as Element).closest('[data-window]')) {
         useWindowStore.getState().blur();
       }
@@ -111,7 +111,7 @@ export function TerminalWindow() {
     window.addEventListener('keydown', onKeyDown);
     document.addEventListener('pointerdown', onPointerDown);
 
-    return () => {
+    return (): void => {
       window.removeEventListener('keydown', onKeyDown);
       document.removeEventListener('pointerdown', onPointerDown);
     };
@@ -119,17 +119,19 @@ export function TerminalWindow() {
 
   // Warm the snapshot while the browser is idle so the first command is instant.
   useEffect(() => {
-    const warm = () => { loadSnapshot(locale).catch(() => {}); };
+    const warm = (): void => {
+      loadSnapshot(locale).catch(() => {});
+    };
 
     if ('requestIdleCallback' in window) {
       const id = window.requestIdleCallback(warm, { timeout: 4000 });
 
-      return () => window.cancelIdleCallback(id);
+      return (): void => window.cancelIdleCallback(id);
     }
 
     const id = globalThis.setTimeout(warm, 2000);
 
-    return () => globalThis.clearTimeout(id);
+    return (): void => globalThis.clearTimeout(id);
   }, [locale]);
 
   return (

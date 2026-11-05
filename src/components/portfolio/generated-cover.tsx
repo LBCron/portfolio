@@ -32,7 +32,7 @@ const PALETTES = [
 /**
  * FNV-1a: a stable 32-bit seed from the slug.
  */
-function hash(text: string) {
+function hash(text: string): number {
   let value = 0x811c9dc5;
   for (let index = 0; index < text.length; index += 1) {
     value ^= text.charCodeAt(index);
@@ -45,7 +45,7 @@ function hash(text: string) {
 function seeded(seed: number) {
   let state = seed || 1;
 
-  return () => {
+  return (): number => {
     state ^= state << 13;
     state ^= state >>> 17;
     state ^= state << 5;

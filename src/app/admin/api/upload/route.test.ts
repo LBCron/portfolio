@@ -10,7 +10,7 @@ vi.mock('@/lib/auth/session', () => ({
   getSession: async () => ({ start: 1 }),
 }));
 
-const upload = (headers: Record<string, string>) =>
+const upload = (headers: Record<string, string>): NextRequest =>
   new NextRequest('http://localhost/admin/api/upload', {
     method: 'POST',
     headers: { origin: 'http://localhost', host: 'localhost', ...headers },

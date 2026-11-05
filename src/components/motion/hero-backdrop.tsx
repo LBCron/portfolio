@@ -28,7 +28,7 @@ export function HeroBackdrop() {
 
     observer.observe(root);
 
-    return () => observer.disconnect();
+    return (): void => observer.disconnect();
   }, []);
 
   useEffect(() => {
@@ -43,7 +43,7 @@ export function HeroBackdrop() {
     const current = { ...target };
     let frame = 0;
 
-    const render = () => {
+    const render = (): void => {
       current.x += (target.x - current.x) * EASE;
       current.y += (target.y - current.y) * EASE;
       spot.style.transform = `translate3d(${(current.x - 0.5) * 100}%, ${(current.y - 0.5) * 100}%, 0)`;
@@ -52,7 +52,7 @@ export function HeroBackdrop() {
 
       frame = settled ? 0 : requestAnimationFrame(render);
     };
-    const onPointerMove = (event: PointerEvent) => {
+    const onPointerMove = (event: PointerEvent): void => {
       if (root.dataset.paused === 'true') return;
 
       const rect = root.getBoundingClientRect();
@@ -65,7 +65,7 @@ export function HeroBackdrop() {
 
     window.addEventListener('pointermove', onPointerMove, { passive: true });
 
-    return () => {
+    return (): void => {
       window.removeEventListener('pointermove', onPointerMove);
       cancelAnimationFrame(frame);
     };

@@ -27,14 +27,14 @@ export function TimelineProgress({ children }: { children: ReactNode }) {
     }
 
     let frame = 0;
-    const update = () => {
+    const update = (): void => {
       frame = 0;
       const rect = root.getBoundingClientRect();
       const anchor = window.innerHeight * 0.6;
       const progress = Math.min(1, Math.max(0, (anchor - rect.top) / Math.max(rect.height, 1)));
       rail.style.transform = `scaleY(${progress})`;
     };
-    const onScroll = () => {
+    const onScroll = (): void => {
       if (!frame) frame = requestAnimationFrame(update);
     };
 
@@ -57,7 +57,7 @@ export function TimelineProgress({ children }: { children: ReactNode }) {
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll, { passive: true });
 
-    return () => {
+    return (): void => {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
       cancelAnimationFrame(frame);

@@ -63,7 +63,7 @@ export async function Pagination({ page, totalPages, kind }: PaginationProps) {
   );
 }
 
-function pageLink(disabled = false) {
+function pageLink(disabled = false): string {
   return cn(
     'inline-flex min-h-11 items-center gap-2 rounded-full px-4 text-small',
     disabled ? 'text-text-3' : 'text-text-2 hover-fine:text-text-1',

@@ -14,13 +14,13 @@ export function SessionPill() {
   useEffect(() => {
     if (!session) return;
 
-    const tick = () => setNow(Date.now());
+    const tick = (): void => setNow(Date.now());
 
     tick();
 
     const timer = window.setInterval(tick, 15_000);
 
-    return () => window.clearInterval(timer);
+    return (): void => window.clearInterval(timer);
   }, [session]);
 
   if (!session) return null;

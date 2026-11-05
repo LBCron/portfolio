@@ -64,7 +64,9 @@ function localPath(url: string): string {
   return path.join(ROOT, 'public', url);
 }
 
-async function uploadAssets(fixtures: ReturnType<typeof createFixtureDataset>) {
+async function uploadAssets(
+  fixtures: ReturnType<typeof createFixtureDataset>,
+): Promise<AssetResolver> {
   const images = new Map<string, ImageAsset>();
   const files = new Map<string, FileAsset>();
 
@@ -83,7 +85,11 @@ async function uploadAssets(fixtures: ReturnType<typeof createFixtureDataset>) {
   });
 
   const ids = new Map<string, string>();
-  const upload = async (kind: 'file' | 'image', url: string, contentType: string) => {
+  const upload = async (
+    kind: 'file' | 'image',
+    url: string,
+    contentType: string,
+  ): Promise<void> => {
     if (dryRun) {
       ids.set(url, `${kind}-dry-run`);
 
@@ -115,7 +121,7 @@ async function uploadAssets(fixtures: ReturnType<typeof createFixtureDataset>) {
   return resolver;
 }
 
-async function confirm(question: string, expected: string) {
+async function confirm(question: string, expected: string): Promise<void> {
   if (!process.stdin.isTTY) fail('--reset needs an interactive terminal.');
 
   const prompt = createInterface({
@@ -129,7 +135,7 @@ async function confirm(question: string, expected: string) {
   if (answer.trim() !== expected) fail('Aborted.');
 }
 
-async function reset() {
+async function reset(): Promise<void> {
   const ids = await client.fetch<string[]>('*[isFixture == true && !(_id in path("_.**"))]._id');
 
   if (ids.length === 0) {
@@ -155,7 +161,7 @@ async function reset() {
   console.info(`Reset: deleted ${ids.length} fixture documents.`);
 }
 
-async function main() {
+async function main(): Promise<void> {
   console.info(
     `Seeding project ${env.SANITY_PROJECT_ID}, dataset "${dataset}"${dryRun ? ' (dry run)' : ''}.`,
   );

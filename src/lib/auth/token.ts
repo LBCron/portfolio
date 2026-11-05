@@ -16,18 +16,22 @@ export interface Session {
   start: number;
 }
 
-export const nowSeconds = () => Math.floor(Date.now() / 1000);
+export const nowSeconds = (): number => Math.floor(Date.now() / 1000);
 
 export function isStrongSecret(secret: string | undefined): secret is string {
   return typeof secret === 'string' && secret.length >= 32;
 }
 
-const key = (secret: string) => new TextEncoder().encode(secret);
+const key = (secret: string): Uint8Array<ArrayBuffer> => new TextEncoder().encode(secret);
 
 /**
  * HS256 JWT: idle expiry 30 min, never past `start` + 8 h.
  */
-export async function signSession(secret: string, start: number, now = nowSeconds()) {
+export async function signSession(
+  secret: string,
+  start: number,
+  now = nowSeconds(),
+): Promise<{ exp: number; token: string }> {
   const exp = Math.min(now + IDLE_SECONDS, start + ABSOLUTE_SECONDS);
   const token = await new SignJWT({ ses: start })
     .setProtectedHeader({ alg: 'HS256' })

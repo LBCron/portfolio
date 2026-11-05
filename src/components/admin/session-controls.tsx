@@ -22,7 +22,7 @@ export function SessionControls({ expiresAt: initial }: { expiresAt: number }) {
   useEffect(() => {
     const tick = window.setInterval(() => setNow(Date.now()), 15_000);
 
-    return () => window.clearInterval(tick);
+    return (): void => window.clearInterval(tick);
   }, []);
 
   // The cookie may have been renewed by navigation; ask before warning.
@@ -37,7 +37,7 @@ export function SessionControls({ expiresAt: initial }: { expiresAt: number }) {
       else setWarning(true);
     }, wait);
 
-    return () => window.clearTimeout(timer);
+    return (): void => window.clearTimeout(timer);
   }, [expiresAt, router]);
 
   useEffect(() => {
@@ -46,12 +46,12 @@ export function SessionControls({ expiresAt: initial }: { expiresAt: number }) {
       Math.max(0, expiresAt - Date.now()) + 1000,
     );
 
-    return () => window.clearTimeout(timer);
+    return (): void => window.clearTimeout(timer);
   }, [expiresAt, router]);
 
   const minutes = Math.max(0, Math.ceil((expiresAt - now) / 60_000));
 
-  async function stay() {
+  async function stay(): Promise<void> {
     const status = await renewSession();
 
     if (status.isAdmin) setExpiresAt(status.expiresAt);
@@ -59,7 +59,7 @@ export function SessionControls({ expiresAt: initial }: { expiresAt: number }) {
     setWarning(false);
   }
 
-  async function signOut() {
+  async function signOut(): Promise<void> {
     await logout();
     router.replace('/');
   }

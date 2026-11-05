@@ -24,7 +24,7 @@ export function Tilt({ children, className }: { children: ReactNode; className?:
     let frame = 0;
     let pointer: { x: number; y: number } | null = null;
 
-    const write = () => {
+    const write = (): void => {
       frame = 0;
 
       if (!pointer) {
@@ -47,14 +47,14 @@ export function Tilt({ children, className }: { children: ReactNode; className?:
 
       element.style.transform = `perspective(900px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-4px)`;
     };
-    const schedule = () => {
+    const schedule = (): void => {
       if (!frame) frame = requestAnimationFrame(write);
     };
-    const onMove = (event: PointerEvent) => {
+    const onMove = (event: PointerEvent): void => {
       pointer = { x: event.clientX, y: event.clientY };
       schedule();
     };
-    const onLeave = () => {
+    const onLeave = (): void => {
       pointer = null;
       schedule();
     };
@@ -62,7 +62,7 @@ export function Tilt({ children, className }: { children: ReactNode; className?:
     element.addEventListener('pointermove', onMove);
     element.addEventListener('pointerleave', onLeave);
 
-    return () => {
+    return (): void => {
       element.removeEventListener('pointermove', onMove);
       element.removeEventListener('pointerleave', onLeave);
       cancelAnimationFrame(frame);

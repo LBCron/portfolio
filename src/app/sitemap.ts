@@ -6,7 +6,7 @@ import { absoluteUrl, languageAlternates, localizedPath } from '@/lib/seo/urls';
 
 export const revalidate = 86400;
 
-function newest(...dates: Array<string | undefined>) {
+function newest(...dates: Array<string | undefined>): string {
   return dates
     .filter((date): date is string => Boolean(date))
     .reduce((latest, date) => (date > latest ? date : latest), '');

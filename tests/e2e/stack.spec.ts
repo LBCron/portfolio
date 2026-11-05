@@ -4,7 +4,7 @@ import { expect, type Page, test } from '@playwright/test';
 /**
  * Hero/geoid motion keeps WebKit's actionability check from settling.
  */
-async function showStack(page: Page) {
+async function showStack(page: Page): Promise<void> {
   await page.goto('/en', { waitUntil: 'domcontentloaded' });
   await page.locator('#stack').evaluate((el) => {
     el.scrollIntoView({ block: 'center' });

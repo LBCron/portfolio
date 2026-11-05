@@ -2,7 +2,7 @@
 
 import { type ComponentProps, type KeyboardEvent, useEffect, useRef } from 'react';
 
-const items = (root: HTMLElement | null) =>
+const items = (root: HTMLElement | null): HTMLElement[] =>
   Array.from(root?.querySelectorAll<HTMLElement>('[role="radio"]') ?? []);
 
 /**
@@ -26,7 +26,7 @@ export function RovingRadiogroup({
     });
   });
 
-  function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+  function handleKeyDown(event: KeyboardEvent<HTMLDivElement>): void {
     const options = items(ref.current);
     const current = options.indexOf(document.activeElement as HTMLElement);
 

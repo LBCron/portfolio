@@ -16,9 +16,11 @@ describe('asset ids', () => {
   });
 });
 
-function fakeClient(options: { current?: null | Record<string, unknown>; failWith?: number } = {}) {
+function fakeClient(
+  options: { current?: null | Record<string, unknown>; failWith?: number } = {},
+): { calls: unknown[][]; client: SanityClient } {
   const calls: unknown[][] = [];
-  const fail = () =>
+  const fail = (): Promise<{ _rev: string }> =>
     options.failWith
       ? Promise.reject(Object.assign(new Error('x'), { statusCode: options.failWith }))
       : Promise.resolve({ _rev: 'r2' });

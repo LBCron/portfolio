@@ -10,7 +10,7 @@ export interface AttentionItem {
 type Bag = Record<string, unknown>;
 const isBag = (value: unknown): value is Bag =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
-const blank = (value: unknown) => typeof value !== 'string' || value.trim() === '';
+const blank = (value: unknown): boolean => typeof value !== 'string' || value.trim() === '';
 
 function missingPortuguese(value: unknown): number {
   if (Array.isArray(value))
@@ -45,10 +45,10 @@ function imagesWithoutAlt(doc: AdminDoc): number {
   }).length;
 }
 
-const length = (field: unknown, lang: 'en' | 'pt') =>
+const length = (field: unknown, lang: 'en' | 'pt'): number =>
   isBag(field) && typeof field[lang] === 'string' ? (field[lang] as string).trim().length : 0;
 
-const words = (field: unknown, lang: 'en' | 'pt') =>
+const words = (field: unknown, lang: 'en' | 'pt'): number =>
   isBag(field) && typeof field[lang] === 'string'
     ? (field[lang] as string).split(/\s+/).filter(Boolean).length
     : 0;
@@ -68,7 +68,7 @@ export function findAttention(
   const items: AttentionItem[] = [];
   for (const [type, list] of Object.entries(docs) as Array<[DocumentType, AdminDoc[]]>) {
     for (const doc of list) {
-      const add = (issue: string) => items.push({ type, id: doc.id, issue });
+      const add = (issue: string): number => items.push({ type, id: doc.id, issue });
       const missing = missingPortuguese(doc);
 
       if (missing > 0)

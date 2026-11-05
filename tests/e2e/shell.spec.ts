@@ -5,14 +5,14 @@ import { waitForHydration } from './hydration';
 
 const AXE_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'];
 
-function locationPath(location: string | undefined) {
+function locationPath(location: string | undefined): string {
   return new URL(location ?? '', 'http://localhost').pathname;
 }
 
 /**
  * Axe-core hangs inside WebKit's evaluate here; its rules are engine-agnostic.
  */
-function skipAxeOnWebkit(browserName: string) {
+function skipAxeOnWebkit(browserName: string): void {
   test.skip(browserName === 'webkit', 'axe runs on Chromium projects');
 }
 

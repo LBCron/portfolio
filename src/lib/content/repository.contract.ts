@@ -12,14 +12,14 @@ export type RepositoryFactory = (
   logger: ContentLogger,
 ) => ContentRepository;
 
-const wordCount = (markdown: string) =>
+const wordCount = (markdown: string): number =>
   markdown.split(/\s+/).filter((word) => /[\p{L}\p{N}]/u.test(word)).length;
 
 /**
  * Behavior every adapter must share. Each test builds its repository from a
  * (possibly modified) copy of the fixture dataset.
  */
-export function describeRepositoryContract(name: string, factory: RepositoryFactory) {
+export function describeRepositoryContract(name: string, factory: RepositoryFactory): void {
   describe(`ContentRepository contract: ${name}`, () => {
     function setup(mutate?: (dataset: FixtureDataset) => void) {
       const dataset = createFixtureDataset();

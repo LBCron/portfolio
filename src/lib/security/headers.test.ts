@@ -1,7 +1,7 @@
 import { adminCsp, isHttpsSite, PERMISSIONS_POLICY, publicCsp, securityHeaders } from './headers';
 
 const prod = { dev: false, https: true };
-const directive = (csp: string, name: string) =>
+const directive = (csp: string, name: string): string | undefined =>
   csp.split('; ').find((part) => part === name || part.startsWith(`${name} `));
 
 describe('publicCsp', () => {
@@ -36,7 +36,7 @@ describe('adminCsp', () => {
 
 describe('securityHeaders', () => {
   it('sends HSTS without preload on https only', () => {
-    const hsts = (https: boolean) =>
+    const hsts = (https: boolean): string | undefined =>
       securityHeaders({ dev: false, https }).find((h) => h.key === 'Strict-Transport-Security')
         ?.value;
 

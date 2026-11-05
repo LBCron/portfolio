@@ -33,7 +33,7 @@ interface ResumeProps {
 const linkClass =
   'inline-flex min-h-11 items-center gap-2 rounded-full border border-line px-4 text-small text-text-1 transition-colors hover-fine:border-line-strong hover-fine:bg-surface-1';
 
-function ownLinkedIn(links: FeaturedLink[]) {
+function ownLinkedIn(links: FeaturedLink[]): FeaturedLink | undefined {
   return links.find(
     (link) =>
       link.isOwnProfile

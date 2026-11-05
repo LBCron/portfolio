@@ -15,7 +15,7 @@ const FINE_POINTER = '(hover: hover) and (pointer: fine)';
 export function Card({ className, children, onPointerMove, ...props }: ComponentProps<'div'>) {
   const ref = useRef<HTMLDivElement>(null);
 
-  function handlePointerMove(event: PointerEvent<HTMLDivElement>) {
+  function handlePointerMove(event: PointerEvent<HTMLDivElement>): void {
     onPointerMove?.(event);
 
     const element = ref.current;

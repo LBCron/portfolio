@@ -16,11 +16,11 @@ export interface SecurityOptions {
   https: boolean;
 }
 
-export function isHttpsSite(siteUrl: string | undefined) {
+export function isHttpsSite(siteUrl: string | undefined): boolean {
   return (siteUrl ?? '').startsWith('https:');
 }
 
-function serialize(directives: Record<string, string[]>) {
+function serialize(directives: Record<string, string[]>): string {
   return Object.entries(directives)
     .map(([name, values]) => [name, ...values].join(' '))
     .join('; ');
@@ -50,7 +50,7 @@ function baseDirectives({ https }: SecurityOptions): Record<string, string[]> {
  * hashes). Scripts therefore keep `'unsafe-inline'`, limited to `'self'` with
  * no third-party origin to load from or exfiltrate to (D4).
  */
-export function publicCsp(options: SecurityOptions) {
+export function publicCsp(options: SecurityOptions): string {
   const unsafeEval = options.dev ? ["'unsafe-eval'"] : [];
 
   return serialize({
@@ -64,7 +64,7 @@ export function publicCsp(options: SecurityOptions) {
 /**
  * The admin is dynamic, so it gets a per-request nonce instead.
  */
-export function adminCsp(nonce: string, options: SecurityOptions) {
+export function adminCsp(nonce: string, options: SecurityOptions): string {
   const unsafeEval = options.dev ? ["'unsafe-eval'"] : [];
 
   return serialize({
@@ -108,7 +108,7 @@ export const HSTS = 'max-age=63072000; includeSubDomains';
 /**
  * Headers for every response; the admin overrides CSP and the referrer.
  */
-export function securityHeaders(options: SecurityOptions) {
+export function securityHeaders(options: SecurityOptions): Array<{ key: string; value: string }> {
   return [
     { key: 'Content-Security-Policy', value: publicCsp(options) },
     ...(options.https ? [{ key: 'Strict-Transport-Security', value: HSTS }] : []),

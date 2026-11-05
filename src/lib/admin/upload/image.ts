@@ -13,7 +13,7 @@ const CONTENT_TYPE: Record<ImageKind, string> = {
   avif: 'image/avif',
 };
 
-const ascii = (bytes: Uint8Array, start: number, end: number) =>
+const ascii = (bytes: Uint8Array, start: number, end: number): string =>
   String.fromCharCode(...bytes.slice(start, end));
 
 /**

@@ -97,7 +97,7 @@ export interface SnapshotSource {
 
 export function buildSnapshot(source: SnapshotSource): ContentSnapshot {
   const techNames = new Map(source.technologies.map((t) => [t.id, t.name]));
-  const namesOf = (ids: string[]) => ids.flatMap((id) => techNames.get(id) ?? []);
+  const namesOf = (ids: string[]): string[] => ids.flatMap((id) => techNames.get(id) ?? []);
   const [user = '', domain = ''] = source.contact?.email.split('@') ?? [];
 
   return {

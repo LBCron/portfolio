@@ -12,7 +12,7 @@ export function fitFontSize({
   contentWidth: number;
   fontSize: number;
   max: number;
-}) {
+}): number {
   if (contentWidth <= 0 || available <= 0) return Math.min(max, fontSize);
 
   const fitted = (fontSize * available) / contentWidth;

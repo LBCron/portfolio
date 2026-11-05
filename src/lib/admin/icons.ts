@@ -12,7 +12,8 @@ export interface IconHit {
 
 const LIMIT = 24;
 
-const kebab = (pascal: string) => pascal.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
+const kebab = (pascal: string): string =>
+  pascal.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
 
 /**
  * Prefix matches first, then substring matches, up to 24 hits.

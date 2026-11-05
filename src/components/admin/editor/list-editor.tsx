@@ -42,7 +42,7 @@ export function ListEditor({
   const error = form.error(path);
   const id = fieldId(path);
 
-  function move(from: number, to: number) {
+  function move(from: number, to: number): void {
     form.set(path, moveItem(items, from, to));
     // Keep the keyboard on the row that moved.
     requestAnimationFrame(() => {
@@ -54,7 +54,7 @@ export function ListEditor({
     });
   }
 
-  function onDrop(event: DragEvent, to: number) {
+  function onDrop(event: DragEvent, to: number): void {
     event.preventDefault();
 
     if (dragging !== null) move(dragging, to);

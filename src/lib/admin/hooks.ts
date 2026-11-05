@@ -22,7 +22,7 @@ export const adminHooks: AdminHooks = {
   now: () => new Date(),
 };
 
-export function revalidateEverything() {
+export function revalidateEverything(): void {
   for (const tag of Object.values(contentTags)) {
     if (typeof tag === 'string') updateTag(tag);
   }

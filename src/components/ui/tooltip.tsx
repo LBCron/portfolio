@@ -41,20 +41,20 @@ export function Tooltip({ content, children, side = 'bottom', className }: Toolt
 
     let timer: number | undefined;
 
-    const show = () => {
+    const show = (): void => {
       window.clearTimeout(timer);
       setOpen(true);
     };
-    const hide = () => {
+    const hide = (): void => {
       window.clearTimeout(timer);
       timer = window.setTimeout(() => setOpen(false), HIDE_DELAY_MS);
     };
     // Pointer events cover the trigger and the bubble (hoverable content);
     // focus events bubble up from the trigger.
-    const onPointerEnter = (event: PointerEvent) => {
+    const onPointerEnter = (event: PointerEvent): void => {
       if (event.pointerType === 'mouse') show();
     };
-    const onKeyDown = (event: KeyboardEvent) => {
+    const onKeyDown = (event: KeyboardEvent): void => {
       if (event.key === 'Escape') setOpen(false);
     };
 
@@ -64,7 +64,7 @@ export function Tooltip({ content, children, side = 'bottom', className }: Toolt
     wrapper.addEventListener('focusout', hide);
     document.addEventListener('keydown', onKeyDown);
 
-    return () => {
+    return (): void => {
       window.clearTimeout(timer);
       wrapper.removeEventListener('pointerenter', onPointerEnter);
       wrapper.removeEventListener('pointerleave', hide);

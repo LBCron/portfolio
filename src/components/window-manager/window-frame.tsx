@@ -55,7 +55,7 @@ const KEY_DIRECTION: Record<string, [number, number]> = {
   ArrowDown: [0, 1],
 };
 
-function applyRect(el: HTMLElement, rect: Rect) {
+function applyRect(el: HTMLElement, rect: Rect): void {
   el.style.transform = `translate3d(${rect.x}px, ${rect.y}px, 0)`;
   el.style.width = `${rect.width}px`;
   el.style.height = `${rect.height}px`;
@@ -74,7 +74,7 @@ function setSnapPreview(
   side: null | SnapSide,
   from: Rect,
   viewport: Viewport,
-) {
+): void {
   if (!el) return;
 
   const armed = el.dataset['snapPreview'] ?? null;
@@ -176,7 +176,7 @@ export function WindowFrame({
 
     if (!sheet || !el || !vv) return;
 
-    const update = () =>
+    const update = (): void =>
       el.style.setProperty(
         '--kb',
         `${Math.max(0, window.innerHeight - vv.height - vv.offsetTop)}px`,
@@ -186,7 +186,7 @@ export function WindowFrame({
     vv.addEventListener('resize', update);
     vv.addEventListener('scroll', update);
 
-    return () => {
+    return (): void => {
       vv.removeEventListener('resize', update);
       vv.removeEventListener('scroll', update);
     };
@@ -201,7 +201,7 @@ export function WindowFrame({
     event: ReactPointerEvent<HTMLElement>,
     compute: (dx: number, dy: number, pointer: PointerEvent) => Rect,
     commit: (rect: Rect) => void,
-  ) {
+  ): void {
     const outer = outerRef.current;
 
     if (!outer) return;
@@ -215,7 +215,7 @@ export function WindowFrame({
     target.setPointerCapture(event.pointerId);
     outer.dataset['gesture'] = 'true';
 
-    const onMove = (move: PointerEvent) => {
+    const onMove = (move: PointerEvent): void => {
       latest = compute(move.clientX - startX, move.clientY - startY, move);
 
       if (frame) return;
@@ -226,7 +226,7 @@ export function WindowFrame({
         if (latest) applyRect(outer, latest);
       });
     };
-    const finish = (commitGesture: boolean) => {
+    const finish = (commitGesture: boolean): void => {
       cancelAnimationFrame(frame);
       target.removeEventListener('pointermove', onMove);
       target.removeEventListener('pointerup', onUp);
@@ -242,9 +242,9 @@ export function WindowFrame({
       if (commitGesture && latest) commit(latest);
       else if (current) applyRect(outer, current.rect);
     };
-    const onUp = () => finish(true);
-    const onCancel = () => finish(false);
-    const onKey = (key: globalThis.KeyboardEvent) => {
+    const onUp = (): void => finish(true);
+    const onCancel = (): void => finish(false);
+    const onKey = (key: globalThis.KeyboardEvent): void => {
       if (key.key === 'Escape') finish(false);
     };
 
@@ -254,7 +254,7 @@ export function WindowFrame({
     window.addEventListener('keydown', onKey);
   }
 
-  function startDrag(event: ReactPointerEvent<HTMLElement>) {
+  function startDrag(event: ReactPointerEvent<HTMLElement>): void {
     if (!win || sheet || win.maximized || event.button !== 0) return;
 
     if ((event.target as Element).closest('button')) return;
@@ -281,7 +281,7 @@ export function WindowFrame({
   }
 
   function startResize(edge: ResizeEdge) {
-    return (event: ReactPointerEvent<HTMLElement>) => {
+    return (event: ReactPointerEvent<HTMLElement>): void => {
       if (!win || event.button !== 0) return;
 
       const start = win.rect;
@@ -295,7 +295,7 @@ export function WindowFrame({
     };
   }
 
-  function onTitleKeyDown(event: KeyboardEvent<HTMLElement>) {
+  function onTitleKeyDown(event: KeyboardEvent<HTMLElement>): void {
     const direction = KEY_DIRECTION[event.key];
 
     if (event.target !== event.currentTarget || !direction) return;

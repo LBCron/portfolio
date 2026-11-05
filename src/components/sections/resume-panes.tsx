@@ -38,7 +38,7 @@ export function ResumePanes({
   const hasEducation = education !== null && education !== undefined;
 
   useEffect(() => {
-    const apply = () => {
+    const apply = (): void => {
       const pane = paneFromHash();
 
       if (pane === 'education' && !hasEducation) return;
@@ -55,7 +55,7 @@ export function ResumePanes({
     apply();
     window.addEventListener('hashchange', apply);
 
-    return () => window.removeEventListener('hashchange', apply);
+    return (): void => window.removeEventListener('hashchange', apply);
   }, [hasEducation, hasExperience]);
 
   if (!hasExperience && !hasEducation) return null;

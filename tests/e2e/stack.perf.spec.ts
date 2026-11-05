@@ -1,11 +1,11 @@
 import { expect, type Page, test } from '@playwright/test';
 
-async function waitFrames(page: Page, count: number) {
+async function waitFrames(page: Page, count: number): Promise<void> {
   await page.evaluate(
     (frames) =>
       new Promise<void>((resolve) => {
         let n = 0;
-        const tick = () => {
+        const tick = (): void => {
           n += 1;
 
           if (n < frames) {
@@ -53,7 +53,7 @@ test('geoid holds 50 fps under 4× CPU throttle', async ({ page }) => {
     const start = performance.now();
 
     await new Promise<void>((resolve) => {
-      const tick = (now: number) => {
+      const tick = (now: number): void => {
         if (now - start >= 1000) {
           resolve();
 

@@ -40,7 +40,7 @@ interface TerminalStore {
   skipTyping: boolean;
 }
 
-function withoutTrailingSpinner(blocks: Block[]) {
+function withoutTrailingSpinner(blocks: Block[]): Block[] {
   return blocks.at(-1)?.node.type === 'spinner' ? blocks.slice(0, -1) : blocks;
 }
 

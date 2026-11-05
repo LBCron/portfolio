@@ -3,7 +3,7 @@ import { expect, type Locator, type Page } from '@playwright/test';
 /**
  * React tags hydrated DOM nodes with `__reactFiber$…` keys.
  */
-export async function waitForHydration(page: Page) {
+export async function waitForHydration(page: Page): Promise<void> {
   await page.waitForFunction(() => {
     const header = document.querySelector('header');
 
@@ -16,7 +16,7 @@ export async function waitForHydration(page: Page) {
  * window is still mounting would close it (slow on Firefox), so wait for
  * hydration first and give each press time to mount before retrying (D61).
  */
-export async function openWithShortcut(page: Page, window: Locator) {
+export async function openWithShortcut(page: Page, window: Locator): Promise<void> {
   await waitForHydration(page);
   await expect(async () => {
     await page.keyboard.press('Control+/');

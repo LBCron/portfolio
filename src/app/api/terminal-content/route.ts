@@ -7,7 +7,7 @@ import { buildSnapshot } from '@/lib/terminal/snapshot';
 /**
  * Public, read-only snapshot for the terminal; hidden items never appear.
  */
-export async function GET(request: Request) {
+export async function GET(request: Request): Promise<NextResponse<unknown>> {
   const locale = new URL(request.url).searchParams.get('locale');
 
   if (!isAppLocale(locale)) {

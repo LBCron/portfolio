@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 
 const AXE_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'];
 
-function skipAxeOnWebkit(browserName: string) {
+function skipAxeOnWebkit(browserName: string): void {
   test.skip(browserName === 'webkit', 'axe runs on Chromium projects');
 }
 

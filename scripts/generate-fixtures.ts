@@ -111,7 +111,11 @@ ${rings}
 </svg>`;
 }
 
-async function encodeAuthored(spec: FixtureImageSpec) {
+async function encodeAuthored(spec: FixtureImageSpec): Promise<{
+  asset: { height: number; lqip: string; url: string; width: number };
+  bytes: number;
+  key: string;
+}> {
   const authored = spec.authored;
 
   if (!authored) {
@@ -149,7 +153,11 @@ async function encodeAuthored(spec: FixtureImageSpec) {
   };
 }
 
-async function renderImage(spec: FixtureImageSpec) {
+async function renderImage(spec: FixtureImageSpec): Promise<{
+  asset: { height: number; lqip: string; url: string; width: number };
+  bytes: number;
+  key: string;
+}> {
   if (spec.authored) return encodeAuthored(spec);
 
   const rand = random(spec.key);
@@ -330,7 +338,7 @@ function buildPdf(locale: 'en' | 'pt'): Buffer {
 
 // --- Main --------------------------------------------------------------------
 
-async function main() {
+async function main(): Promise<void> {
   await mkdir(path.join(PUBLIC_DIR, 'images'), { recursive: true });
   await mkdir(path.join(PUBLIC_DIR, 'pdf'), { recursive: true });
 

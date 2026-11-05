@@ -6,7 +6,7 @@ import { waitForHydration } from './hydration';
  * Records every view transition the page starts and the pseudo-element
  * animations that run once it is ready (D62).
  */
-async function recordTransitions(page: Page) {
+async function recordTransitions(page: Page): Promise<void> {
   await page.evaluate(() => {
     const record: { animations: string[]; started: number } = {
       started: 0,
@@ -35,13 +35,13 @@ async function recordTransitions(page: Page) {
   });
 }
 
-function recorded(page: Page) {
+function recorded(page: Page): Promise<{ animations: string[]; started: number }> {
   return page.evaluate(
     () => (window as unknown as { __vt: { animations: string[]; started: number } }).__vt,
   );
 }
 
-async function openOrbitFromWork(page: Page) {
+async function openOrbitFromWork(page: Page): Promise<void> {
   await page.goto('/en');
   await waitForHydration(page);
 

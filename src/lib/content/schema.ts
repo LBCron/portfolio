@@ -22,7 +22,7 @@ export type ContentLocale = (typeof contentLocales)[number];
 
 // --- Primitives --------------------------------------------------------------
 
-const text = (max: number) => z.string().trim().min(1).max(max);
+const text = (max: number): z.ZodString => z.string().trim().min(1).max(max);
 
 const FENCED_CODE = /```[\s\S]*?```|~~~[\s\S]*?~~~/g;
 const INLINE_CODE = /`[^`\n]*`/g;
@@ -35,12 +35,17 @@ export function hasNoRawHtml(markdown: string): boolean {
   return !RAW_HTML.test(markdown.replace(FENCED_CODE, '').replace(INLINE_CODE, ''));
 }
 
-const markdown = (max: number) =>
+const markdown = (max: number): z.ZodString =>
   text(max).refine(hasNoRawHtml, { message: 'Raw HTML is not allowed' });
 
-export const localized = (max: number) => z.object({ en: text(max), pt: text(max) });
+export const localized = (
+  max: number,
+): z.ZodObject<{ en: z.ZodString; pt: z.ZodString }, z.core.$strip> =>
+  z.object({ en: text(max), pt: text(max) });
 
-export const localizedMarkdown = (max: number) =>
+export const localizedMarkdown = (
+  max: number,
+): z.ZodObject<{ en: z.ZodString; pt: z.ZodString }, z.core.$strip> =>
   z.object({ en: markdown(max), pt: markdown(max) });
 
 export type LocalizedText = z.infer<ReturnType<typeof localized>>;

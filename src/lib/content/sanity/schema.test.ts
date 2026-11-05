@@ -17,7 +17,7 @@ const builtIn: Record<string, string[]> = {
   reference: ['_ref'],
 };
 
-function check(value: unknown, field: Field, at: string, errors: string[]) {
+function check(value: unknown, field: Field, at: string, errors: string[]): void {
   if (Array.isArray(value)) {
     value.forEach((item: unknown, index) => {
       const itemType =

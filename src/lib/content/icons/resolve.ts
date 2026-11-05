@@ -52,7 +52,7 @@ function loadDevicon(): Promise<IconifyJSON[]> {
 /**
  * Every Simple Icons brand, for the admin picker.
  */
-export async function simpleIconCatalog() {
+export async function simpleIconCatalog(): Promise<Array<{ label: string; slug: string }>> {
   return [...(await loadSimpleIcons()).values()].map((icon) => ({
     slug: icon.slug,
     label: icon.title,
@@ -62,7 +62,7 @@ export async function simpleIconCatalog() {
 /**
  * Every Devicon name (plain and original sets), for the admin picker.
  */
-export async function deviconCatalog() {
+export async function deviconCatalog(): Promise<Array<{ label: string; slug: string }>> {
   const sets = await loadDevicon();
 
   return [...new Set(sets.flatMap((set) => Object.keys(set.icons)))]

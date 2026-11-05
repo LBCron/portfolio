@@ -16,7 +16,7 @@ const fail = (status: number, error: string) => NextResponse.json({ error }, { s
 /**
  * Same-origin browser requests only: Origin and Sec-Fetch-Site must agree.
  */
-function sameOrigin(request: NextRequest) {
+function sameOrigin(request: NextRequest): boolean {
   const origin = request.headers.get('origin');
   const fetchSite = request.headers.get('sec-fetch-site');
 

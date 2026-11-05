@@ -14,7 +14,7 @@ test.skip(
   'visual baselines are checked in CI (set VISUAL=1 to run locally)',
 );
 
-async function settle(page: Page, width: number, path: string) {
+async function settle(page: Page, width: number, path: string): Promise<void> {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.setViewportSize({ width, height: width < 768 ? 812 : 900 });
   await page.goto(path);

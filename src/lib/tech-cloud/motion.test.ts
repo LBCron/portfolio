@@ -5,7 +5,7 @@ import { decay, ease, FRAME_MS, frameScale, MAX_FRAME_MS, stepDrag } from './mot
 /**
  * Integrates `step` over one second at the given refresh rate.
  */
-function simulate(hz: number, step: (k: number, gapMs: number) => void) {
+function simulate(hz: number, step: (k: number, gapMs: number) => void): void {
   const gap = 1000 / hz;
   for (let i = 0; i < hz; i += 1) step(frameScale(gap), gap);
 }
@@ -24,7 +24,7 @@ describe('frameScale', () => {
 
 describe('refresh-rate independence', () => {
   it('auto-spin covers the same angle per second at 60 and 144 Hz', () => {
-    const total = (hz: number) => {
+    const total = (hz: number): number => {
       let angle = 0;
 
       simulate(hz, (k) => {
@@ -39,7 +39,7 @@ describe('refresh-rate independence', () => {
   });
 
   it('hover easing settles to the same value at any rate', () => {
-    const settle = (hz: number) => {
+    const settle = (hz: number): number => {
       let value = 1;
 
       simulate(hz, (k) => {
@@ -54,7 +54,7 @@ describe('refresh-rate independence', () => {
   });
 
   it('friction decays equally over one second', () => {
-    const rate = (hz: number) => {
+    const rate = (hz: number): number => {
       let v = 1;
 
       simulate(hz, (k) => {
@@ -68,7 +68,7 @@ describe('refresh-rate independence', () => {
   });
 
   it('a coast after release travels the same distance at 60 and 144 Hz', () => {
-    const travel = (hz: number) => {
+    const travel = (hz: number): number => {
       let velocity = 0.02;
       let total = 0;
 

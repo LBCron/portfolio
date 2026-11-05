@@ -5,7 +5,7 @@ import { createFixtureDataset } from './dataset';
 
 const dataset = createFixtureDataset();
 
-const pascalCase = (name: string) =>
+const pascalCase = (name: string): string =>
   name.replace(/(^|-)([a-z0-9])/g, (_, __, char: string) => char.toUpperCase());
 
 function collectStrings(value: unknown, out: string[] = []): string[] {

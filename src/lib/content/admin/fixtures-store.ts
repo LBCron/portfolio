@@ -14,9 +14,9 @@ const PLACEHOLDER_FILE = '/fixtures/pdf/resume-en.pdf';
 type Stored = AdminDoc;
 
 const INITIAL_REV = 'initial';
-const nextRev = () => crypto.randomUUID().slice(0, 8);
+const nextRev = (): string => crypto.randomUUID().slice(0, 8);
 
-function labelOf(doc: Stored) {
+function labelOf(doc: Stored): string {
   const title = doc['title'] as { en?: string } | undefined;
 
   return title?.en ?? (doc['company'] as string | undefined) ?? doc.id;
@@ -31,11 +31,12 @@ export function createFixturesAdminStore(
   dataset: FixtureDataset,
   options: { readOnlyReason: string; writable: boolean },
 ): AdminStore {
-  const collection = (type: DocumentType) => dataset[type] as unknown as Stored[];
+  const collection = (type: DocumentType): AdminDoc[] => dataset[type] as unknown as Stored[];
 
-  const find = (type: DocumentType, id: string) => collection(type).find((doc) => doc.id === id);
+  const find = (type: DocumentType, id: string): AdminDoc | undefined =>
+    collection(type).find((doc) => doc.id === id);
 
-  const revOf = (doc: Stored) => doc.rev ?? INITIAL_REV;
+  const revOf = (doc: Stored): string => doc.rev ?? INITIAL_REV;
 
   function check(doc: Stored | undefined, expectedRev?: string): null | WriteResult {
     if (!doc) return { ok: false, reason: 'missing' };
@@ -47,7 +48,7 @@ export function createFixturesAdminStore(
     return null;
   }
 
-  function stamp(doc: Stored, touch = true) {
+  function stamp(doc: Stored, touch = true): string {
     doc.rev = nextRev();
 
     if (touch) doc.updatedAt = new Date().toISOString();
@@ -60,20 +61,25 @@ export function createFixturesAdminStore(
     readOnlyReason: options.writable ? null : options.readOnlyReason,
     label: options.writable ? 'Demo data' : 'Demo data, read-only',
 
-    async list(type) {
+    async list(
+      type,
+    ): Promise<Array<{ id: string; isFixture?: boolean; rev: string; updatedAt?: string }>> {
       return structuredClone(collection(type)).map((doc) => ({
         ...(stripNulls(doc) as Stored),
         rev: revOf(doc),
       }));
     },
 
-    async get(type, id) {
+    async get(
+      type,
+      id,
+    ): Promise<{ id: string; isFixture?: boolean; rev: string; updatedAt?: string } | null> {
       const doc = find(type, id);
 
       return doc ? { ...(stripNulls(structuredClone(doc)) as Stored), rev: revOf(doc) } : null;
     },
 
-    async write(type, document, { isNew, expectedRev }) {
+    async write(type, document, { isNew, expectedRev }): Promise<WriteResult> {
       const list = collection(type);
       const existing = find(type, document.id);
 
@@ -94,7 +100,7 @@ export function createFixturesAdminStore(
       return { ok: true, rev };
     },
 
-    async patch(type, id, fields, expectedRev) {
+    async patch(type, id, fields, expectedRev): Promise<WriteResult> {
       const doc = find(type, id);
       const problem = check(doc, expectedRev);
 
@@ -105,7 +111,7 @@ export function createFixturesAdminStore(
       return { ok: true, rev: stamp(doc) };
     },
 
-    async remove(type, id, expectedRev) {
+    async remove(type, id, expectedRev): Promise<WriteResult> {
       const doc = find(type, id);
       const problem = check(doc, expectedRev);
 
@@ -116,7 +122,7 @@ export function createFixturesAdminStore(
       return { ok: true, rev: INITIAL_REV };
     },
 
-    async referencesTo(id) {
+    async referencesTo(id): Promise<Reference[]> {
       const found: Reference[] = [];
       for (const type of ['project', 'experience'] as const) {
         for (const doc of collection(type)) {
@@ -129,13 +135,13 @@ export function createFixturesAdminStore(
       return found;
     },
 
-    async uploadImage(bytes) {
+    async uploadImage(bytes): Promise<{ height: number; url: string; width: number }> {
       const { width, height } = await sharp(bytes).metadata();
 
       return { url: PLACEHOLDER_IMAGE, width: width ?? 1, height: height ?? 1 };
     },
 
-    async uploadFile(bytes) {
+    async uploadFile(bytes): Promise<{ mimeType: 'application/pdf'; size: number; url: string }> {
       return {
         url: PLACEHOLDER_FILE,
         size: bytes.length,

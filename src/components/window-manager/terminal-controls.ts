@@ -2,14 +2,14 @@ import { useWindowStore } from '@/stores/window-store';
 
 export const TERMINAL_ID = 'terminal';
 
-export function terminalTitle(cwd: string, admin = false) {
+export function terminalTitle(cwd: string, admin = false): string {
   return `${admin ? 'julio' : 'visitor'}@julio-muller: ${cwd}`;
 }
 
 /**
  * Shortcut and header button: open, restore, or minimize when focused.
  */
-export function toggleTerminal() {
+export function toggleTerminal(): void {
   const store = useWindowStore.getState();
   const win = store.windows[TERMINAL_ID];
 
@@ -22,7 +22,7 @@ export function toggleTerminal() {
 /**
  * CTAs never minimize: open, restore or just focus.
  */
-export function openTerminal() {
+export function openTerminal(): void {
   const store = useWindowStore.getState();
   const win = store.windows[TERMINAL_ID];
 

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
  * Tracks which section sits in the reading band of the viewport. Only the
  * sections that exist on the page are observed.
  */
-export function useActiveSection(ids: readonly string[], enabled: boolean) {
+export function useActiveSection(ids: readonly string[], enabled: boolean): null | string {
   const [active, setActive] = useState<null | string>(null);
 
   useEffect(() => {
@@ -27,13 +27,13 @@ export function useActiveSection(ids: readonly string[], enabled: boolean) {
 
     elements.forEach((element) => observer.observe(element));
 
-    const onScroll = () => {
+    const onScroll = (): void => {
       if (window.scrollY < 80) setActive(null);
     };
 
     window.addEventListener('scroll', onScroll, { passive: true });
 
-    return () => {
+    return (): void => {
       observer.disconnect();
       window.removeEventListener('scroll', onScroll);
     };

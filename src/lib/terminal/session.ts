@@ -51,7 +51,7 @@ export function loadSession(storage: StorageLike): null | SavedSession {
  * Volatile (secret) blocks, spinners and one-shot typing are never saved.
  * Closing the window passes empty blocks: only the history survives.
  */
-export function saveSession(storage: StorageLike, session: SavedSession) {
+export function saveSession(storage: StorageLike, session: SavedSession): void {
   const blocks = session.blocks
     .filter((block) => !block.volatile && block.node.type !== 'spinner')
     .slice(-BLOCK_LIMIT)

@@ -13,7 +13,7 @@ export function switchLocale(
   router: ReturnType<typeof useRouter>,
   pathname: string,
   target: AppLocale,
-) {
+): void {
   saveLocalePreference(target);
   track('language_switch', { to: target });
 

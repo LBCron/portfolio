@@ -51,7 +51,7 @@ const experience: Command = {
 
     if (entries.length === 0) return [text(ctx.t('terminal.empty'), 'warn')];
 
-    const date = (value: string) => formatPartialDate(ctx.locale, value);
+    const date = (value: string): string => formatPartialDate(ctx.locale, value);
 
     return entries.flatMap((entry): OutputNode[] => [
       lines(
@@ -83,7 +83,7 @@ const education: Command = {
 
     if (entries.length === 0) return [text(ctx.t('terminal.empty'), 'warn')];
 
-    const date = (value: string) => formatPartialDate(ctx.locale, value);
+    const date = (value: string): string => formatPartialDate(ctx.locale, value);
 
     return [
       lines(
@@ -210,7 +210,10 @@ const recommend: Command = {
   },
 };
 
-function matchCategory(ctx: CommandContext, value: string) {
+function matchCategory(
+  ctx: CommandContext,
+  value: string,
+): 'ai' | 'backend' | 'cloud' | 'data' | 'frontend' | 'integration' | 'language' | undefined {
   const needle = value.toLowerCase();
 
   return CATEGORIES.find(
@@ -457,7 +460,7 @@ const neofetch: Command = {
 /**
  * FNV-1a, folded to 7 hex digits: a stable, commit-looking id.
  */
-export function shortHash(input: string) {
+export function shortHash(input: string): string {
   let hash = 0x811c9dc5;
   for (const char of input) {
     hash = Math.imul(hash ^ char.charCodeAt(0), 0x01000193) >>> 0;

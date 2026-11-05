@@ -11,7 +11,7 @@ interface Saved {
   status: 'minimized' | 'open';
 }
 
-const isNumber = (value: unknown) => typeof value === 'number' && Number.isFinite(value);
+const isNumber = (value: unknown): boolean => typeof value === 'number' && Number.isFinite(value);
 
 /**
  * Hand-written instead of zod: zod would add its whole runtime to the initial
@@ -49,12 +49,12 @@ export function parseSaved(value: unknown): null | Saved {
  * Rehydration happens after mount to avoid a hydration mismatch; a closed
  * window is not persisted, so it stays unmounted.
  */
-export function useWindowSync(id: string, title: string) {
+export function useWindowSync(id: string, title: string): void {
   useEffect(() => {
     const key = `jm.window.${id}.v1`;
     const store = useWindowStore.getState();
 
-    const updateViewport = () => {
+    const updateViewport = (): void => {
       const top = parseFloat(
         getComputedStyle(document.documentElement).getPropertyValue('--header-height'),
       );
@@ -96,7 +96,7 @@ export function useWindowSync(id: string, title: string) {
       }
     });
 
-    return () => {
+    return (): void => {
       window.removeEventListener('resize', updateViewport);
       unsubscribe();
     };

@@ -134,7 +134,47 @@ export function createRepository(
   source: ContentSource,
   logger: ContentLogger = contentLogger,
 ): ContentRepository {
-  async function readProjects() {
+  async function readProjects(): Promise<{
+    filterTech: (ownerId: string, techIds: readonly string[]) => string[];
+    projects: Array<{
+      approach: { en: string; pt: string };
+      body?: { en: string; pt: string } | undefined;
+      context: { en: string; pt: string };
+      cover?:
+        | {
+            alt: { en: string; pt: string };
+            asset: { height: number; lqip?: string | undefined; url: string; width: number };
+            focal?: { x: number; y: number } | undefined;
+          }
+        | undefined;
+      featured: boolean;
+      gallery: Array<{
+        alt: { en: string; pt: string };
+        asset: { height: number; lqip?: string | undefined; url: string; width: number };
+        caption?: { en: string; pt: string } | undefined;
+        focal?: { x: number; y: number } | undefined;
+      }>;
+      highlights: Array<{ en: string; pt: string }>;
+      id: string;
+      isFixture?: boolean | undefined;
+      kind: 'automation' | 'desktop' | 'integration' | 'mobile' | 'open-source' | 'web';
+      links: { live?: string | undefined; repo?: string | undefined };
+      order: number;
+      outcome?: { en: string; pt: string } | undefined;
+      previousSlugs: string[];
+      rev?: string | undefined;
+      role: { en: string; pt: string };
+      slug: string;
+      status: 'archived' | 'in-progress' | 'live' | 'private';
+      summary: { en: string; pt: string };
+      tagline: { en: string; pt: string };
+      techIds: string[];
+      title: { en: string; pt: string };
+      updatedAt: string;
+      visible: boolean;
+      year: number;
+    }>;
+  }> {
     const read = await source.projects();
     const filterTech = createTechFilter(read.technologies, logger);
     const projects = uniqueBySlug(parseCollection('project', read.projects, logger), logger);
@@ -145,7 +185,37 @@ export function createRepository(
   return {
     source: source.name,
 
-    async getProfile(locale) {
+    async getProfile(locale): Promise<{
+      bio: string;
+      displayName: string;
+      focus: string;
+      heroLead: string;
+      jobTitle: string;
+      location: string;
+      metrics: Array<{
+        countTo: number | undefined;
+        label: string;
+        prefix: string | undefined;
+        suffix: string | undefined;
+        value: string;
+      }>;
+      photo: ImageRef | undefined;
+      photoLg: ImageRef | undefined;
+      spokenLanguages: string[];
+      titleFont:
+        | 'amita'
+        | 'courgette'
+        | 'euphoria-script'
+        | 'kaushan-script'
+        | 'lobster'
+        | 'pacifico'
+        | 'princess-sofia'
+        | 'redressed'
+        | 'rock-salt'
+        | 'sacramento'
+        | undefined;
+      updatedAt: string;
+    } | null> {
       const profile = parseDocument('profile', await source.profile(), logger);
 
       if (!profile) return null;
@@ -174,7 +244,13 @@ export function createRepository(
       });
     },
 
-    async getContact(locale) {
+    async getContact(locale): Promise<{
+      bookingUrl: string | undefined;
+      ctaHeading: string;
+      ctaText: string;
+      email: string;
+      phone: string | undefined;
+    } | null> {
       const contact = parseDocument('contact', await source.contact(), logger);
 
       if (!contact) return null;
@@ -223,7 +299,26 @@ export function createRepository(
       );
     },
 
-    async getRecommendedProfiles(locale) {
+    async getRecommendedProfiles(locale): Promise<
+      Array<{
+        avatar:
+          | {
+              alt: string;
+              focal: { x: number; y: number } | undefined;
+              height: number;
+              lqip?: string | undefined;
+              url: string;
+              width: number;
+            }
+          | undefined;
+        id: string;
+        name: string;
+        note: string;
+        order: number;
+        role: string;
+        url: string;
+      }>
+    > {
       const profiles = parseCollection(
         'recommendedProfile',
         await source.recommendedProfiles(),
@@ -249,7 +344,7 @@ export function createRepository(
       );
     },
 
-    async getProjects(locale) {
+    async getProjects(locale): Promise<ProjectSummary[]> {
       const { projects, filterTech } = await readProjects();
 
       return projects.map((project) =>
@@ -275,7 +370,7 @@ export function createRepository(
       return moved ? { status: 'moved', slug: moved.slug } : { status: 'missing' };
     },
 
-    async getProjectRoutes() {
+    async getProjectRoutes(): Promise<Array<{ slug: string; updatedAt: string }>> {
       const { projects } = await readProjects();
 
       return projects.map((project) => ({
@@ -284,7 +379,25 @@ export function createRepository(
       }));
     },
 
-    async getExperience(locale) {
+    async getExperience(locale): Promise<
+      Array<{
+        collapsedByDefault: boolean;
+        company: string;
+        companyUrl: string | undefined;
+        id: string;
+        location: string;
+        order: number;
+        roles: Array<{
+          bullets: string[];
+          end: string | undefined;
+          start: string;
+          summary: string;
+          title: string;
+        }>;
+        slug: string;
+        techIds: string[];
+      }>
+    > {
       const read = await source.experience();
       const filterTech = createTechFilter(read.technologies, logger);
       const entries = parseCollection('experience', read.entries, logger);
@@ -313,7 +426,18 @@ export function createRepository(
       );
     },
 
-    async getEducation(locale) {
+    async getEducation(locale): Promise<
+      Array<{
+        end: string | undefined;
+        id: string;
+        institution: string;
+        kind: 'certification' | 'degree';
+        order: number;
+        start: string | undefined;
+        title: string;
+        url: string | undefined;
+      }>
+    > {
       const entries = parseCollection('education', await source.education(), logger);
 
       return entries.map((entry) =>
@@ -351,7 +475,7 @@ export function createRepository(
       );
     },
 
-    async getPractices(locale) {
+    async getPractices(locale): Promise<Array<{ id: string; label: string; order: number }>> {
       const practices = parseCollection('practice', await source.practices(), logger);
 
       return practices.map((practice) => ({

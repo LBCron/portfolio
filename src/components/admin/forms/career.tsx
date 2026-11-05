@@ -15,7 +15,7 @@ export interface Option {
   value: string;
 }
 
-const blank = () => ({ en: '', pt: '' });
+const blank = (): { en: string; pt: string } => ({ en: '', pt: '' });
 
 export function ExperienceForm({ techOptions }: { techOptions: Option[] }) {
   return (

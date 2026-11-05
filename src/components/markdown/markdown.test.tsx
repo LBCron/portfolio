@@ -6,7 +6,7 @@ const gallery: MarkdownImage[] = [
   { url: '/fixtures/images/a.webp', width: 1600, height: 1000, alt: 'First' },
 ];
 
-function render(markdown: string, images: MarkdownImage[] = []) {
+function render(markdown: string, images: MarkdownImage[] = []): string {
   return renderToStaticMarkup(
     <Markdown
       newTabLabel="(opens in a new tab)"

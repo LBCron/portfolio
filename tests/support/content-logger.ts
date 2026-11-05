@@ -12,7 +12,7 @@ export function createRecordingLogger(): {
 
   return {
     warnings,
-    warn(event, details) {
+    warn(event, details): void {
       warnings.push({ event, details });
     },
   };

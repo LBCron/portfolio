@@ -61,4 +61,4 @@ export const removeItem = <T>(list: readonly T[], index: number): T[] =>
 /**
  * DOM id for the control of a form path (error summary links point here).
  */
-export const fieldId = (path: string) => `f-${path.replace(/\./g, '-')}`;
+export const fieldId = (path: string): string => `f-${path.replace(/\./g, '-')}`;

@@ -16,7 +16,7 @@ export function JobDetails({
 }) {
   const [open, setOpen] = useState(openByDefault);
 
-  function onToggle(event: ToggleEvent<HTMLDetailsElement>) {
+  function onToggle(event: ToggleEvent<HTMLDetailsElement>): void {
     setOpen(event.currentTarget.open);
   }
 

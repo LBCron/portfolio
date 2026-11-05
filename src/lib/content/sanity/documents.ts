@@ -30,23 +30,27 @@ function key(...parts: Array<number | string>): string {
   return createHash('sha1').update(parts.join(':')).digest('hex').slice(0, 12);
 }
 
-const localeString = (value: LocalizedText) => ({
+const localeString = (value: LocalizedText): { _type: string; en: string; pt: string } => ({
   _type: 'localeString',
   ...value,
 });
-const localeText = (value: LocalizedText) => ({
+const localeText = (value: LocalizedText): { _type: string; en: string; pt: string } => ({
   _type: 'localeText',
   ...value,
 });
 
-function localeStrings(id: string, field: string, values: LocalizedText[]) {
+function localeStrings(
+  id: string,
+  field: string,
+  values: LocalizedText[],
+): Array<{ _key: string; _type: string; en: string; pt: string }> {
   return values.map((value, index) => ({
     _key: key(id, field, index),
     ...localeString(value),
   }));
 }
 
-function optional<T, R>(value: T | undefined, map: (value: T) => R) {
+function optional<T, R>(value: T | undefined, map: (value: T) => R): R | undefined {
   return value === undefined ? undefined : map(value);
 }
 
@@ -56,7 +60,15 @@ interface ImageInput {
   focal?: { x: number; y: number };
 }
 
-function image(assets: AssetResolver, input: ImageInput) {
+function image(
+  assets: AssetResolver,
+  input: ImageInput,
+): {
+  _type: string;
+  alt?: { _type: string; en: string; pt: string } | undefined;
+  asset: { _ref: string; _type: string };
+  hotspot?: { _type: string; height: number; width: number; x: number; y: number } | undefined;
+} {
   return {
     _type: 'image',
     asset: { _type: 'reference', _ref: assets.image(input.asset) },
@@ -75,7 +87,11 @@ function image(assets: AssetResolver, input: ImageInput) {
   };
 }
 
-function references(id: string, field: string, ids: readonly string[] = []) {
+function references(
+  id: string,
+  field: string,
+  ids: readonly string[] = [],
+): Array<{ _key: string; _ref: string; _type: string }> {
   return ids.map((ref, index) => ({
     _key: key(id, field, index),
     _type: 'reference',
@@ -89,7 +105,10 @@ function compact(document: Record<string, unknown>): SanityDocument {
   ) as SanityDocument;
 }
 
-function base<T extends DocumentType>(type: T, doc: DocumentInput<T>) {
+function base<T extends DocumentType>(
+  type: T,
+  doc: DocumentInput<T>,
+): { _id: string; _type: T; isFixture: boolean | undefined } {
   return { _id: doc.id, _type: type, isFixture: doc.isFixture };
 }
 

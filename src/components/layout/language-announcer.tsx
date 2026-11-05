@@ -44,7 +44,7 @@ export function LanguageAnnouncer() {
 
     const timer = window.setTimeout(() => setMessage(''), 4000);
 
-    return () => window.clearTimeout(timer);
+    return (): void => window.clearTimeout(timer);
   }, [locale, t]);
 
   return (

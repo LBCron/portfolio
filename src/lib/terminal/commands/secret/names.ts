@@ -4,5 +4,5 @@
  */
 export const SECRET_NAMES = ['su', 'admin', 'logout'] as const;
 
-export const isSecretName = (name: string | undefined) =>
+export const isSecretName = (name: string | undefined): boolean =>
   (SECRET_NAMES as ReadonlyArray<string | undefined>).includes(name);

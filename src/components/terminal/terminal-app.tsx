@@ -39,7 +39,7 @@ function promptSpans(cwd: string, admin: boolean): Span[] {
   ];
 }
 
-const applyStatus = (status: SessionStatus) =>
+const applyStatus = (status: SessionStatus): void =>
   useSessionStore
     .getState()
     .set(status.isAdmin ? { expiresAt: status.expiresAt, base: status.base } : null);
@@ -85,7 +85,7 @@ export default function TerminalApp() {
 
     if (!root) return;
 
-    const focusInput = () => {
+    const focusInput = (): void => {
       if (!window.getSelection()?.toString()) {
         inputRef.current?.focus({ preventScroll: true });
       }
@@ -93,7 +93,7 @@ export default function TerminalApp() {
 
     root.addEventListener('click', focusInput);
 
-    return () => root.removeEventListener('click', focusInput);
+    return (): void => root.removeEventListener('click', focusInput);
   }, [t]);
 
   useEffect(() => {
@@ -103,7 +103,7 @@ export default function TerminalApp() {
       if (!cancelled) setT(() => translator);
     });
 
-    return () => {
+    return (): void => {
       cancelled = true;
     };
   }, [locale]);
@@ -129,7 +129,9 @@ export default function TerminalApp() {
 
   // The server owns the session; ask on mount and when the window regains focus.
   useEffect(() => {
-    const refresh = () => { getSessionStatus().then(applyStatus, () => {}); };
+    const refresh = (): void => {
+      getSessionStatus().then(applyStatus, () => {});
+    };
 
     refresh();
 
@@ -137,7 +139,7 @@ export default function TerminalApp() {
 
     window.addEventListener('focus', refresh);
 
-    return () => window.removeEventListener('focus', refresh);
+    return (): void => window.removeEventListener('focus', refresh);
   }, [admin]);
 
   // Boot once per session (not on rehydrate), always while open.
@@ -207,7 +209,7 @@ export default function TerminalApp() {
       loadSecret: () => import('@/lib/terminal/commands/secret'),
       readSecret: (label, signal) =>
         new Promise<null | string>((resolve) => {
-          const finish = (value: null | string) => {
+          const finish = (value: null | string): void => {
             if (secretResolver.current !== finish) return;
 
             secretResolver.current = null;
@@ -241,7 +243,7 @@ export default function TerminalApp() {
     };
   }
 
-  function echo(line: string, suffix = '', volatile = false) {
+  function echo(line: string, suffix = '', volatile = false): void {
     const { cwd: current } = useTerminalStore.getState();
 
     useTerminalStore.getState().append(
@@ -256,7 +258,7 @@ export default function TerminalApp() {
     );
   }
 
-  async function run(line: string, options?: { multiline: boolean }) {
+  async function run(line: string, options?: { multiline: boolean }): Promise<void> {
     const store = useTerminalStore.getState();
 
     if (!t || store.running) return;
@@ -292,7 +294,7 @@ export default function TerminalApp() {
     }
   }
 
-  function interrupt(line: string) {
+  function interrupt(line: string): void {
     const store = useTerminalStore.getState();
 
     if (secretResolver.current) {
@@ -317,7 +319,7 @@ export default function TerminalApp() {
     return applyCompletion(line, cursor, complete(line, cursor, defaultRegistry, ctx));
   }
 
-  function listCandidates(line: string, candidates: string[]) {
+  function listCandidates(line: string, candidates: string[]): void {
     echo(line);
     useTerminalStore.getState().append(text(candidates.join('   '), 'accent'));
   }

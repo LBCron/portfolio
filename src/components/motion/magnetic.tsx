@@ -23,16 +23,16 @@ export function Magnetic({ children }: { children: ReactNode }) {
 
     let frame = 0;
     let next = '';
-    const write = () => {
+    const write = (): void => {
       frame = 0;
       element.style.transform = next;
     };
-    const schedule = (transform: string) => {
+    const schedule = (transform: string): void => {
       next = transform;
 
       if (!frame) frame = requestAnimationFrame(write);
     };
-    const onMove = (event: PointerEvent) => {
+    const onMove = (event: PointerEvent): void => {
       const rect = element.getBoundingClientRect();
       const dx = (event.clientX - (rect.left + rect.width / 2)) / rect.width;
       const dy = (event.clientY - (rect.top + rect.height / 2)) / rect.height;
@@ -41,12 +41,12 @@ export function Magnetic({ children }: { children: ReactNode }) {
         `translate3d(${(dx * MAX_PULL * 2).toFixed(2)}px, ${(dy * MAX_PULL * 2).toFixed(2)}px, 0)`,
       );
     };
-    const onLeave = () => schedule('');
+    const onLeave = (): void => schedule('');
 
     element.addEventListener('pointermove', onMove);
     element.addEventListener('pointerleave', onLeave);
 
-    return () => {
+    return (): void => {
       element.removeEventListener('pointermove', onMove);
       element.removeEventListener('pointerleave', onLeave);
       cancelAnimationFrame(frame);

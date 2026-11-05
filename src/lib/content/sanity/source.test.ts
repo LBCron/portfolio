@@ -26,7 +26,7 @@ describe('sanity adapter', () => {
       createSanitySource(createMemoryGroqFetch(createSanityMemoryDataset(dataset))),
     );
 
-    const read = async (repository: ContentRepository) => {
+    const read = async (repository: ContentRepository): Promise<unknown[]> => {
       const results: unknown[] = [
         await repository.getResume(),
         await repository.getProjectRoutes(),

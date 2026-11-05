@@ -56,7 +56,8 @@ const ADMIN_PATH = /["'`]\/admin(?:[/"'`?]|$)/;
 // The analytics filter in ClickTracker (`url.includes('/admin')`) must ship
 // publicly to drop admin page views; it is not a route reference.
 const ANALYTICS_FILTER = /\.includes\((["'`])\/admin\1\)/g;
-const mentionsAdmin = (text: string) => ADMIN_PATH.test(text.replace(ANALYTICS_FILTER, ''));
+const mentionsAdmin = (text: string): boolean =>
+  ADMIN_PATH.test(text.replace(ANALYTICS_FILTER, ''));
 
 interface RouteStats {
   firstLoadChunkPaths: string[];
@@ -64,7 +65,7 @@ interface RouteStats {
 }
 
 const errors: string[] = [];
-const fail = (message: string) => {
+const fail = (message: string): void => {
   errors.push(message);
   console.error(`✗ ${message}`);
 };
@@ -78,7 +79,7 @@ function walk(dir: string): string[] {
 }
 
 const contents = new Map<string, string>();
-const read = (path: string) => {
+const read = (path: string): string => {
   let text = contents.get(path);
 
   if (text === undefined) {
@@ -88,16 +89,16 @@ const read = (path: string) => {
 
   return text;
 };
-const gzip = (path: string) => gzipSync(readFileSync(path)).length;
-const kb = (bytes: number) => `${(bytes / KB).toFixed(1)} KB`;
-const normalize = (path: string) => path.replace(/^\.next\//, '');
+const gzip = (path: string): number => gzipSync(readFileSync(path)).length;
+const kb = (bytes: number): string => `${(bytes / KB).toFixed(1)} KB`;
+const normalize = (path: string): string => path.replace(/^\.next\//, '');
 
 const stats = JSON.parse(readFileSync(STATS, 'utf8')) as RouteStats[];
-const isAdmin = (route: string) => route.startsWith('/admin');
+const isAdmin = (route: string): boolean => route.startsWith('/admin');
 const publicRoutes = stats.filter(
   (r) => r.route.startsWith('/[locale]') || r.route === '/_not-found',
 );
-const firstLoad = (routes: RouteStats[]) =>
+const firstLoad = (routes: RouteStats[]): Set<string> =>
   new Set(routes.flatMap((r) => r.firstLoadChunkPaths.map(normalize)));
 const publicChunks = firstLoad(publicRoutes);
 const adminChunks = firstLoad(stats.filter((r) => isAdmin(r.route)));

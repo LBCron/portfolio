@@ -35,7 +35,7 @@ async function homeGraph() {
   );
 }
 
-function collectIds(value: unknown, ids: Set<string>, refs: Set<string>) {
+function collectIds(value: unknown, ids: Set<string>, refs: Set<string>): void {
   if (Array.isArray(value)) {
     value.forEach((item) => collectIds(item, ids, refs));
 
@@ -55,7 +55,7 @@ function collectIds(value: unknown, ids: Set<string>, refs: Set<string>) {
   Object.values(record).forEach((item) => collectIds(item, ids, refs));
 }
 
-function collectUrls(value: unknown, out: string[]) {
+function collectUrls(value: unknown, out: string[]): void {
   if (typeof value === 'string' && /^(\/|https?:)/.test(value)) out.push(value);
   else if (Array.isArray(value)) value.forEach((item) => collectUrls(item, out));
   else if (value && typeof value === 'object') {

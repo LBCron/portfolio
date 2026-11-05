@@ -49,7 +49,7 @@ function TypedText({ spans, immediate }: { immediate: boolean; spans: Span[] }) 
       });
     }, 16);
 
-    return () => window.clearInterval(timer);
+    return (): void => window.clearInterval(timer);
   }, [immediate, total]);
 
   if (immediate || count >= total) return <Spans spans={spans} />;

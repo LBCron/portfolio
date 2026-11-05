@@ -64,7 +64,10 @@ function friendly(issue: IssueLike): string {
 /**
  * One message per field path (the first), plus issues with no path.
  */
-export function toFieldErrors(issues: readonly IssueLike[]) {
+export function toFieldErrors(issues: readonly IssueLike[]): {
+  fieldErrors: FieldErrors;
+  formErrors: string[];
+} {
   const fieldErrors: FieldErrors = {};
   const formErrors: string[] = [];
   for (const issue of issues) {

@@ -90,7 +90,7 @@ export function MarkdownEditor({
   const ref = useRef<HTMLTextAreaElement>(null);
   const [preview, setPreview] = useState(false);
 
-  function edit(change: (selected: string) => { select: [number, number]; text: string }) {
+  function edit(change: (selected: string) => { select: [number, number]; text: string }): void {
     const area = ref.current;
 
     if (!area) return;
@@ -105,7 +105,7 @@ export function MarkdownEditor({
     });
   }
 
-  function apply(tool: Tool) {
+  function apply(tool: Tool): void {
     edit((selected) => {
       if (tool.prefix) {
         const text = (selected || 'Text')

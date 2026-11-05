@@ -12,9 +12,9 @@ const MAX_BODY = 64 * 1024;
 /**
  * Anything that is not a valid, signed webhook gets the same bare 404.
  */
-const nothing = () => new Response(null, { status: 404 });
+const nothing = (): Response => new Response(null, { status: 404 });
 
-export async function POST(request: Request) {
+export async function POST(request: Request): Promise<Response> {
   const secret = env.SANITY_WEBHOOK_SECRET;
   const client = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown';
 

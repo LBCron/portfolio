@@ -13,13 +13,13 @@ const windowOf = (page: Page) => page.locator('[data-window=terminal]');
 const inputOf = (page: Page) => page.getByRole('textbox', { name: /Command input/ });
 const logOf = (page: Page) => page.getByRole('log', { name: 'Terminal output' });
 
-async function openTerminal(page: Page, path = '/en') {
+async function openTerminal(page: Page, path = '/en'): Promise<void> {
   await page.goto(path, { waitUntil: 'domcontentloaded' });
   await openWithShortcut(page, windowOf(page));
   await expect(inputOf(page)).toBeFocused();
 }
 
-async function run(page: Page, line: string) {
+async function run(page: Page, line: string): Promise<void> {
   await inputOf(page).fill(line);
   await inputOf(page).press('Enter');
 }

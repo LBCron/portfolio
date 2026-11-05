@@ -12,7 +12,7 @@ const AXE_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-
 const axe = (page: Page) =>
   new AxeBuilder({ page }).withTags(AXE_TAGS).exclude('[data-reveal=pending]').analyze();
 
-const chromiumOnly = (projectName: string) =>
+const chromiumOnly = (projectName: string): void =>
   test.skip(projectName !== 'chromium', 'axe and emulation run on Chromium');
 
 test.describe('axe on every route type', () => {
@@ -225,7 +225,7 @@ test.describe('keyboard only', () => {
 });
 
 test.describe('motion', () => {
-  const infinite = (page: Page) =>
+  const infinite = (page: Page): Promise<number> =>
     page.evaluate(
       () =>
         document

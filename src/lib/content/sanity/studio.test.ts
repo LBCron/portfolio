@@ -32,7 +32,7 @@ const byName = new Map(types.map((type) => [type.name, type]));
 /**
  * Runs a field's Studio validation the way Studio would.
  */
-function validate(type: DocumentType, name: string, value: unknown) {
+function validate(type: DocumentType, name: string, value: unknown): string | true {
   const field = byName.get(type)?.fields.find((item) => item.name === name);
 
   if (!field?.validation) throw new Error(`${type}.${name} has no validation`);

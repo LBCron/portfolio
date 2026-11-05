@@ -14,7 +14,7 @@ import { useForm } from '../editor/form';
 import { ImageField, PdfField } from '../editor/image-field';
 import { ListEditor } from '../editor/list-editor';
 
-const blank = () => ({ en: '', pt: '' });
+const blank = (): { en: string; pt: string } => ({ en: '', pt: '' });
 
 export function ProfileForm() {
   return (

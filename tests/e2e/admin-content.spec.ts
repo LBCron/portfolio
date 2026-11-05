@@ -20,7 +20,7 @@ test.describe.configure({ timeout: 120_000 });
 
 const field = (page: Page, path: string) => page.locator(`#f-${path.replace(/\./g, '-')}`);
 
-async function fillBoth(page: Page, path: string, en: string, pt = en) {
+async function fillBoth(page: Page, path: string, en: string, pt = en): Promise<void> {
   await field(page, `${path}.en`).fill(en);
 
   const portuguese = field(page, `${path}.pt`);
@@ -36,20 +36,22 @@ async function fillBoth(page: Page, path: string, en: string, pt = en) {
   await portuguese.fill(pt);
 }
 
-const published = (page: Page) =>
+const published = (page: Page): Promise<void> =>
   slow(page.getByText('Published · public pages refreshed').first()).toBeVisible();
 
 /**
  * Public pages are regenerated lazily after a revalidation.
  */
-const publicText = (page: Page, path: string) => async () => (await page.request.get(path)).text();
+const publicText = (page: Page, path: string) => async (): Promise<string> =>
+  (await page.request.get(path)).text();
 
 /**
  * Typing before hydration is lost, so wait until the form is interactive.
  */
-const hydrated = (page: Page) => expect(page.locator('form[data-hydrated="true"]')).toBeAttached();
+const hydrated = (page: Page): Promise<void> =>
+  expect(page.locator('form[data-hydrated="true"]')).toBeAttached();
 
-async function openEditor(page: Page, url: string) {
+async function openEditor(page: Page, url: string): Promise<void> {
   await page.goto(url);
   await hydrated(page);
 }
@@ -71,7 +73,7 @@ async function openDeleteDialog(page: Page) {
 /**
  * The terminal snapshot is uncached, so it shows an edit at once.
  */
-const snapshot = (page: Page) => async () =>
+const snapshot = (page: Page) => async (): Promise<string> =>
   (await page.request.get('/api/terminal-content?locale=en')).text();
 
 const AREAS = [
@@ -425,7 +427,7 @@ test('saving without a session says the session expired and keeps the edits', as
 });
 
 test.describe('uploads', () => {
-  const makePng = () =>
+  const makePng = (): Promise<Buffer<ArrayBuffer>> =>
     sharp({
       create: { width: 8, height: 8, channels: 3, background: '#0099ff' },
     })

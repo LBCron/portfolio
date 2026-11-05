@@ -60,7 +60,7 @@ export async function generateMetadata(): Promise<Metadata> {
 /**
  * Newest `updatedAt` among the documents the home page renders.
  */
-function newest(...dates: Array<string | undefined>) {
+function newest(...dates: Array<string | undefined>): string {
   return dates
     .filter((date): date is string => Boolean(date))
     .reduce((latest, date) => (date > latest ? date : latest), '');

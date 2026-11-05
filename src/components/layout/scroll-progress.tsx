@@ -14,13 +14,13 @@ export function ScrollProgress() {
     if (!bar) return;
 
     let frame = 0;
-    const update = () => {
+    const update = (): void => {
       frame = 0;
       const max = document.documentElement.scrollHeight - window.innerHeight;
       const progress = max > 0 ? Math.min(1, window.scrollY / max) : 0;
       bar.style.transform = `scaleX(${progress})`;
     };
-    const schedule = () => {
+    const schedule = (): void => {
       if (!frame) frame = requestAnimationFrame(update);
     };
 
@@ -28,7 +28,7 @@ export function ScrollProgress() {
     window.addEventListener('scroll', schedule, { passive: true });
     window.addEventListener('resize', schedule);
 
-    return () => {
+    return (): void => {
       window.removeEventListener('scroll', schedule);
       window.removeEventListener('resize', schedule);
       cancelAnimationFrame(frame);

@@ -30,7 +30,7 @@ const CLIENT_NAMESPACES = ['a11y', 'header', 'errors', 'project', 'stack', 'wind
 
 export const revalidate = 86400;
 
-export function generateStaticParams() {
+export function generateStaticParams(): Array<{ locale: 'en' | 'pt' }> {
   return routing.locales.map((locale) => ({ locale }));
 }
 

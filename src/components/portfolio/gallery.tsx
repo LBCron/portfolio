@@ -40,19 +40,19 @@ export function Gallery({ images }: GalleryProps) {
 
     if (!dialog) return;
 
-    const onClick = (event: MouseEvent) => {
+    const onClick = (event: MouseEvent): void => {
       if (event.target === dialog) close();
     };
 
     dialog.addEventListener('click', onClick);
 
-    return () => dialog.removeEventListener('click', onClick);
+    return (): void => dialog.removeEventListener('click', onClick);
   }, [close]);
 
   useEffect(() => {
     if (index === null) return;
 
-    const onKey = (event: KeyboardEvent) => {
+    const onKey = (event: KeyboardEvent): void => {
       if (event.key === 'ArrowRight') show(index + 1);
 
       if (event.key === 'ArrowLeft') show(index - 1);
@@ -60,7 +60,7 @@ export function Gallery({ images }: GalleryProps) {
 
     window.addEventListener('keydown', onKey);
 
-    return () => window.removeEventListener('keydown', onKey);
+    return (): void => window.removeEventListener('keydown', onKey);
   }, [index, show]);
 
   if (images.length === 0) return null;

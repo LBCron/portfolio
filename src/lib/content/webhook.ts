@@ -30,7 +30,7 @@ export function isValidWebhookSignature(
   );
 }
 
-export function signWebhook(body: string, secret: string, timestamp = Date.now()) {
+export function signWebhook(body: string, secret: string, timestamp = Date.now()): string {
   const signature = createHmac('sha256', secret).update(`${timestamp}.${body}`).digest('base64url');
 
   return `t=${timestamp},v1=${signature}`;

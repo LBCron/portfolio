@@ -37,7 +37,7 @@ function asProjectsRead(value: unknown): ProjectsRead {
 }
 
 export function createSanitySource(fetchGroq: GroqFetch): ContentSource {
-  const list = async (query: string, tags: readonly string[]) =>
+  const list = async (query: string, tags: readonly string[]): Promise<unknown[]> =>
     asArray(await fetchGroq(query, {}, tags));
 
   return {

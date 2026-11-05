@@ -51,12 +51,27 @@ const invalid = (fieldErrors: FieldErrors, formErrors: string[] = []): SaveOutco
 const isObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
 
-const unique = <T>(values: T[]) => [...new Set(values)];
+const unique = <T>(values: T[]): T[] => [...new Set(values)];
 
-export function createAdminService(store: AdminStore, hooks: AdminHooks) {
+export function createAdminService(
+  store: AdminStore,
+  hooks: AdminHooks,
+): {
+  readOnlyReason: null | string;
+  remove(type: DocumentType, id: string, rev?: string): Promise<DeleteOutcome>;
+  reorder(type: DocumentType, ids: string[]): Promise<FlagOutcome>;
+  save(type: DocumentType, id: null | string, values: unknown, rev?: string): Promise<SaveOutcome>;
+  setFlag(
+    type: DocumentType,
+    id: string,
+    field: 'featured' | 'visible',
+    value: boolean,
+    rev?: string,
+  ): Promise<FlagOutcome>;
+} {
   const readonly = store.readOnlyReason !== null;
 
-  async function nextOrder(type: DocumentType) {
+  async function nextOrder(type: DocumentType): Promise<number> {
     const docs = await store.list(type);
     const max = Math.max(0, ...docs.map((doc) => Number(doc['order'] ?? 0)));
 
@@ -66,7 +81,7 @@ export function createAdminService(store: AdminStore, hooks: AdminHooks) {
   /**
    * A slug change keeps the old one so its URL still redirects (§8.4).
    */
-  function trackSlugs(candidate: Record<string, unknown>, existing: AdminDoc | null) {
+  function trackSlugs(candidate: Record<string, unknown>, existing: AdminDoc | null): void {
     const slug = candidate['slug'] as string | undefined;
     const previous = ((candidate['previousSlugs'] as string[] | undefined) ?? []).filter(
       (item) => item !== slug,

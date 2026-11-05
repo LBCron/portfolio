@@ -10,7 +10,7 @@ const LENGTH = 22;
 function seeded(seed: number) {
   let state = seed;
 
-  return () => {
+  return (): number => {
     state ^= state << 13;
     state ^= state >>> 17;
     state ^= state << 5;

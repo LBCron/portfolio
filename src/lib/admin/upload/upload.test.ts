@@ -5,7 +5,11 @@ import { MAX_SIDE, normalizeFilename, processImage, sniffImage } from './image';
 import { checkPdf } from './pdf';
 import { sanitizeSvg } from './svg';
 
-const raster = (width: number, height: number, format: 'avif' | 'jpeg' | 'png' | 'webp') =>
+const raster = (
+  width: number,
+  height: number,
+  format: 'avif' | 'jpeg' | 'png' | 'webp',
+): Promise<Buffer<ArrayBuffer>> =>
   sharp({
     create: {
       width,
@@ -90,7 +94,8 @@ describe('normalizeFilename', () => {
 });
 
 describe('checkPdf', () => {
-  const pdf = (body: string) => new TextEncoder().encode(`%PDF-1.7\n${body}\n%%EOF`);
+  const pdf = (body: string): Uint8Array<ArrayBuffer> =>
+    new TextEncoder().encode(`%PDF-1.7\n${body}\n%%EOF`);
 
   it('accepts a plain PDF', () => {
     expect(checkPdf(pdf('1 0 obj << /Type /Catalog >> endobj'))).toEqual({
@@ -117,7 +122,7 @@ describe('checkPdf', () => {
 });
 
 describe('sanitizeSvg', () => {
-  const svg = (inner: string, attrs = 'viewBox="0 0 24 24"') =>
+  const svg = (inner: string, attrs = 'viewBox="0 0 24 24"'): string =>
     `<?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg" ${attrs}>${inner}</svg>`;
 
   it('keeps geometry as data', () => {

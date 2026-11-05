@@ -3,13 +3,19 @@ import { describe, expect, it } from 'vitest';
 import { type Block } from './output';
 import { BLOCK_LIMIT, loadSession, saveSession, SESSION_KEY } from './session';
 
-function fakeStorage() {
+function fakeStorage(): {
+  data: Map<string, string>;
+  getItem: (key: string) => null | string;
+  setItem: (key: string, value: string) => void;
+} {
   const data = new Map<string, string>();
 
   return {
     data,
     getItem: (key: string) => data.get(key) ?? null,
-    setItem: (key: string, value: string) => { data.set(key, value); },
+    setItem: (key: string, value: string) => {
+      data.set(key, value);
+    },
   };
 }
 

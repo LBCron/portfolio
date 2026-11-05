@@ -26,7 +26,7 @@ import { absoluteUrl, localizedPath } from '@/lib/seo/urls';
 export const revalidate = 86400;
 export const dynamicParams = true;
 
-export async function generateStaticParams() {
+export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
   const routes = await getContent().getProjectRoutes();
 
   return routes.map((route) => ({ slug: route.slug }));

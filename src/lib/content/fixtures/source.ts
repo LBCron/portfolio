@@ -6,16 +6,46 @@ interface Visible {
   visible?: boolean;
 }
 
-const isVisible = (document: Visible) => document.visible !== false;
+const isVisible = (document: Visible): boolean => document.visible !== false;
 
-function technologyRefs(dataset: FixtureDataset) {
+function technologyRefs(dataset: FixtureDataset): Array<{ id: string; visible: boolean }> {
   return dataset.technology.map((tech) => ({
     id: tech.id,
     visible: tech.visible ?? true,
   }));
 }
 
-function withoutLongForm(project: DocumentInput<'project'>) {
+function withoutLongForm(project: DocumentInput<'project'>): {
+  approach: { en: string; pt: string };
+  context: { en: string; pt: string };
+  cover?:
+    | {
+        alt: { en: string; pt: string };
+        asset: { height: number; lqip?: string | undefined; url: string; width: number };
+        focal?: { x: number; y: number } | undefined;
+      }
+    | undefined;
+  featured?: boolean | undefined;
+  highlights: Array<{ en: string; pt: string }>;
+  id: string;
+  isFixture?: boolean | undefined;
+  kind: 'automation' | 'desktop' | 'integration' | 'mobile' | 'open-source' | 'web';
+  links?: { live?: string | undefined; repo?: string | undefined } | undefined;
+  order: number;
+  outcome?: { en: string; pt: string } | undefined;
+  previousSlugs?: string[] | undefined;
+  rev?: string | undefined;
+  role: { en: string; pt: string };
+  slug: string;
+  status: 'archived' | 'in-progress' | 'live' | 'private';
+  summary: { en: string; pt: string };
+  tagline: { en: string; pt: string };
+  techIds?: string[] | undefined;
+  title: { en: string; pt: string };
+  updatedAt: string;
+  visible?: boolean | undefined;
+  year: number;
+} {
   const { body, gallery, ...summary } = project;
 
   return summary;

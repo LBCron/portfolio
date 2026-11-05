@@ -51,13 +51,13 @@ export function Dialog({
 
     if (!dialog) return;
 
-    const onClick = (event: MouseEvent) => {
+    const onClick = (event: MouseEvent): void => {
       if (event.target === dialog) onClose();
     };
 
     dialog.addEventListener('click', onClick);
 
-    return () => dialog.removeEventListener('click', onClick);
+    return (): void => dialog.removeEventListener('click', onClick);
   }, [onClose]);
 
   return (

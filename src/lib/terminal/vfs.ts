@@ -64,14 +64,14 @@ const CATEGORY_FILES = [
 export function buildVfs(snapshot: ContentSnapshot, t: Translate): VirtualFS {
   const nodes = new Map<string, DirNode | FileNode>();
   const locale = snapshot.locale;
-  const date = (value: string) => formatPartialDate(locale, value);
-  const period = (start?: string, end?: string) =>
+  const date = (value: string): string => formatPartialDate(locale, value);
+  const period = (start?: string, end?: string): string =>
     [start ? date(start) : '', end ? date(end) : t('resume.present')].filter(Boolean).join(' – ');
 
-  function dir(path: string) {
+  function dir(path: string): void {
     if (!nodes.has(path)) nodes.set(path, { type: 'dir', children: [] });
   }
-  function file(path: string, lines: Array<string | undefined>, binary = false) {
+  function file(path: string, lines: Array<string | undefined>, binary = false): void {
     const parent = path.slice(0, path.lastIndexOf('/'));
 
     dir(parent);
@@ -185,9 +185,9 @@ export function buildVfs(snapshot: ContentSnapshot, t: Translate): VirtualFS {
     file(`${HOME}/stack/practices.txt`, snapshot.practices);
   }
 
-  const kindOf = (path: string) => nodes.get(path)?.type ?? null;
+  const kindOf = (path: string): 'dir' | 'file' | null => nodes.get(path)?.type ?? null;
 
-  function list(path: string) {
+  function list(path: string): Array<{ name: string; type: 'dir' | 'file' }> {
     const node = nodes.get(path);
 
     if (node?.type !== 'dir') return [];
@@ -230,7 +230,7 @@ export function buildVfs(snapshot: ContentSnapshot, t: Translate): VirtualFS {
     stat: kindOf,
     list,
     tree: (path) => [path === HOME ? HOME : path, ...tree(path)],
-    read(path) {
+    read(path): { binary: boolean; text: string } | null {
       const node = nodes.get(path);
 
       return node?.type === 'file' ? { text: node.text, binary: node.binary } : null;

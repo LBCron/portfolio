@@ -16,9 +16,10 @@ const ROOT = path.resolve(import.meta.dirname, '..');
 const OUT_DIR = path.join(ROOT, '.cache');
 const NEUTRAL = '#a3a9b8';
 
-const escapeXml = (value: string) => value.replace(/[<>&"]/g, (char) => `&#${char.charCodeAt(0)};`);
+const escapeXml = (value: string): string =>
+  value.replace(/[<>&"]/g, (char) => `&#${char.charCodeAt(0)};`);
 
-async function main() {
+async function main(): Promise<void> {
   const technologies = createFixtureDataset().technology;
   const rows = await Promise.all(
     technologies.map(async (tech) => ({
@@ -41,11 +42,11 @@ async function main() {
     const icon = resolved.icon;
     const glyph =
       'paths' in icon
-        ? (offset: number, fill: string) =>
+        ? (offset: number, fill: string): string =>
             `<svg x="${x + offset}" y="${y + 24}" width="48" height="48" viewBox="${icon.viewBox}">${icon.paths
               .map((d) => `<path d="${d}" fill="${fill}"/>`)
               .join('')}</svg>`
-        : (offset: number, fill: string) =>
+        : (offset: number, fill: string): string =>
             `<g><rect x="${x + offset}" y="${y + 24}" width="48" height="48" rx="10" fill="none" stroke="${fill}" stroke-width="2"/><text x="${x + offset + 24}" y="${y + 54}" font-family="sans-serif" font-size="15" font-weight="700" text-anchor="middle" fill="${fill}">${escapeXml(icon.monogram)}</text></g>`;
 
     return `${glyph(18, NEUTRAL)}${glyph(84, color)}<text x="${x + cell / 2}" y="${y + 100}" font-family="sans-serif" font-size="13" text-anchor="middle" fill="#e8eaf0">${escapeXml(tech.name)}</text><text x="${x + cell / 2}" y="${y + 118}" font-family="sans-serif" font-size="11" text-anchor="middle" fill="#828a9f">${resolved.source}</text>`;

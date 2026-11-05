@@ -121,7 +121,7 @@ export async function createHarness(
     cwd: options.cwd ?? '~',
     history: options.history ?? [],
     actions,
-    loadContent: options.loadContent ?? (async () => snapshot),
+    loadContent: options.loadContent ?? (async (): Promise<ContentSnapshot> => snapshot),
     delay: async (_ms, signal) => {
       if (signal.aborted) throw new Error('aborted');
     },

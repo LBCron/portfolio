@@ -30,14 +30,14 @@ export interface AreaConfig {
   needsTechnologies?: boolean;
 }
 
-const blank = () => ({ en: '', pt: '' });
+const blank = (): { en: string; pt: string } => ({ en: '', pt: '' });
 
 /**
  * Reads `value.en` from a localized field of an unvalidated document.
  */
-const en = (doc: AdminDoc, field: string) =>
+const en = (doc: AdminDoc, field: string): string =>
   String((doc[field] as { en?: string } | undefined)?.en ?? '');
-const str = (doc: AdminDoc, field: string) => String(doc[field] ?? '');
+const str = (doc: AdminDoc, field: string): string => String(doc[field] ?? '');
 
 export const AREA_CONFIG: Record<string, AreaConfig> = {
   profile: {

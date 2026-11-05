@@ -68,7 +68,7 @@ function textOf(node: ReactNode): string {
   return '';
 }
 
-function isExternal(href: string) {
+function isExternal(href: string): boolean {
   return /^https?:\/\//i.test(href);
 }
 
@@ -103,7 +103,7 @@ export function Markdown({
       return <Tag id={id}>{content}</Tag>;
     };
 
-  const resolveImage = (src: string) => {
+  const resolveImage = (src: string): MarkdownImage | undefined => {
     const galleryIndex = /^gallery:(\d+)$/.exec(src)?.[1];
 
     if (galleryIndex) return images[Number(galleryIndex) - 1];

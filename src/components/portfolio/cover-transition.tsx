@@ -3,7 +3,7 @@ import { type ReactNode, ViewTransition } from 'react';
 /**
  * One name per project, so a card cover and the detail hero form a pair.
  */
-export function coverTransitionName(slug: string) {
+export function coverTransitionName(slug: string): string {
   return `project-cover-${slug}`;
 }
 

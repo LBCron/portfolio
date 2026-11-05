@@ -6,7 +6,18 @@ const secure = (process.env['NEXT_PUBLIC_SITE_URL'] ?? '').startsWith('https:');
 
 export const SESSION_COOKIE = secure ? '__Host-jm_session' : 'jm_session';
 
-export function sessionCookie(token: string, exp: number) {
+export function sessionCookie(
+  token: string,
+  exp: number,
+): {
+  expires: Date;
+  httpOnly: boolean;
+  name: string;
+  path: string;
+  sameSite: 'strict';
+  secure: boolean;
+  value: string;
+} {
   return {
     name: SESSION_COOKIE,
     value: token,

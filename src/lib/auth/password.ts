@@ -7,7 +7,13 @@ const R = 8;
 const P = 1;
 const KEY_LENGTH = 64;
 
-function derive(password: string, salt: Buffer, n: number, r: number, p: number) {
+function derive(
+  password: string,
+  salt: Buffer,
+  n: number,
+  r: number,
+  p: number,
+): Promise<Buffer<ArrayBufferLike>> {
   return new Promise<Buffer>((resolve, reject) => {
     scrypt(password, salt, KEY_LENGTH, { N: n, r, p, maxmem: 256 * n * r }, (error, key) =>
       error ? reject(error) : resolve(key),
@@ -18,14 +24,20 @@ function derive(password: string, salt: Buffer, n: number, r: number, p: number)
 /**
  * `scrypt:N:r:p:salt:hash` (no `$`, so env files do not expand it) (base64).
  */
-export async function hashPassword(password: string) {
+export async function hashPassword(password: string): Promise<string> {
   const salt = randomBytes(16);
   const hash = await derive(password, salt, N, R, P);
 
   return `scrypt:${N}:${R}:${P}:${salt.toString('base64')}:${hash.toString('base64')}`;
 }
 
-export function parseHash(encoded: string) {
+export function parseHash(encoded: string): {
+  hash: Buffer<ArrayBuffer>;
+  n: number;
+  p: number;
+  r: number;
+  salt: Buffer<ArrayBuffer>;
+} | null {
   const [scheme, n, r, p, salt, hash] = encoded.split(':');
 
   if (scheme !== 'scrypt' || !salt || !hash) return null;
@@ -67,7 +79,8 @@ export async function verifyPassword(
 
   if (!expected.plain) return false;
 
-  const mac = (value: string) => createHmac('sha256', secret).update(value).digest();
+  const mac = (value: string): NonSharedBuffer =>
+    createHmac('sha256', secret).update(value).digest();
 
   return timingSafeEqual(mac(candidate), mac(expected.plain));
 }

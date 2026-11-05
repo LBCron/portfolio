@@ -45,7 +45,7 @@ export function createRegistry(commands: readonly Command[]): Registry {
  * Checks the raw first word and the one the engine will actually run, so
  * `"su"`, `s''u` or `\admin` cannot dodge the secrecy rules.
  */
-export function isSecretLine(registry: Registry, line: string) {
+export function isSecretLine(registry: Registry, line: string): boolean {
   const raw = line.trim().split(/\s+/)[0] ?? '';
   const tokens = tokenize(line);
   const parsed = tokens.ok ? tokens.tokens[0] : undefined;
@@ -56,7 +56,7 @@ export function isSecretLine(registry: Registry, line: string) {
 /**
  * Secret commands are never recorded in history (nor persisted anywhere).
  */
-export function isRecordable(registry: Registry, line: string) {
+export function isRecordable(registry: Registry, line: string): boolean {
   return line.trim() !== '' && !isSecretLine(registry, line);
 }
 

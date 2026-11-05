@@ -31,7 +31,7 @@ import { absoluteUrl, localizedPath, PERSON_ID, SITE_URL, WEBSITE_ID } from './u
  * JSON for a `<script type="application/ld+json">`. Escapes `<`, `>`, `&` and
  * the JS line separators so content can never close the script element.
  */
-export function serializeJsonLd(data: Graph) {
+export function serializeJsonLd(data: Graph): string {
   return JSON.stringify(data)
     .replace(/</g, '\\u003c')
     .replace(/>/g, '\\u003e')
@@ -44,7 +44,7 @@ export function graph(...nodes: Thing[]): Graph {
   return { '@context': 'https://schema.org', '@graph': nodes };
 }
 
-const ref = (id: string) => ({ '@id': id });
+const ref = (id: string): { '@id': string } => ({ '@id': id });
 
 interface PersonInput {
   links: FeaturedLink[];
@@ -115,7 +115,7 @@ export function profilePageNode(locale: AppLocale, dateModified: string): Profil
   };
 }
 
-export function projectUrl(locale: AppLocale, slug: string) {
+export function projectUrl(locale: AppLocale, slug: string): string {
   return absoluteUrl(localizedPath(locale, `/projects/${slug}`));
 }
 

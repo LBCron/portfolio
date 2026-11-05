@@ -70,7 +70,7 @@ test.describe('anonymous access', () => {
 
   test('garbage, forged and expired cookies are not sessions', async ({ request, context }) => {
     const { SignJWT } = await import('jose');
-    const forge = (secret: string, exp: number) =>
+    const forge = (secret: string, exp: number): Promise<string> =>
       new SignJWT({ ses: Math.floor(Date.now() / 1000) })
         .setProtectedHeader({ alg: 'HS256' })
         .setSubject('admin')

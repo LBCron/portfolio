@@ -20,7 +20,7 @@ export function HeaderFrame({ children }: { children: ReactNode }) {
     if (!header) return;
 
     let frame = 0;
-    const update = () => {
+    const update = (): void => {
       frame = 0;
       const scrolled = window.scrollY > SCROLL_THRESHOLD;
 
@@ -28,14 +28,14 @@ export function HeaderFrame({ children }: { children: ReactNode }) {
         header.dataset.scrolled = String(scrolled);
       }
     };
-    const onScroll = () => {
+    const onScroll = (): void => {
       if (!frame) frame = requestAnimationFrame(update);
     };
 
     update();
     window.addEventListener('scroll', onScroll, { passive: true });
 
-    return () => {
+    return (): void => {
       window.removeEventListener('scroll', onScroll);
       cancelAnimationFrame(frame);
     };
@@ -68,7 +68,7 @@ export function HeaderFrame({ children }: { children: ReactNode }) {
 
     observer.observe(hero);
 
-    return () => observer.disconnect();
+    return (): void => observer.disconnect();
   }, [pathname]);
 
   return (

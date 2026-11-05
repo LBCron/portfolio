@@ -133,8 +133,8 @@ const ADMIN_LIST_FIELDS: Record<keyof typeof ADMIN_FIELDS, string> = {
   project: PROJECT_SUMMARY,
 };
 
-export const adminListQuery = (type: keyof typeof ADMIN_FIELDS) =>
+export const adminListQuery = (type: keyof typeof ADMIN_FIELDS): string =>
   `*[_type == "${type}"] | order(order asc, _id asc){${ADMIN_LIST_FIELDS[type]}\n}`;
 
-export const adminGetQuery = (type: keyof typeof ADMIN_FIELDS) =>
+export const adminGetQuery = (type: keyof typeof ADMIN_FIELDS): string =>
   `*[_type == "${type}" && _id == $id][0]{${ADMIN_FIELDS[type]}\n}`;

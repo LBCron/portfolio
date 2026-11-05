@@ -8,18 +8,18 @@ export const inputOf = (page: Page) => page.getByRole('textbox', { name: /Comman
 export const passwordOf = (page: Page) => page.getByLabel('Password', { exact: true });
 export const logOf = (page: Page) => page.getByRole('log', { name: 'Terminal output' });
 
-export async function openTerminal(page: Page, path = '/en') {
+export async function openTerminal(page: Page, path = '/en'): Promise<void> {
   await page.goto(path, { waitUntil: 'domcontentloaded' });
   await openWithShortcut(page, windowOf(page));
   await expect(inputOf(page)).toBeFocused();
 }
 
-export async function run(page: Page, line: string) {
+export async function run(page: Page, line: string): Promise<void> {
   await inputOf(page).fill(line);
   await inputOf(page).press('Enter');
 }
 
-export async function submitPassword(page: Page, password: string) {
+export async function submitPassword(page: Page, password: string): Promise<void> {
   await expect(passwordOf(page)).toBeFocused();
   await passwordOf(page).fill(password);
   await passwordOf(page).press('Enter');
@@ -28,7 +28,7 @@ export async function submitPassword(page: Page, password: string) {
 /**
  * Signs in through the terminal and lands on the dashboard.
  */
-export async function signIn(page: Page) {
+export async function signIn(page: Page): Promise<void> {
   await openTerminal(page);
   await run(page, 'su julio');
   await submitPassword(page, ADMIN_PASSWORD);
@@ -39,7 +39,7 @@ export async function signIn(page: Page) {
 /**
  * Gives each test its own client key, so the login rate limiter is not shared.
  */
-export async function isolateClient(page: Page) {
+export async function isolateClient(page: Page): Promise<void> {
   await page.context().setExtraHTTPHeaders({
     'x-forwarded-for': `10.${Math.floor(Math.random() * 250)}.${Math.floor(Math.random() * 250)}.${Math.floor(Math.random() * 250)}`,
   });

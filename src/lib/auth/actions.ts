@@ -13,7 +13,7 @@ import { ADMIN_BASE, endSession, getSession, requireAdmin, startSession } from '
 const store = globalThis as { __jmAuthLimiter?: RateLimiter };
 const limiter = (store.__jmAuthLimiter ??= createMemoryLimiter());
 
-async function clientKey() {
+async function clientKey(): Promise<string> {
   const list = await headers();
   const ip =
     list.get('x-forwarded-for')?.split(',')[0]?.trim() ?? list.get('x-real-ip') ?? 'unknown';
@@ -30,7 +30,7 @@ const authenticator = createAuthenticator({
     const config = getAdminConfig();
 
     return config.enabled
-      ? (password: string) => verifyPassword(password, config, config.secret)
+      ? (password: string): Promise<boolean> => verifyPassword(password, config, config.secret)
       : null;
   },
   sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
@@ -61,7 +61,7 @@ export async function getSessionStatus(): Promise<SessionStatus> {
     : { isAdmin: false };
 }
 
-export async function logout() {
+export async function logout(): Promise<void> {
   await endSession();
 }
 

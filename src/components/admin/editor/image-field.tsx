@@ -11,7 +11,7 @@ import { LocalizedField } from './fields';
 import { SESSION_EXPIRED, useForm } from './form';
 import { hintClass, labelClass, smallButton } from './styles';
 
-async function upload(file: File, kind: 'image' | 'pdf') {
+async function upload(file: File, kind: 'image' | 'pdf'): Promise<Record<string, unknown>> {
   const body = new FormData();
 
   body.set('file', file);
@@ -135,7 +135,7 @@ export function ImageField({
   const id = fieldId(path);
   const error = form.error(`${path}.asset`) ?? form.error(path);
 
-  async function onFile(file: File) {
+  async function onFile(file: File): Promise<void> {
     setBusy(true);
     setMessage('');
 
@@ -149,19 +149,19 @@ export function ImageField({
     }
   }
 
-  function setFocal(x: number, y: number) {
-    const clamp = (n: number) => Math.min(1, Math.max(0, Math.round(n * 100) / 100));
+  function setFocal(x: number, y: number): void {
+    const clamp = (n: number): number => Math.min(1, Math.max(0, Math.round(n * 100) / 100));
 
     form.set(`${path}.focal`, { x: clamp(x), y: clamp(y) });
   }
 
-  function onPick(event: PointerEvent<HTMLDivElement>) {
+  function onPick(event: PointerEvent<HTMLDivElement>): void {
     const box = event.currentTarget.getBoundingClientRect();
 
     setFocal((event.clientX - box.left) / box.width, (event.clientY - box.top) / box.height);
   }
 
-  function onKey(event: KeyboardEvent<HTMLButtonElement>) {
+  function onKey(event: KeyboardEvent<HTMLButtonElement>): void {
     const step = event.shiftKey ? 0.1 : 0.02;
     const delta: Record<string, [number, number]> = {
       ArrowLeft: [-step, 0],
@@ -227,7 +227,9 @@ export function ImageField({
         accept="image/jpeg,image/png,image/webp,image/avif"
         busy={busy}
         label={asset ? 'Replace image' : 'Choose image'}
-        onFile={(file) => { onFile(file); }}
+        onFile={(file) => {
+          onFile(file);
+        }}
       />
       {message || error ? (
         <p role="alert" className="text-small text-danger">
@@ -260,7 +262,7 @@ export function PdfField({ path, label }: { label: string; path: string }) {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
 
-  async function onFile(file: File) {
+  async function onFile(file: File): Promise<void> {
     setBusy(true);
     setMessage('');
 
@@ -292,7 +294,9 @@ export function PdfField({ path, label }: { label: string; path: string }) {
         accept="application/pdf"
         busy={busy}
         label={value ? 'Replace PDF' : 'Choose PDF'}
-        onFile={(file) => { onFile(file); }}
+        onFile={(file) => {
+          onFile(file);
+        }}
       />
       {value ? (
         <div>

@@ -60,7 +60,7 @@ function IconSearch({
       if (live) setHits(result);
     }, 220);
 
-    return () => {
+    return (): void => {
       live = false;
       window.clearTimeout(timer);
     };
@@ -119,13 +119,13 @@ export function TechIconFields() {
       if (live) setPreview(result);
     }, 250);
 
-    return () => {
+    return (): void => {
       live = false;
       window.clearTimeout(timer);
     };
   }, [source, slug, customSvg, monogram, name]);
 
-  async function applySvg(text: string) {
+  async function applySvg(text: string): Promise<void> {
     const result = await parseSvgAction(text);
 
     if (result.ok) {
@@ -186,7 +186,9 @@ export function TechIconFields() {
             <button
               type="button"
               disabled={form.disabled || !svgText.trim()}
-              onClick={() => { applySvg(svgText); }}
+              onClick={() => {
+                applySvg(svgText);
+              }}
               className={smallButton}
             >
               Use this SVG
@@ -266,7 +268,7 @@ export function LinkIconField({ path }: { path: string }) {
       if (live) setPreview(result);
     }, 250);
 
-    return () => {
+    return (): void => {
       live = false;
       window.clearTimeout(timer);
     };

@@ -10,7 +10,7 @@ import { useSessionStore } from '@/stores/session-store';
 import { useTerminalStore } from '@/stores/terminal-store';
 import { useWindowStore } from '@/stores/window-store';
 
-function openInNewTab(href: string) {
+function openInNewTab(href: string): void {
   const anchor = document.createElement('a');
   anchor.href = href;
   anchor.target = '_blank';

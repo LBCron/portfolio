@@ -121,7 +121,8 @@ export function cloudIconFill(brandColor: string | undefined, fallback = '#a3a9b
     const r = ((value >> 16) & 255) / 255;
     const g = ((value >> 8) & 255) / 255;
     const b = (value & 255) / 255;
-    const channel = (c: number) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+    const channel = (c: number): number =>
+      c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
     const luminance = 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
 
     return luminance < 0.25 ? '#e8eaf0' : brandColor;

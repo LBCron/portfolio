@@ -16,7 +16,7 @@ const fail = (message: string): never => {
   console.error(`✗ ${message}`);
   process.exit(1);
 };
-const check = (condition: unknown, message: string) => {
+const check = (condition: unknown, message: string): void => {
   if (!condition) fail(message);
 
   console.info(`✓ ${message}`);

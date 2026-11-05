@@ -170,10 +170,10 @@ export function GeoidSphere({
       document.documentElement.dataset.motion === 'reduced'
       || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    const canRun = () => inView && visible && width > 0 && height > 0;
+    const canRun = (): boolean => inView && visible && width > 0 && height > 0;
     // The loop stops itself when the stage is hidden or off-screen and is
     // restarted here, so an idle cloud costs no frames at all.
-    const start = () => {
+    const start = (): void => {
       if (frame !== 0 || !canRun()) return;
 
       lastTime = 0;
@@ -199,11 +199,11 @@ export function GeoidSphere({
 
     observer.observe(stage);
 
-    const onVisibility = () => {
+    const onVisibility = (): void => {
       visible = document.visibilityState === 'visible';
       start();
     };
-    const onMotion = () => {
+    const onMotion = (): void => {
       reduced =
         document.documentElement.dataset.motion === 'reduced'
         || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -223,7 +223,7 @@ export function GeoidSphere({
     });
 
     let frameIndex = 0;
-    function tick(time: number) {
+    function tick(time: number): void {
       if (!canRun()) {
         frame = 0;
 
@@ -346,7 +346,7 @@ export function GeoidSphere({
     }
     start();
 
-    return () => {
+    return (): void => {
       cancelAnimationFrame(frame);
       frame = 0;
       hoverAbort.abort();
@@ -359,7 +359,7 @@ export function GeoidSphere({
     };
   }, [technologies]);
 
-  function onPointerDown(event: ReactPointerEvent<HTMLDivElement>) {
+  function onPointerDown(event: ReactPointerEvent<HTMLDivElement>): void {
     // Touch has its own path below (it must keep vertical page scroll).
     if (event.pointerType === 'touch') return;
 
@@ -378,7 +378,7 @@ export function GeoidSphere({
     event.currentTarget.setPointerCapture(event.pointerId);
   }
 
-  function onPointerMove(event: ReactPointerEvent<HTMLDivElement>) {
+  function onPointerMove(event: ReactPointerEvent<HTMLDivElement>): void {
     const drag = dragRef.current;
 
     if (!drag.active || event.pointerId !== drag.pointerId) return;
@@ -390,7 +390,7 @@ export function GeoidSphere({
     drag.pending += -(deltaX / (sizeRef.current.width || 1)) * 2.5;
   }
 
-  function onPointerUp(event: ReactPointerEvent<HTMLDivElement>) {
+  function onPointerUp(event: ReactPointerEvent<HTMLDivElement>): void {
     const drag = dragRef.current;
 
     if (event.pointerId !== drag.pointerId) return;
@@ -411,7 +411,7 @@ export function GeoidSphere({
     let moved = false;
     let startTime = 0;
 
-    const onStart = (event: TouchEvent) => {
+    const onStart = (event: TouchEvent): void => {
       if (event.touches.length !== 1) return;
 
       const touch = event.touches[0]!;
@@ -424,7 +424,7 @@ export function GeoidSphere({
       dragRef.current.pending = 0;
       dragRef.current.velocity = 0;
     };
-    const onMove = (event: TouchEvent) => {
+    const onMove = (event: TouchEvent): void => {
       if (!tracking || event.touches.length !== 1) return;
 
       const touch = event.touches[0]!;
@@ -441,7 +441,7 @@ export function GeoidSphere({
         dragRef.current.previousX = touch.clientX;
       }
     };
-    const onEnd = (event: TouchEvent) => {
+    const onEnd = (event: TouchEvent): void => {
       if (!tracking) return;
 
       tracking = false;
@@ -479,7 +479,7 @@ export function GeoidSphere({
     stage.addEventListener('touchcancel', onEnd);
 
     // Losing focus mid-drag must not leave the gesture latched.
-    const release = () => {
+    const release = (): void => {
       tracking = false;
       dragRef.current.active = false;
       dragRef.current.pointerId = -1;
@@ -487,7 +487,7 @@ export function GeoidSphere({
 
     window.addEventListener('blur', release);
 
-    return () => {
+    return (): void => {
       window.removeEventListener('blur', release);
       stage.removeEventListener('touchstart', onStart);
       stage.removeEventListener('touchmove', onMove);

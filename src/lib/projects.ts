@@ -10,7 +10,7 @@ export interface ProjectsQuery {
 export type ProjectsQueryResult =
   { ok: false; reason: 'kind' | 'page' } | { ok: true; query: ProjectsQuery };
 
-function first(value: string | string[] | undefined) {
+function first(value: string | string[] | undefined): string | undefined {
   return Array.isArray(value) ? value[0] : value;
 }
 
@@ -52,7 +52,10 @@ export function filterByKind<T extends { kind: ProjectKind }>(
   return kind ? projects.filter((project) => project.kind === kind) : [...projects];
 }
 
-export function kindsWithCounts(projects: readonly ProjectSummary[]) {
+export function kindsWithCounts(projects: readonly ProjectSummary[]): Array<{
+  count: number;
+  kind: 'automation' | 'desktop' | 'integration' | 'mobile' | 'open-source' | 'web';
+}> {
   const counts = new Map<ProjectKind, number>();
   for (const project of projects) {
     counts.set(project.kind, (counts.get(project.kind) ?? 0) + 1);
@@ -63,7 +66,11 @@ export function kindsWithCounts(projects: readonly ProjectSummary[]) {
     .filter((entry) => entry.count > 0);
 }
 
-export function paginate<T>(items: readonly T[], page: number, size = PROJECTS_PAGE_SIZE) {
+export function paginate<T>(
+  items: readonly T[],
+  page: number,
+  size = PROJECTS_PAGE_SIZE,
+): { items: T[]; outOfRange: boolean; page: number; total: number; totalPages: number } {
   const totalPages = Math.max(1, Math.ceil(items.length / size));
   const start = (page - 1) * size;
 
