@@ -32,7 +32,7 @@ Bilingual (en/pt), dark-only personal portfolio: Next.js 16 App Router on Vercel
 ```sh
 bun install && cp .env.example .env.local   # every variable is optional (fixtures run)
 bun run dev                                 # http://localhost:3000 → /en
-bun run format:check && bun run lint && bun run typecheck
+bun run lint && bun run typecheck
 bun run test && bun run i18n:check && bun run icons:audit
 bun run build && bun run check:bundle && bun run check:seo
 bun run test:e2e                            # needs the build; own server on :3100
@@ -52,7 +52,7 @@ Run the relevant gates before saying something works. For UI work, run the dev s
 - Styling: Tailwind v4 tokens from `src/styles/globals.css` (`@theme`); default palette disabled (`bg-bg-0`, `text-text-2`, `border-line`…). `cn()` from `@/lib/cn`, variants with `cva`. **Dark only**: no `dark:` variants, light themes or `prefers-color-scheme`.
 - Internal links on public pages use `Link` from `@/i18n/navigation`, never `next/link`.
 - Animate only `transform`/`opacity` (and `filter` sparingly). No React state updates per animation frame (write styles via refs in rAF). Honor `useReducedMotionPreference()` / `data-motion='reduced'`.
-- Prettier: single quotes, trailing commas, 80 columns, semicolons, LF. Husky runs lint-staged on commit.
+- Formatting is handled by `eslint-config-any` (Prettier embedded; no Prettier config in the repo). Husky runs lint-staged on commit, commitlint on commit-msg, typecheck on push.
 
 **Data layer**
 

@@ -31,7 +31,7 @@ With no Sanity variables the site runs on fixtures. To try the admin locally set
 | Script                                          | What it does                                                                                   |
 | ----------------------------------------------- | ---------------------------------------------------------------------------------------------- |
 | `dev` / `build` / `start`                       | Development server, production build, production server                                        |
-| `lint`, `format`, `format:check`, `typecheck`   | ESLint (jsx-a11y strict, zero warnings), Prettier, `tsc` after route type generation           |
+| `lint`, `typecheck`                                  | ESLint (incl. Prettier formatting, zero warnings), `tsc` after route type generation           |
 | `test`, `test:watch`                            | Vitest unit tests                                                                              |
 | `test:e2e`                                      | Playwright against the production build on port 3100 (run `build` first)                       |
 | `check:seo`                                     | Crawl of every sitemap URL with JavaScript off, plus admin and API header checks               |

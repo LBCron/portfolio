@@ -82,7 +82,7 @@ bun run build && bun run start       # production build on port 3000
 ### 2.5 Verify like CI does
 
 ```sh
-bun run format:check && bun run lint && bun run typecheck
+bun run lint && bun run typecheck
 bun run test && bun run i18n:check && bun run icons:audit
 bun run build && bun run check:bundle && bun run check:seo
 bunx playwright install --with-deps chromium webkit firefox   # once

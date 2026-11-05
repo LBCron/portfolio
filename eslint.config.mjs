@@ -1,30 +1,11 @@
+import anyConfig from 'eslint-config-any';
 import { defineConfig, globalIgnores } from 'eslint/config';
-import nextVitals from 'eslint-config-next/core-web-vitals';
-import nextTs from 'eslint-config-next/typescript';
-import jsxA11y from 'eslint-plugin-jsx-a11y';
 
 export default defineConfig([
-  ...nextVitals,
-  ...nextTs,
+  ...anyConfig.next(),
   {
-    // eslint-config-next already registers the jsx-a11y plugin; only the
-    // strict rule set is layered on top.
     files: ['**/*.{ts,tsx}'],
     rules: {
-      ...jsxA11y.flatConfigs.strict.rules,
-      '@typescript-eslint/no-explicit-any': 'error',
-      '@typescript-eslint/ban-ts-comment': [
-        'error',
-        { 'ts-expect-error': 'allow-with-description', 'ts-ignore': true },
-      ],
-      '@typescript-eslint/no-unused-vars': [
-        'warn',
-        { ignoreRestSiblings: true, argsIgnorePattern: '^_' },
-      ],
-      '@typescript-eslint/consistent-type-imports': [
-        'error',
-        { fixStyle: 'inline-type-imports' },
-      ],
       'no-restricted-imports': [
         'error',
         {
@@ -43,31 +24,18 @@ export default defineConfig([
           ],
         },
       ],
-      'import/no-default-export': 'off',
     },
   },
   {
     files: ['src/lib/content/**', 'scripts/**', 'tests/support/**'],
     rules: { 'no-restricted-imports': 'off' },
   },
-  {
-    files: ['src/app/admin/**', 'src/components/admin/**'],
-    rules: {
-      'no-restricted-imports': [
-        'error',
-        {
-          patterns: [
-            {
-              group: ['@sanity/*', 'groq-js', '**/lib/content/sanity/*'],
-              message: 'The admin goes through @/lib/content too.',
-            },
-          ],
-        },
-      ],
-    },
-  },
   globalIgnores([
     '.next/**',
+    '.cache/**',
+    '.lighthouseci/**',
+    '.vercel/**',
+    'C:*/**',
     'out/**',
     'build/**',
     'coverage/**',

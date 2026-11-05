@@ -1,8 +1,0 @@
-.next/
-coverage/
-playwright-report/
-test-results/
-bun.lock
-fixtures/images/
-fixtures/pdf/
-docs/archive/SPEC.md
