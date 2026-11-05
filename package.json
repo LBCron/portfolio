@@ -27,7 +27,8 @@
     "admin:hash": "bun --conditions=react-server scripts/admin-hash.ts",
     "update": "bun update --latest && bun add -d eslint@^9 typescript@~6.0",
     "prepare": "husky",
-    "admin:smoke": "bun --conditions=react-server scripts/admin-smoke.ts"
+    "admin:smoke": "bun --conditions=react-server scripts/admin-smoke.ts",
+    "commit": "commit"
   },
   "dependencies": {
     "@iconify-json/devicon": "^1.2.76",
@@ -56,6 +57,9 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",
+    "@commitlint/cli": "^21.2.4",
+    "@commitlint/config-conventional": "^21.2.4",
+    "@commitlint/prompt-cli": "^21.2.4",
     "@formatjs/icu-messageformat-parser": "^3.5.22",
     "@iconify/types": "^2.0.0",
     "@playwright/test": "^1.64.1",
