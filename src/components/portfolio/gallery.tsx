@@ -15,7 +15,7 @@ export function Gallery({ images }: GalleryProps): null | React.JSX.Element {
   const t = useTranslations('project');
   const titleId = useId();
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const touchStart = useRef<null | number>(null);
+  const touchStartRef = useRef<null | number>(null);
   const [index, setIndex] = useState<null | number>(null);
   const current = index === null ? undefined : images[index];
 
@@ -110,12 +110,12 @@ export function Gallery({ images }: GalleryProps): null | React.JSX.Element {
           close();
         }}
         onTouchStart={(event) => {
-          touchStart.current = event.changedTouches[0]?.clientX ?? null;
+          touchStartRef.current = event.changedTouches[0]?.clientX ?? null;
         }}
         onTouchEnd={(event) => {
-          const start = touchStart.current;
+          const start = touchStartRef.current;
           const end = event.changedTouches[0]?.clientX;
-          touchStart.current = null;
+          touchStartRef.current = null;
 
           if (start === null || end === undefined || index === null) return;
 

@@ -48,19 +48,19 @@ export function InputLine(props: InputLineProps): React.JSX.Element {
   const [value, setValue] = useState('');
   const [selection, setSelection] = useState({ start: 0, end: 0 });
   const [inputFocused, setInputFocused] = useState(false);
-  const navigator = useRef<HistoryNavigator | null>(null);
-  const tabPending = useRef(false);
-  const pendingCaret = useRef<null | number>(null);
+  const navigatorRef = useRef<HistoryNavigator | null>(null);
+  const tabPendingRef = useRef(false);
+  const pendingCaretRef = useRef<null | number>(null);
 
   useLayoutEffect(() => {
-    if (pendingCaret.current === null) return;
+    if (pendingCaretRef.current === null) return;
 
-    inputRef.current?.setSelectionRange(pendingCaret.current, pendingCaret.current);
-    pendingCaret.current = null;
+    inputRef.current?.setSelectionRange(pendingCaretRef.current, pendingCaretRef.current);
+    pendingCaretRef.current = null;
   }, [value, selection, inputRef]);
 
   function edit(next: string, caret: number): void {
-    pendingCaret.current = caret;
+    pendingCaretRef.current = caret;
     setValue(next);
     setSelection({ start: caret, end: caret });
   }
@@ -72,7 +72,7 @@ export function InputLine(props: InputLineProps): React.JSX.Element {
   }
 
   function submit(line: string, multiline = false): void {
-    navigator.current = null;
+    navigatorRef.current = null;
     edit('', 0);
     props.onSubmit(line, { multiline });
   }
@@ -82,7 +82,7 @@ export function InputLine(props: InputLineProps): React.JSX.Element {
 
     props.onKey();
 
-    if (event.key !== 'Tab') tabPending.current = false;
+    if (event.key !== 'Tab') tabPendingRef.current = false;
 
     const caret = event.currentTarget.selectionStart ?? value.length;
     const ctrl = event.ctrlKey && !event.metaKey && !event.altKey;
@@ -105,8 +105,9 @@ export function InputLine(props: InputLineProps): React.JSX.Element {
       submit(value);
     } else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
       event.preventDefault();
-      navigator.current ??= new HistoryNavigator(props.history);
-      const next = event.key === 'ArrowUp' ? navigator.current.up(value) : navigator.current.down();
+      navigatorRef.current ??= new HistoryNavigator(props.history);
+      const next =
+        event.key === 'ArrowUp' ? navigatorRef.current.up(value) : navigatorRef.current.down();
 
       if (next !== null) edit(next, next.length);
     } else if (event.key === 'Tab' && !event.shiftKey && value.trim()) {
@@ -117,13 +118,13 @@ export function InputLine(props: InputLineProps): React.JSX.Element {
       event.preventDefault();
 
       if (applied.progressed) {
-        tabPending.current = false;
+        tabPendingRef.current = false;
         edit(applied.line, applied.cursor);
       } else if (applied.candidates.length > 1) {
-        if (tabPending.current) {
-          tabPending.current = false;
+        if (tabPendingRef.current) {
+          tabPendingRef.current = false;
           props.onListCandidates(value, applied.candidates);
-        } else tabPending.current = true;
+        } else tabPendingRef.current = true;
       }
     } else if (ctrl && event.key === 'a') {
       event.preventDefault();
@@ -149,7 +150,7 @@ export function InputLine(props: InputLineProps): React.JSX.Element {
     } else if (ctrl && event.key === 'c') {
       event.preventDefault();
       props.onInterrupt(value);
-      navigator.current = null;
+      navigatorRef.current = null;
       edit('', 0);
     }
   }

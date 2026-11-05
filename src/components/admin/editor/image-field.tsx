@@ -52,7 +52,7 @@ function DropZone({
   label: string;
   onFile: (file: File) => void;
 }): React.JSX.Element {
-  const input = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const form = useForm();
   const [over, setOver] = useState(false);
 
@@ -79,7 +79,7 @@ function DropZone({
       )}
     >
       <input
-        ref={input}
+        ref={inputRef}
         id={id}
         type="file"
         accept={accept}
@@ -96,7 +96,7 @@ function DropZone({
       <button
         type="button"
         disabled={form.disabled || busy}
-        onClick={() => input.current?.click()}
+        onClick={() => inputRef.current?.click()}
         className={smallButton}
       >
         {busy ? 'Uploading…' : label}

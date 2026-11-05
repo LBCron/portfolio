@@ -11,12 +11,12 @@ import { usePathname } from '@/i18n/navigation';
  */
 export function RouteFocus(): null {
   const pathname = usePathname();
-  const previous = useRef(pathname);
+  const previousRef = useRef(pathname);
 
   useEffect(() => {
-    if (previous.current === pathname) return;
+    if (previousRef.current === pathname) return;
 
-    previous.current = pathname;
+    previousRef.current = pathname;
 
     if (window.location.hash) return;
 

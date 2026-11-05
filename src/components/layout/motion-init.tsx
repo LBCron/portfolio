@@ -11,12 +11,12 @@ import { MOTION_INIT_SCRIPT } from '@/lib/motion-init';
  * executes (or even accepts) a `<script>` created during client render.
  */
 export function MotionInit(): null {
-  const flushed = useRef(false);
+  const flushedRef = useRef(false);
 
   useServerInsertedHTML(() => {
-    if (flushed.current) return null;
+    if (flushedRef.current) return null;
 
-    flushed.current = true;
+    flushedRef.current = true;
 
     return <script id="motion-init" dangerouslySetInnerHTML={{ __html: MOTION_INIT_SCRIPT }} />;
   });

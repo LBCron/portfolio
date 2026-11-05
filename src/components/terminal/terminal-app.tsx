@@ -66,11 +66,11 @@ export default function TerminalApp(): React.JSX.Element {
   const admin = session !== null;
   const [secretInput, setSecretInput] = useState(false);
   const [effect, setEffect] = useState<null | TerminalEffect>(null);
-  const secretResolver = useRef<((value: null | string) => void) | null>(null);
+  const secretResolverRef = useRef<((value: null | string) => void) | null>(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const logRef = useRef<HTMLDivElement>(null);
-  const stickToBottom = useRef(true);
+  const stickToBottomRef = useRef(true);
   const controllerRef = useRef<AbortController | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const reducedRef = useRef(reduced);
@@ -190,7 +190,7 @@ export default function TerminalApp(): React.JSX.Element {
   useLayoutEffect(() => {
     const log = logRef.current;
 
-    if (log && stickToBottom.current) log.scrollTop = log.scrollHeight;
+    if (log && stickToBottomRef.current) log.scrollTop = log.scrollHeight;
   }, [blocks]);
 
   function makeDeps(translator: Translate): EngineDeps {
@@ -210,13 +210,13 @@ export default function TerminalApp(): React.JSX.Element {
       readSecret: (label, signal) =>
         new Promise<null | string>((resolve) => {
           const finish = (value: null | string): void => {
-            if (secretResolver.current !== finish) return;
+            if (secretResolverRef.current !== finish) return;
 
-            secretResolver.current = null;
+            secretResolverRef.current = null;
             setSecretInput(false);
             resolve(value);
           };
-          secretResolver.current = finish;
+          secretResolverRef.current = finish;
           signal.addEventListener('abort', () => finish(null), { once: true });
           useTerminalStore.getState().append(text(label), { volatile: true });
           setSecretInput(true);
@@ -263,7 +263,7 @@ export default function TerminalApp(): React.JSX.Element {
 
     if (!t || store.running) return;
 
-    stickToBottom.current = true;
+    stickToBottomRef.current = true;
     const trimmed = line.trim();
     // Secret lines and their output are never persisted.
     const volatile = isSecretLine(defaultRegistry, trimmed);
@@ -297,8 +297,8 @@ export default function TerminalApp(): React.JSX.Element {
   function interrupt(line: string): void {
     const store = useTerminalStore.getState();
 
-    if (secretResolver.current) {
-      secretResolver.current(null);
+    if (secretResolverRef.current) {
+      secretResolverRef.current(null);
       store.append(text('^C', 'dim'), { volatile: true });
     } else if (controllerRef.current) {
       controllerRef.current.abort();
@@ -343,7 +343,7 @@ export default function TerminalApp(): React.JSX.Element {
           tabIndex={0}
           onScroll={(event) => {
             const el = event.currentTarget;
-            stickToBottom.current = el.scrollHeight - el.scrollTop - el.clientHeight < 24;
+            stickToBottomRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < 24;
           }}
           className="min-h-0 flex-1 overflow-y-auto px-3 py-2"
         >
@@ -398,7 +398,7 @@ export default function TerminalApp(): React.JSX.Element {
           history={history}
           inputRef={inputRef}
           onSubmit={(line, options) => {
-            if (secretResolver.current) secretResolver.current(line);
+            if (secretResolverRef.current) secretResolverRef.current(line);
             else run(line, options);
           }}
           onInterrupt={interrupt}
