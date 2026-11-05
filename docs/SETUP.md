@@ -31,7 +31,7 @@ Rules that hold everywhere:
 | Git     | any recent version                   | Husky installs a pre-commit hook (`lint-staged`) |
 | OpenSSL | any                                  | generating secrets (`openssl rand`)              |
 
-Accounts: **GitHub** (repository `juliolmuller/juliolmuller.github.io`), **Sanity** (project `njcnsmax`, organization `ow3ahfjbr`), **Vercel**, and DNS access for `juliolmuller.com` only if you later adopt the custom domain (§6.6).
+Accounts: **GitHub** (repository `juliolmuller/portfolio`), **Sanity** (project `njcnsmax`, organization `ow3ahfjbr`), **Vercel**, and DNS access for `juliolmuller.com` only if you later adopt the custom domain (§6.6).
 
 **Windows:** use WSL2 and keep the clone inside the Linux filesystem (`~/…`, not `/mnt/c/…`); Turbopack and file watching are much slower across the boundary.
 
@@ -40,7 +40,7 @@ Accounts: **GitHub** (repository `juliolmuller/juliolmuller.github.io`), **Sanit
 ### 2.1 Install
 
 ```sh
-git clone git@github.com:juliolmuller/juliolmuller.github.io.git juliolmuller.com
+git clone git@github.com:juliolmuller/portfolio.git juliolmuller.com
 cd juliolmuller.com
 bun install            # also installs the Husky pre-commit hook
 cp .env.example .env.local
@@ -138,7 +138,7 @@ Details in [SANITY.md](./SANITY.md). Summary:
 
 ## 5. GitHub
 
-- **Repository:** `juliolmuller/juliolmuller.github.io`. The name is historical (a GitHub Pages user site); hosting is Vercel (D11). Branches: `next` is the working/staging branch, `main` is production. `main` still holds the **old static portfolio** until the launch merge (§6.4). Remote branches today: `main`, `next` (plus a stale `master`).
+- **Repository:** `juliolmuller/portfolio`. Formerly `juliolmuller.github.io` (a GitHub Pages user site); hosting is Vercel (D11). Branches: `next` is the working/staging branch, `main` is production. `main` still holds the **old static portfolio** until the launch merge (§6.4). Remote branches today: `main`, `next` (plus a stale `master`).
 - **CI** (`.github/workflows/ci.yml`): runs on **push** to `main` and `next` (not on pull requests): frozen install, format, lint, typecheck, unit tests, i18n and icon audits, build, `check:bundle`, `check:seo`, Playwright (Chromium, WebKit, mobile, Firefox smoke, visual), Lighthouse CI (reports as artifacts); `bun audit` runs as a separate job. It needs no secrets: it uses fixtures and test-only credentials. Runners are pinned to `ubuntu-24.04` (Playwright WebKit does not start on 26.04); bump together with Playwright. Actions are pinned to commit SHAs.
 - **Dependabot** (`.github/dependabot.yml`): grouped weekly updates on Mondays; review release notes for the `framework` group (Next.js + React together).
 - **Visual baselines** (`visual-baselines.yml`, manual): Actions → _Visual baselines_ → Run workflow, download the artifact and commit the PNGs under `tests/e2e/__screenshots__/`.
@@ -150,7 +150,7 @@ Details in [SANITY.md](./SANITY.md). Summary:
 
 ### 6.1 Create and link (one-time)
 
-1. **Add New → Project**, import `juliolmuller/juliolmuller.github.io` into the account that should own it (a personal portfolio usually belongs on the personal Hobby account).
+1. **Add New → Project**, import `juliolmuller/portfolio` into the account that should own it (a personal portfolio usually belongs on the personal Hobby account).
 2. Build settings:
 
    | Setting          | Value                                               |
