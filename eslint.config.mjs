@@ -3,6 +3,8 @@ import { defineConfig, globalIgnores } from 'eslint/config';
 
 export default defineConfig([
   ...anyConfig.next(),
+  // The docs use GFM task lists (`- [ ]`), which CommonMark reads as label refs.
+  { files: ['**/*.md'], language: 'markdown/gfm' },
   {
     files: ['**/*.{ts,tsx}'],
     rules: {
