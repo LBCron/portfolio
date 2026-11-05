@@ -89,7 +89,9 @@ export function Markdown({
   const shift = topHeadingLevel - topLevel(children);
   const usedIds = new Map<string, number>();
 
+  // Defined per render on purpose: ids are deduplicated through this render's `usedIds`. Markdown is a Server Component, so nothing remounts.
   const heading = (level: Level) =>
+    // eslint-disable-next-line @eslint-react/no-nested-component-definitions -- see above
     function Heading({ children: content }: { children?: ReactNode }): React.JSX.Element {
       const target = Math.min(Math.max(level + shift, topHeadingLevel), 6);
       const Tag = `h${target}` as 'h2';

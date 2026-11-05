@@ -15,7 +15,7 @@ export function LanguageAnnouncer(): React.JSX.Element {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    let raw: null | string = null;
+    let raw: null | string;
 
     try {
       raw = sessionStorage.getItem(LANGUAGE_SWITCH_KEY);
