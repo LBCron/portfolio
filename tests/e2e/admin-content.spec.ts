@@ -1,5 +1,5 @@
 import AxeBuilder from '@axe-core/playwright';
-import { expect, type Page, test } from '@playwright/test';
+import { expect, type Locator, type Page, test } from '@playwright/test';
 import sharp from 'sharp';
 
 import { signWebhook } from '../../src/lib/content/webhook';
@@ -18,7 +18,7 @@ const slow = expect.configure({ timeout: 40_000 });
 
 test.describe.configure({ timeout: 120_000 });
 
-const field = (page: Page, path: string) => page.locator(`#f-${path.replace(/\./g, '-')}`);
+const field = (page: Page, path: string): Locator => page.locator(`#f-${path.replace(/\./g, '-')}`);
 
 async function fillBoth(page: Page, path: string, en: string, pt = en): Promise<void> {
   await field(page, `${path}.en`).fill(en);
@@ -59,7 +59,7 @@ async function openEditor(page: Page, url: string): Promise<void> {
 /**
  * Retries the click: it can land before the page has hydrated.
  */
-async function openDeleteDialog(page: Page) {
+async function openDeleteDialog(page: Page): Promise<Locator> {
   const dialog = page.getByRole('dialog', { name: 'Delete permanently?' });
 
   await expect(async () => {

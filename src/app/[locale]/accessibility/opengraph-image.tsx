@@ -1,4 +1,5 @@
 import { getTranslations } from 'next-intl/server';
+import { type ImageResponse } from 'next/og';
 
 import { owner } from '@/config/site';
 import { isAppLocale, routing } from '@/i18n/routing';
@@ -9,7 +10,11 @@ export const size = ogSize;
 export const contentType = ogContentType;
 export const revalidate = 86400;
 
-export default async function Image({ params }: { params: Promise<{ locale: string }> }) {
+export default async function Image({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<ImageResponse> {
   const { locale } = await params;
   const resolved = isAppLocale(locale) ? locale : routing.defaultLocale;
   const t = await getTranslations({

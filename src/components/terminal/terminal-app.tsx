@@ -10,7 +10,7 @@ import { isMotionReduced, useReducedMotionPreference } from '@/lib/motion-prefer
 import { isApplePlatform, TERMINAL_SHORTCUT } from '@/lib/shortcuts';
 import { MARK } from '@/lib/terminal/commands/public/explore';
 import { type TerminalEffect } from '@/lib/terminal/commands/types';
-import { applyCompletion, complete } from '@/lib/terminal/completion';
+import { type AppliedCompletion, applyCompletion, complete } from '@/lib/terminal/completion';
 import { buildContext, type EngineDeps, execute } from '@/lib/terminal/engine';
 import { type Span, text } from '@/lib/terminal/output';
 import { defaultRegistry, isRecordable, isSecretLine } from '@/lib/terminal/registry';
@@ -306,7 +306,7 @@ export default function TerminalApp(): React.JSX.Element {
     } else if (line) echo(line, '^C');
   }
 
-  function completeLine(line: string, cursor: number) {
+  function completeLine(line: string, cursor: number): AppliedCompletion {
     if (!t) return applyCompletion(line, cursor, { start: cursor, candidates: [] });
 
     const deps = makeDeps(t);

@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { useWindowStore } from './window-store';
+import { useWindowStore, type WindowState } from '@/stores/window-store';
 
 const viewport = { width: 1280, height: 800, top: 64 };
 const get = () => useWindowStore.getState();
-const win = () => get().windows['t']!;
+const win = (): WindowState => get().windows['t']!;
 
 beforeEach(() => {
   useWindowStore.setState({ windows: {}, zCounter: 0, viewport });

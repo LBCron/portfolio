@@ -1,9 +1,19 @@
 import { describe, expect, it } from 'vitest';
 
-import { type AuthenticatorDeps, createAuthenticator, MIN_DELAY_MS } from './authenticate';
+import {
+  type AuthenticatorDeps,
+  type AuthResult,
+  createAuthenticator,
+  MIN_DELAY_MS,
+} from '@/lib/auth/authenticate';
+
 import { createMemoryLimiter } from './rate-limit';
 
-function setup(overrides: Partial<AuthenticatorDeps> = {}) {
+function setup(overrides: Partial<AuthenticatorDeps> = {}): {
+  authenticate: (password: unknown) => Promise<AuthResult>;
+  events: string[];
+  sleeps: number[];
+} {
   let time = 0;
   const sleeps: number[] = [];
   const events: string[] = [];

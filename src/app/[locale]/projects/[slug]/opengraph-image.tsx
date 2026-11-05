@@ -1,3 +1,5 @@
+import { type ImageResponse } from 'next/og';
+
 import { owner } from '@/config/site';
 import { isAppLocale, routing } from '@/i18n/routing';
 import { getContent } from '@/lib/content';
@@ -12,7 +14,7 @@ export default async function Image({
   params,
 }: {
   params: Promise<{ locale: string; slug: string }>;
-}) {
+}): Promise<ImageResponse> {
   const { locale, slug } = await params;
   const resolved = isAppLocale(locale) ? locale : routing.defaultLocale;
   const lookup = await getContent().getProject(resolved, slug);

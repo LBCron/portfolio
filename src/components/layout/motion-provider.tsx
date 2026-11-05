@@ -1,11 +1,12 @@
-'use client';
-
-import { LazyMotion, MotionConfig } from 'motion/react';
+import { type FeatureBundle, LazyMotion, MotionConfig } from 'motion/react';
 import { type ReactNode } from 'react';
 
 import { useMotionPaused } from '@/lib/motion-preference';
 
-const loadFeatures = () => import('./motion-features').then((module) => module.domAnimation);
+('use client');
+
+const loadFeatures = (): Promise<FeatureBundle> =>
+  import('./motion-features').then((module) => module.domAnimation);
 
 export function MotionProvider({ children }: { children: ReactNode }): React.JSX.Element {
   const paused = useMotionPaused();

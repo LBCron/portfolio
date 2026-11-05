@@ -1,12 +1,13 @@
-import { expect, type Page } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
 
 import { ADMIN_PASSWORD } from './auth-constants';
 import { openWithShortcut } from './hydration';
 
-export const windowOf = (page: Page) => page.locator('[data-window=terminal]');
-export const inputOf = (page: Page) => page.getByRole('textbox', { name: /Command input/ });
-export const passwordOf = (page: Page) => page.getByLabel('Password', { exact: true });
-export const logOf = (page: Page) => page.getByRole('log', { name: 'Terminal output' });
+export const windowOf = (page: Page): Locator => page.locator('[data-window=terminal]');
+export const inputOf = (page: Page): Locator =>
+  page.getByRole('textbox', { name: /Command input/ });
+export const passwordOf = (page: Page): Locator => page.getByLabel('Password', { exact: true });
+export const logOf = (page: Page): Locator => page.getByRole('log', { name: 'Terminal output' });
 
 export async function openTerminal(page: Page, path = '/en'): Promise<void> {
   await page.goto(path, { waitUntil: 'domcontentloaded' });

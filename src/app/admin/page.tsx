@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 import { AREA_CONFIG } from '@/components/admin/area-config';
-import { AREAS, idToSegment } from '@/components/admin/areas';
+import { type AreaMeta, AREAS, idToSegment } from '@/components/admin/areas';
 import { DashboardActions } from '@/components/admin/dashboard-actions';
 import { requireAdmin } from '@/lib/auth/session';
 import { getAdminStore } from '@/lib/content/admin';
@@ -17,7 +17,8 @@ export default async function Dashboard(): Promise<React.JSX.Element> {
   const docs = Object.fromEntries(AREAS.map((area, index) => [area.type, lists[index]])) as Partial<
     Record<DocumentType, AdminDoc[]>
   >;
-  const areaOf = (type: DocumentType) => AREAS.find((area) => area.type === type);
+  const areaOf = (type: DocumentType): AreaMeta | undefined =>
+    AREAS.find((area) => area.type === type);
   const hrefFor = (type: DocumentType, id: string): string => {
     const area = areaOf(type);
 

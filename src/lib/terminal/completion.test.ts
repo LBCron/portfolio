@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
+import {
+  applyCompletion,
+  commonPrefix,
+  complete,
+  type Completion,
+} from '@/lib/terminal/completion';
+
 import { type Command } from './commands/types';
-import { applyCompletion, commonPrefix, complete } from './completion';
 import { buildContext } from './engine';
 import { createRegistry, defaultRegistry, publicCommands } from './registry';
 import { createHarness } from './test-utils';
@@ -18,7 +24,11 @@ const secret: Command = {
   },
 };
 
-async function candidates(line: string, cwd = '~', registry = defaultRegistry) {
+async function candidates(
+  line: string,
+  cwd = '~',
+  registry = defaultRegistry,
+): Promise<Completion> {
   const harness = await createHarness('en', { cwd });
   const content = await harness.deps.loadContent();
   const ctx = buildContext({ ...harness.deps, registry }, content, new AbortController().signal);

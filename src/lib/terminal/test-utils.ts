@@ -3,12 +3,12 @@ import { createTranslator } from 'next-intl';
 import { type AppLocale } from '@/i18n/routing';
 import { createRepository } from '@/lib/content/create-repository';
 import { createFixtureSource } from '@/lib/content/fixtures/source';
+import { type KvItem, type LinkItem, type OutputNode, type Span } from '@/lib/terminal/output';
 
 import enMessages from '../../../messages/en.json';
 import ptMessages from '../../../messages/pt.json';
 import { type Command, type CommandActions, type SessionInfo } from './commands/types';
 import { type EngineDeps, execute } from './engine';
-import { type OutputNode } from './output';
 import { createRegistry, defaultRegistry } from './registry';
 import { buildSnapshot, type ContentSnapshot } from './snapshot';
 import { type Translate } from './vfs';
@@ -135,7 +135,21 @@ export async function createHarness(
   return {
     deps,
     calls,
-    async run(line, signal = new AbortController().signal) {
+    async run(
+      line,
+      signal = new AbortController().signal,
+    ): Promise<
+      Array<
+        | { fallback?: string; label?: string; lines: string[]; type: 'ascii' }
+        | { head?: string[]; rows: string[][]; type: 'table' }
+        | { items: Array<{ command: string; label?: string }>; type: 'command' }
+        | { items: KvItem[]; type: 'kv' }
+        | { items: LinkItem[]; type: 'link' }
+        | { lines: string[]; type: 'tree' }
+        | { spans: Span[]; type: 'text'; typed?: boolean }
+        | { type: 'blank' }
+      >
+    > {
       const nodes: OutputNode[] = [];
       for await (const node of execute(line, deps, signal)) nodes.push(node);
 

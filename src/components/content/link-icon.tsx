@@ -1,10 +1,10 @@
-import { icons, Link as LinkGlyph } from 'lucide-react';
+import { icons, Link as LinkGlyph, type LucideIcon } from 'lucide-react';
 import { createElement } from 'react';
 
 import { cn } from '@/lib/cn';
 import { type LinkIcon as LinkIconData } from '@/lib/content';
 
-function lucideFor(name: string) {
+function lucideFor(name: string): LucideIcon {
   const pascal = name
     .split('-')
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))

@@ -1,5 +1,5 @@
 import AxeBuilder from '@axe-core/playwright';
-import { expect, type Page, test } from '@playwright/test';
+import { expect, type Locator, type Page, test } from '@playwright/test';
 
 import { openWithShortcut } from './hydration';
 
@@ -9,9 +9,9 @@ test.beforeEach(async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
 });
 
-const windowOf = (page: Page) => page.locator('[data-window=terminal]');
-const inputOf = (page: Page) => page.getByRole('textbox', { name: /Command input/ });
-const logOf = (page: Page) => page.getByRole('log', { name: 'Terminal output' });
+const windowOf = (page: Page): Locator => page.locator('[data-window=terminal]');
+const inputOf = (page: Page): Locator => page.getByRole('textbox', { name: /Command input/ });
+const logOf = (page: Page): Locator => page.getByRole('log', { name: 'Terminal output' });
 
 async function openTerminal(page: Page, path = '/en'): Promise<void> {
   await page.goto(path, { waitUntil: 'domcontentloaded' });

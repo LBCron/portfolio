@@ -1,10 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
-import { createMemoryLimiter } from './rate-limit';
+import { createMemoryLimiter, type RateLimiter } from '@/lib/auth/rate-limit';
 
 const MIN = 60_000;
 
-function setup() {
+function setup(): {
+  advance: (ms: number) => number;
+  fail: (key: string, times: number) => Promise<void>;
+  limiter: RateLimiter;
+} {
   let time = 1_000_000;
   const limiter = createMemoryLimiter(() => time);
 

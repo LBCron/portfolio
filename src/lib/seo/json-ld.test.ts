@@ -1,3 +1,5 @@
+import { type Graph } from 'schema-dts';
+
 import { createRepository } from '@/lib/content/create-repository';
 import { createFixtureSource } from '@/lib/content/fixtures/source';
 
@@ -16,7 +18,7 @@ import { SITE_URL } from './urls';
 
 const repository = createRepository(createFixtureSource());
 
-async function homeGraph() {
+async function homeGraph(): Promise<Graph> {
   const [profile, links, technologies, practices, projects] = await Promise.all([
     repository.getProfile('en'),
     repository.getFeaturedLinks('en'),
