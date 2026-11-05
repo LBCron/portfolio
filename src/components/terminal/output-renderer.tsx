@@ -24,6 +24,7 @@ const CHIP_CLASS =
 
 function Spans({ spans }: { spans: Span[] }): React.JSX.Element[] {
   return spans.map((span, index) => (
+    // eslint-disable-next-line @eslint-react/no-array-index-key -- output cells are positional and never reordered
     <span key={index} className={TONE_CLASS[span.tone ?? 'default']}>
       {span.text}
     </span>
@@ -237,8 +238,10 @@ function Node({
             ) : null}
             <tbody>
               {node.rows.map((row, index) => (
+                // eslint-disable-next-line @eslint-react/no-array-index-key -- output cells are positional and never reordered
                 <tr key={index}>
                   {row.map((cell, cellIndex) => (
+                    // eslint-disable-next-line @eslint-react/no-array-index-key -- output cells are positional and never reordered
                     <td key={cellIndex} className={cellIndex === 0 ? 'text-accent-2' : ''}>
                       {cell}
                     </td>

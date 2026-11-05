@@ -46,6 +46,7 @@ export function MatrixRain(): React.JSX.Element {
     >
       {COLUMN_DATA.map((column, index) => (
         <span
+          // eslint-disable-next-line @eslint-react/no-array-index-key -- decorative columns are a static list
           key={index}
           className="matrix-column"
           style={

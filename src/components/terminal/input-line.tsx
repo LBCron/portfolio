@@ -178,6 +178,7 @@ export function InputLine(props: InputLineProps): React.JSX.Element {
     <div className="relative flex min-h-6 items-start gap-2 rounded-sm has-[input:focus-visible]:outline-2 has-[input:focus-visible]:outline-offset-2 has-[input:focus-visible]:outline-accent-2">
       <span aria-hidden="true" className={cn('shrink-0 whitespace-pre', props.secret && 'hidden')}>
         {props.prompt.map((span, index) => (
+          // eslint-disable-next-line @eslint-react/no-array-index-key -- spans are positional and never reordered
           <span key={index} className={TONE_CLASS[span.tone ?? 'default']}>
             {span.text}
           </span>

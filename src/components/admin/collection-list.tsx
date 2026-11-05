@@ -234,6 +234,7 @@ export function CollectionList({
                   )}
                 >
                   {row.cells.map((cell, position) => (
+                    // eslint-disable-next-line @eslint-react/no-array-index-key -- cells are positional columns
                     <td key={position} className="px-3 py-2">
                       {position === 0 ? (
                         <Link

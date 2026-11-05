@@ -90,6 +90,7 @@ export function GeneratedCover({
       >
         <defs>
           {blobs.map((_, index) => (
+            // eslint-disable-next-line @eslint-react/no-array-index-key -- blobs are a static, positional list
             <radialGradient key={index} id={`${id}-g${index}`}>
               <stop offset="0" stopColor={index === 0 ? from : to} stopOpacity="0.75" />
               <stop offset="1" stopColor={index === 0 ? from : to} stopOpacity="0" />
@@ -101,6 +102,7 @@ export function GeneratedCover({
         </defs>
         <rect width="160" height="100" fill="#11141b" />
         {blobs.map((blob, index) => (
+          // eslint-disable-next-line @eslint-react/no-array-index-key -- blobs are a static, positional list
           <circle key={index} {...blob} fill={`url(#${id}-g${index})`} />
         ))}
         <rect width="160" height="100" fill={`url(#${id}-grid)`} />

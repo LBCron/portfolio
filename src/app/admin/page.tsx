@@ -80,6 +80,7 @@ export default async function Dashboard(): Promise<React.JSX.Element> {
             const config = AREA_CONFIG[areaOf(item.type)?.slug ?? ''];
 
             return (
+              // eslint-disable-next-line @eslint-react/no-array-index-key -- dashboard rows render in a fixed order and never reorder
               <li key={`${item.id}-${index}`} className="text-small">
                 <Link
                   href={hrefFor(item.type, item.id)}

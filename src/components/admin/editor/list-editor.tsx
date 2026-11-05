@@ -83,6 +83,7 @@ export function ListEditor({
           // Dragging is a pointer extra; the up/down buttons are the keyboard path.
           // eslint-disable-next-line jsx-a11y-x/no-noninteractive-element-interactions
           <li
+            // eslint-disable-next-line @eslint-react/no-array-index-key -- rows have no identity besides their position; reordering rewrites values by index
             key={index}
             data-row={`${path}.${index}`}
             onDragOver={(event) => dragging !== null && event.preventDefault()}
