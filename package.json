@@ -96,12 +96,8 @@
     "node": ">=24.11.0 <25"
   },
   "lint-staged": {
-    "*.{ts,tsx}": [
-      "eslint --max-warnings=0 --fix",
-      "prettier --write"
-    ],
-    "*.{json,md,css,yml,yaml,mjs}": [
-      "prettier --write"
+    "*.{js,mjs,ts,tsx}": [
+      "eslint --max-warnings=0 --fix"
     ]
   },
   "trustedDependencies": []
