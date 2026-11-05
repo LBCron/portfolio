@@ -31,6 +31,24 @@ export default defineConfig([
     files: ['src/lib/content/**', 'scripts/**', 'tests/support/**'],
     rules: { 'no-restricted-imports': 'off' },
   },
+  {
+    // The admin is not localized, so it links with next/link; it still must
+    // not reach Sanity directly.
+    files: ['src/app/admin/**', 'src/components/admin/**'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@sanity/*', 'groq-js', '**/lib/content/sanity/*'],
+              message: 'The admin goes through @/lib/content too.',
+            },
+          ],
+        },
+      ],
+    },
+  },
   globalIgnores([
     '.next/**',
     '.cache/**',
