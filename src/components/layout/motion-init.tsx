@@ -18,6 +18,7 @@ export function MotionInit(): null {
 
     flushedRef.current = true;
 
+    // eslint-disable-next-line @eslint-react/dom-no-dangerously-set-innerhtml -- constant script, the sanctioned exception (D21)
     return <script id="motion-init" dangerouslySetInnerHTML={{ __html: MOTION_INIT_SCRIPT }} />;
   });
 

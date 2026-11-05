@@ -81,6 +81,7 @@ export function Tooltip({
 
   return (
     <span ref={wrapperRef} className="relative inline-flex">
+      {/* eslint-disable-next-line @eslint-react/no-clone-element -- the tooltip must add aria-describedby to its single, arbitrary child */}
       {cloneElement(children, { 'aria-describedby': id })}
       <span
         id={id}
