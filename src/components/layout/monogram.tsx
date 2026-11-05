@@ -5,7 +5,7 @@ import { cn } from '@/lib/cn';
 /**
  * "JM" mark. Decorative: the surrounding link carries the accessible name.
  */
-export function Monogram({ className }: { className?: string }) {
+export function Monogram({ className }: { className?: string }): React.JSX.Element {
   const gradientId = useId();
 
   return (

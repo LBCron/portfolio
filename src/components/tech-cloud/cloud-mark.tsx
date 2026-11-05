@@ -14,7 +14,7 @@ export function CloudMark({
   brandColor?: string;
   className?: string;
   icon: PublicTechIcon;
-}) {
+}): React.JSX.Element {
   const fill = cloudIconFill(brandColor);
 
   if ('monogram' in icon) {

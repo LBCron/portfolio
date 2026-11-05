@@ -28,7 +28,7 @@ interface FieldProps {
  * Label, hint and error wiring (`aria-describedby`, `aria-invalid`) for one
  * control.
  */
-export function Field({ path, label, hint, children }: FieldProps) {
+export function Field({ path, label, hint, children }: FieldProps): React.JSX.Element {
   const form = useForm();
   const id = fieldId(path);
   const error = form.error(path);
@@ -79,7 +79,7 @@ export function TextField({
   path: string;
   placeholder?: string;
   type?: 'email' | 'tel' | 'text' | 'url';
-}) {
+}): React.JSX.Element {
   const form = useForm();
 
   return (
@@ -113,7 +113,7 @@ export function TextAreaField({
   maxLength?: number;
   path: string;
   rows?: number;
-}) {
+}): React.JSX.Element {
   const form = useForm();
   const value = asText(form.get(path));
 
@@ -152,7 +152,7 @@ export function NumberField({
   max?: number;
   min?: number;
   path: string;
-}) {
+}): React.JSX.Element {
   const form = useForm();
   const value = form.get(path);
 
@@ -191,7 +191,7 @@ export function SelectField({
   label: string;
   options: ReadonlyArray<{ label: string; value: number | string }>;
   path: string;
-}) {
+}): React.JSX.Element {
   const form = useForm();
   const value = form.get(path);
 
@@ -235,7 +235,7 @@ export function ToggleField({
   hint?: ReactNode;
   label: string;
   path: string;
-}) {
+}): React.JSX.Element {
   const form = useForm();
   const id = fieldId(path);
 
@@ -277,7 +277,7 @@ export function CheckboxGroup({
   max?: number;
   options: ReadonlyArray<{ label: string; value: string }>;
   path: string;
-}) {
+}): React.JSX.Element {
   const form = useForm();
   const [query, setQuery] = useState('');
   const selected = (form.get(path) as string[] | undefined) ?? [];
@@ -395,7 +395,7 @@ function CopyMenu({
   label: string;
   onCopyToEn: () => void;
   onCopyToPt: () => void;
-}) {
+}): React.JSX.Element {
   const ref = useRef<HTMLDetailsElement>(null);
 
   useEffect(() => {
@@ -474,7 +474,7 @@ export function LocalizedField({
   markdown,
   range,
   gallery,
-}: LocalizedProps) {
+}: LocalizedProps): React.JSX.Element {
   const form = useForm();
   const [tab, setTab] = useState<'en' | 'pt'>('en');
   const en = asText(form.get(`${path}.en`));
@@ -615,7 +615,7 @@ export function Section({
   children: ReactNode;
   description?: string;
   title: string;
-}) {
+}): React.JSX.Element {
   return (
     <section className="flex flex-col gap-5 rounded-xl border border-line p-5">
       <div>

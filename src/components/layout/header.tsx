@@ -14,7 +14,7 @@ import { MobileMenu } from './mobile-menu';
 import { Monogram } from './monogram';
 import { TerminalToggle } from './terminal-toggle';
 
-export async function Header() {
+export async function Header(): Promise<React.JSX.Element> {
   const t = await getTranslations('header');
   const links = await HeaderLinks();
   const locale = await rootLocale();

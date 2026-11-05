@@ -66,7 +66,7 @@ export function GeneratedCover({
   className?: string;
   kind: ProjectKind;
   slug: string;
-}) {
+}): React.JSX.Element {
   const id = useId();
   const random = seeded(hash(slug));
   const [from, to] = PALETTES[hash(slug) % PALETTES.length] ?? PALETTES[0];

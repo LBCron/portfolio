@@ -39,7 +39,7 @@ export function Button({
   size,
   type = 'button',
   ...props
-}: ButtonVariantProps & ComponentProps<'button'>) {
+}: ButtonVariantProps & ComponentProps<'button'>): React.JSX.Element {
   return (
     <button type={type} className={cn(buttonVariants({ variant, size }), className)} {...props} />
   );
@@ -53,7 +53,7 @@ export function ButtonLink({
   variant,
   size,
   ...props
-}: ButtonVariantProps & ComponentProps<typeof Link>) {
+}: ButtonVariantProps & ComponentProps<typeof Link>): React.JSX.Element {
   return <Link className={cn(buttonVariants({ variant, size }), className)} {...props} />;
 }
 
@@ -66,7 +66,7 @@ export function ButtonAnchor({
   size,
   children,
   ...props
-}: ButtonVariantProps & ComponentProps<'a'>) {
+}: ButtonVariantProps & ComponentProps<'a'>): React.JSX.Element {
   return (
     <a className={cn(buttonVariants({ variant, size }), className)} {...props}>
       {children}

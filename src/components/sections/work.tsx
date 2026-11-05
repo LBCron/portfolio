@@ -14,7 +14,7 @@ export async function Work({
 }: {
   projects: ProjectSummary[];
   technologies: Technology[];
-}) {
+}): Promise<React.JSX.Element> {
   const t = await getTranslations('work');
   const namesFor = techNameLookup(technologies);
 

@@ -47,7 +47,7 @@ const applyStatus = (status: SessionStatus): void =>
 /**
  * The terminal body: boot, output log, quick commands and the input line.
  */
-export default function TerminalApp() {
+export default function TerminalApp(): React.JSX.Element {
   const locale = useLocale() as AppLocale;
   const actions = useTerminalActions();
   const reduced = useReducedMotionPreference();

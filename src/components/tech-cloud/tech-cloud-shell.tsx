@@ -60,7 +60,7 @@ export function TechCloudShell({
 }: {
   practices: Practice[];
   technologies: StackTech[];
-}) {
+}): React.JSX.Element {
   const t = useTranslations('stack');
   const reduced = useReducedMotionPreference();
   const isClient = useSyncExternalStore(

@@ -49,7 +49,7 @@ export async function ProjectCard({
   headingLevel: Heading = 'h3',
   eager = false,
   lcp = false,
-}: ProjectCardProps) {
+}: ProjectCardProps): Promise<React.JSX.Element> {
   const t = await getTranslations('work');
   const chips = techNames.slice(0, MAX_CHIPS);
   const overflow = techNames.length - chips.length;

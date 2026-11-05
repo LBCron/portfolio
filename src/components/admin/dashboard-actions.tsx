@@ -8,7 +8,7 @@ import { revalidateAllAction } from '@/lib/admin/actions';
 import { cn } from '@/lib/cn';
 import { toast } from '@/stores/toast-store';
 
-export function DashboardActions() {
+export function DashboardActions(): React.JSX.Element {
   const [busy, setBusy] = useState(false);
 
   return (

@@ -13,7 +13,7 @@ const CATEGORIES = [
   ['ai', 'AI agents & tooling'],
 ] as const;
 
-export function TechnologyForm() {
+export function TechnologyForm(): React.JSX.Element {
   return (
     <>
       <Section title="Technology">
@@ -50,7 +50,7 @@ export function TechnologyForm() {
   );
 }
 
-export function PracticeForm() {
+export function PracticeForm(): React.JSX.Element {
   return (
     <Section title="Practice">
       <LocalizedField path="label" label="Label" max={60} />

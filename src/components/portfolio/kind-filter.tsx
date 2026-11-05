@@ -14,7 +14,7 @@ interface KindFilterProps {
 /**
  * Crawlable single-select. Hidden by the caller when only one kind exists.
  */
-export async function KindFilter({ kinds, active }: KindFilterProps) {
+export async function KindFilter({ kinds, active }: KindFilterProps): Promise<React.JSX.Element> {
   const t = await getTranslations('projects');
   const options: Array<{ count?: number; kind?: ProjectKind; label: string }> = [
     { label: t('all') },

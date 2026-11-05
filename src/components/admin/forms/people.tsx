@@ -11,7 +11,7 @@ import {
 import { LinkIconField } from '../editor/icon-fields';
 import { ImageField } from '../editor/image-field';
 
-export function LinkForm() {
+export function LinkForm(): React.JSX.Element {
   return (
     <Section title="Link">
       <LocalizedField path="label" label="Label" max={40} />
@@ -51,7 +51,7 @@ export function LinkForm() {
   );
 }
 
-export function RecommendedForm() {
+export function RecommendedForm(): React.JSX.Element {
   return (
     <Section title="Person">
       <TextField path="name" label="Name" maxLength={80} />

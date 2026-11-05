@@ -13,7 +13,7 @@ import { switchLocale } from './switch-locale';
  * Segmented EN | PT control made of real links (works without JS). With JS it
  * keeps query, hash and approximate scroll position, and saves the choice.
  */
-export function LanguageSwitcher({ className }: { className?: string }) {
+export function LanguageSwitcher({ className }: { className?: string }): React.JSX.Element {
   const t = useTranslations('header');
   const locale = useLocale();
   const pathname = usePathname();

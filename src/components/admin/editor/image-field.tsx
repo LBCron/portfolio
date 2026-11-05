@@ -51,7 +51,7 @@ function DropZone({
   id: string;
   label: string;
   onFile: (file: File) => void;
-}) {
+}): React.JSX.Element {
   const input = useRef<HTMLInputElement>(null);
   const form = useForm();
   const [over, setOver] = useState(false);
@@ -125,7 +125,7 @@ export function ImageField({
   alt?: boolean;
   label: string;
   path: string;
-}) {
+}): React.JSX.Element {
   const form = useForm();
   const value = form.get(path) as ImageValue | undefined;
   const [busy, setBusy] = useState(false);
@@ -256,7 +256,7 @@ interface PdfValue {
 /**
  * A PDF per language (the résumé).
  */
-export function PdfField({ path, label }: { label: string; path: string }) {
+export function PdfField({ path, label }: { label: string; path: string }): React.JSX.Element {
   const form = useForm();
   const value = form.get(path) as PdfValue | undefined;
   const [busy, setBusy] = useState(false);

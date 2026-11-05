@@ -29,7 +29,7 @@ interface GalleryItem {
   asset?: { height: number; lqip?: string; url: string; width: number };
 }
 
-export function ProjectForm({ techOptions }: { techOptions: Option[] }) {
+export function ProjectForm({ techOptions }: { techOptions: Option[] }): React.JSX.Element {
   const form = useForm();
   const gallery = ((form.get('gallery') as GalleryItem[] | undefined) ?? []).flatMap((item) =>
     item.asset ? [{ ...item.asset, alt: item.alt?.en ?? '' }] : [],

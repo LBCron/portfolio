@@ -9,7 +9,7 @@ import { LANGUAGE_SWITCH_KEY } from './switch-locale';
  * After a language switch: restores the approximate scroll position and
  * politely announces the new language (in that language).
  */
-export function LanguageAnnouncer() {
+export function LanguageAnnouncer(): React.JSX.Element {
   const t = useTranslations('a11y');
   const locale = useLocale();
   const [message, setMessage] = useState('');

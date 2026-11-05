@@ -16,7 +16,7 @@ import { ListEditor } from '../editor/list-editor';
 
 const blank = (): { en: string; pt: string } => ({ en: '', pt: '' });
 
-export function ProfileForm() {
+export function ProfileForm(): React.JSX.Element {
   return (
     <>
       <Section title="Identity">
@@ -88,7 +88,7 @@ export function ProfileForm() {
   );
 }
 
-export function ContactForm() {
+export function ContactForm(): React.JSX.Element {
   return (
     <Section title="Contact details">
       <TextField path="email" label="Email" type="email" maxLength={254} />
@@ -110,7 +110,7 @@ export function ContactForm() {
   );
 }
 
-export function ResumeForm() {
+export function ResumeForm(): React.JSX.Element {
   const form = useForm();
   const updated = form.get('updatedAt');
 

@@ -110,7 +110,7 @@ function Control({
   color: string;
   label: string;
   onClick: () => void;
-}) {
+}): React.JSX.Element {
   return (
     <button
       type="button"
@@ -150,7 +150,7 @@ export function WindowFrame({
   id: string;
   labels: WindowLabels;
   title: string;
-}) {
+}): null | React.JSX.Element {
   const win = useWindowStore((state) => state.windows[id]);
   const viewport = useWindowStore((state) => state.viewport);
   const outerRef = useRef<HTMLDivElement>(null);

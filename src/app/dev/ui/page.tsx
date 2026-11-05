@@ -15,7 +15,7 @@ import { SectionHeader } from '@/components/ui/section-header';
 import { Tooltip } from '@/components/ui/tooltip';
 import { toast } from '@/stores/toast-store';
 
-function Demo({ title, children }: { children: ReactNode; title: string }) {
+function Demo({ title, children }: { children: ReactNode; title: string }): React.JSX.Element {
   return (
     <section className="border-t border-line py-10">
       <h2 className="mb-6 font-label text-text-3">{title}</h2>
@@ -24,7 +24,7 @@ function Demo({ title, children }: { children: ReactNode; title: string }) {
   );
 }
 
-export default function DevUiPage() {
+export default function DevUiPage(): React.JSX.Element {
   const [dialogOpen, setDialogOpen] = useState(false);
 
   return (

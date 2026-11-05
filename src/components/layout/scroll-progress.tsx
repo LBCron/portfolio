@@ -5,7 +5,7 @@ import { useEffect, useRef } from 'react';
 /**
  * 2px gradient bar at the very top; transform is written in rAF.
  */
-export function ScrollProgress() {
+export function ScrollProgress(): React.JSX.Element {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

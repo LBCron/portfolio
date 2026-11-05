@@ -8,7 +8,7 @@ export default function LocaleError({
 }: {
   error: { digest?: string } & Error;
   retry: () => void;
-}) {
+}): React.JSX.Element {
   const t = useTranslations('errors');
   const locale = useLocale();
 

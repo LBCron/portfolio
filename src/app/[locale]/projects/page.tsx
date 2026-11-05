@@ -62,7 +62,9 @@ export async function generateMetadata({
   });
 }
 
-export default async function ProjectsPage({ searchParams }: PageProps<'/[locale]/projects'>) {
+export default async function ProjectsPage({
+  searchParams,
+}: PageProps<'/[locale]/projects'>): Promise<React.JSX.Element> {
   const locale = await currentLocale();
   const parsed = parseProjectsQuery(await searchParams);
 

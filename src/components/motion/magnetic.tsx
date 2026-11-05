@@ -10,7 +10,7 @@ const MAX_PULL = 8;
 /**
  * Pulls its child toward the pointer by up to 8px (fine pointers only).
  */
-export function Magnetic({ children }: { children: ReactNode }) {
+export function Magnetic({ children }: { children: ReactNode }): React.JSX.Element {
   const ref = useRef<HTMLSpanElement>(null);
   const reduced = useReducedMotionPreference();
 

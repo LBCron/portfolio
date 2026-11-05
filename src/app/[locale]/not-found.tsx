@@ -2,7 +2,7 @@ import { getLocale, getTranslations } from 'next-intl/server';
 
 import { NotFoundView } from '@/components/layout/not-found-view';
 
-export default async function LocaleNotFound() {
+export default async function LocaleNotFound(): Promise<React.JSX.Element> {
   const [t, locale] = await Promise.all([getTranslations('errors'), getLocale()]);
 
   return (

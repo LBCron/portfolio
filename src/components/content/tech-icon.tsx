@@ -14,7 +14,7 @@ export function TechIcon({
 }: {
   className?: string;
   icon: PublicTechIcon | TechIconData;
-}) {
+}): React.JSX.Element {
   if ('monogram' in icon) {
     return (
       <span

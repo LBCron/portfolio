@@ -12,7 +12,12 @@ const FINE_POINTER = '(hover: hover) and (pointer: fine)';
  * Surface card with a pointer-tracked spotlight border. The spotlight only runs
  * for fine pointers and writes CSS variables, never React state.
  */
-export function Card({ className, children, onPointerMove, ...props }: ComponentProps<'div'>) {
+export function Card({
+  className,
+  children,
+  onPointerMove,
+  ...props
+}: ComponentProps<'div'>): React.JSX.Element {
   const ref = useRef<HTMLDivElement>(null);
 
   function handlePointerMove(event: PointerEvent<HTMLDivElement>): void {

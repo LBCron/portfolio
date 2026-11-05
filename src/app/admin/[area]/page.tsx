@@ -7,7 +7,9 @@ import { DocumentEditor } from '@/components/admin/editor/form';
 import { requireAdmin } from '@/lib/auth/session';
 import { getAdminStore } from '@/lib/content/admin';
 
-export default async function AreaPage({ params }: PageProps<'/admin/[area]'>) {
+export default async function AreaPage({
+  params,
+}: PageProps<'/admin/[area]'>): Promise<React.JSX.Element> {
   await requireAdmin();
 
   const { area: slug } = await params;

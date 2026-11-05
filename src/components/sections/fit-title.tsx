@@ -20,7 +20,7 @@ export function FitTitle({
   className?: string;
   fontFamily?: string | undefined;
   id?: string;
-}) {
+}): React.JSX.Element {
   const ref = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {

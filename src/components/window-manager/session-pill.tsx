@@ -7,7 +7,7 @@ import { useSessionStore } from '@/stores/session-store';
 /**
  * Remaining admin time in the title bar; renders nothing for visitors.
  */
-export function SessionPill() {
+export function SessionPill(): null | React.JSX.Element {
   const session = useSessionStore((state) => state.session);
   const [now, setNow] = useState(0);
 

@@ -24,7 +24,7 @@ const subscribe = () => (): void => {};
  * the server renders an invisible placeholder of the same size and the section
  * provides a `<noscript>` fallback.
  */
-export function EmailActions({ user, domain, labels }: EmailActionsProps) {
+export function EmailActions({ user, domain, labels }: EmailActionsProps): React.JSX.Element {
   const isClient = useSyncExternalStore(
     subscribe,
     () => true,

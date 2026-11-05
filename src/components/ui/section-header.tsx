@@ -14,7 +14,14 @@ interface SectionHeaderProps {
 /**
  * Mono eyebrow with number ("01 — About"), h2 and optional lead.
  */
-export function SectionHeader({ id, index, eyebrow, title, lead, className }: SectionHeaderProps) {
+export function SectionHeader({
+  id,
+  index,
+  eyebrow,
+  title,
+  lead,
+  className,
+}: SectionHeaderProps): React.JSX.Element {
   return (
     <header className={cn('mb-12 max-w-3xl md:mb-16', className)}>
       <p className="mb-4 flex items-center gap-3 font-label text-text-3">

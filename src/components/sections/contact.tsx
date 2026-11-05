@@ -19,7 +19,12 @@ interface ContactProps {
 const linkClass =
   'inline-flex min-h-11 items-center gap-2 rounded-full border border-line px-4 text-small text-text-1 transition-colors hover-fine:border-line-strong hover-fine:bg-surface-1';
 
-export async function Contact({ locale, contact, links, resume }: ContactProps) {
+export async function Contact({
+  locale,
+  contact,
+  links,
+  resume,
+}: ContactProps): Promise<React.JSX.Element> {
   const [t, tA11y, tHeader] = await Promise.all([
     getTranslations('contact'),
     getTranslations('a11y'),

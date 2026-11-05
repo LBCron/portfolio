@@ -10,7 +10,7 @@ const SCROLL_THRESHOLD = 24;
  * Fixed header that turns into frosted glass after 24px of scroll. The state
  * lives in a data attribute so scrolling never re-renders React.
  */
-export function HeaderFrame({ children }: { children: ReactNode }) {
+export function HeaderFrame({ children }: { children: ReactNode }): React.JSX.Element {
   const ref = useRef<HTMLElement>(null);
   const pathname = usePathname();
 

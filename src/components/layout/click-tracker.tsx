@@ -10,7 +10,7 @@ import { track } from '@/lib/analytics';
  * server renders (header, contact, resume), so those components stay
  * untouched.
  */
-export function ClickTracker() {
+export function ClickTracker(): React.JSX.Element {
   useEffect(() => {
     function onClick(event: MouseEvent): void {
       const anchor = (event.target as Element | null)?.closest?.('a[href]');

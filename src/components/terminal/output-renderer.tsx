@@ -22,7 +22,7 @@ export const TONE_CLASS: Record<Tone, string> = {
 const CHIP_CLASS =
   'inline-flex min-h-6 items-center rounded-full border border-line-strong px-2.5 font-mono text-accent-2 hover-fine:bg-surface-2 pointer-coarse:min-h-9';
 
-function Spans({ spans }: { spans: Span[] }) {
+function Spans({ spans }: { spans: Span[] }): React.JSX.Element[] {
   return spans.map((span, index) => (
     <span key={index} className={TONE_CLASS[span.tone ?? 'default']}>
       {span.text}
@@ -33,7 +33,7 @@ function Spans({ spans }: { spans: Span[] }) {
 /**
  * Reveals text over ~450ms; the full text is always there for screen readers.
  */
-function TypedText({ spans, immediate }: { immediate: boolean; spans: Span[] }) {
+function TypedText({ spans, immediate }: { immediate: boolean; spans: Span[] }): React.JSX.Element {
   const total = spans.reduce((sum, span) => sum + span.text.length, 0);
   const [count, setCount] = useState(immediate ? total : 0);
 
@@ -80,7 +80,7 @@ export function OutputRenderer({
   onRun: (command: string) => void;
   skipTyping: boolean;
   t: Translate;
-}) {
+}): React.JSX.Element {
   return (
     <div className="mb-1" data-block={block.node.type}>
       <Node node={block.node} t={t} skipTyping={skipTyping} onRun={onRun} />
@@ -98,7 +98,7 @@ function Node({
   onRun: (command: string) => void;
   skipTyping: boolean;
   t: Translate;
-}) {
+}): React.JSX.Element {
   switch (node.type) {
     case 'ascii':
       if (node.label) {

@@ -27,7 +27,7 @@ export const viewport: Viewport = {
   themeColor: THEME_COLOR,
 };
 
-export default function GlobalNotFound() {
+export default function GlobalNotFound(): React.JSX.Element {
   return (
     <html lang="en" className={fontVariables}>
       <body>

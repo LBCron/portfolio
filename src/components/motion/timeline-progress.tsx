@@ -9,7 +9,7 @@ import { useReducedMotionPreference } from '@/lib/motion-preference';
  * `[data-timeline-node]` pulses once when the rail reaches it. Without JS, or
  * with reduced motion, the rail is simply drawn.
  */
-export function TimelineProgress({ children }: { children: ReactNode }) {
+export function TimelineProgress({ children }: { children: ReactNode }): React.JSX.Element {
   const rootRef = useRef<HTMLDivElement>(null);
   const railRef = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotionPreference();

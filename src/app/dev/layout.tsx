@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 /**
  * Development-only playground; the proxy also hides it in production.
  */
-export default function DevLayout({ children }: { children: ReactNode }) {
+export default function DevLayout({ children }: { children: ReactNode }): React.JSX.Element {
   if (process.env.NODE_ENV === 'production') notFound();
 
   return (

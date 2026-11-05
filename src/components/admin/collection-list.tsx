@@ -51,7 +51,7 @@ export function CollectionList({
   filterColumns = [],
   hasFeatured,
   readOnly,
-}: CollectionListProps) {
+}: CollectionListProps): React.JSX.Element {
   const [rows, setRows] = useState(initial);
   const [query, setQuery] = useState('');
   const [filters, setFilters] = useState<Record<number, string>>({});

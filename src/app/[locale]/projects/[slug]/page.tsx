@@ -60,7 +60,9 @@ export async function generateMetadata({
   });
 }
 
-export default async function ProjectPage({ params }: PageProps<'/[locale]/projects/[slug]'>) {
+export default async function ProjectPage({
+  params,
+}: PageProps<'/[locale]/projects/[slug]'>): Promise<React.JSX.Element> {
   const { slug } = await params;
   const { locale, project } = await loadProject(slug);
   const content = getContent();
@@ -284,7 +286,15 @@ export default async function ProjectPage({ params }: PageProps<'/[locale]/proje
   );
 }
 
-function Meta({ label, value, stacked }: { label: string; stacked?: boolean; value: string }) {
+function Meta({
+  label,
+  value,
+  stacked,
+}: {
+  label: string;
+  stacked?: boolean;
+  value: string;
+}): React.JSX.Element {
   return (
     <div className={stacked ? 'flex flex-col gap-1' : 'flex gap-2'}>
       <dt className="text-text-3">{label}</dt>
@@ -293,7 +303,7 @@ function Meta({ label, value, stacked }: { label: string; stacked?: boolean; val
   );
 }
 
-function Block({ title, body }: { body: string; title: string }) {
+function Block({ title, body }: { body: string; title: string }): React.JSX.Element {
   return (
     <section>
       <h2 className="text-h3">{title}</h2>

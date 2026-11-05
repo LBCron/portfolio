@@ -6,7 +6,7 @@ import { useEffect, useRef } from 'react';
 /**
  * Hint to scroll that fades out over the first 240px of scroll.
  */
-export function ScrollCue({ href, label }: { href: string; label: string }) {
+export function ScrollCue({ href, label }: { href: string; label: string }): React.JSX.Element {
   const ref = useRef<HTMLAnchorElement>(null);
 
   useEffect(() => {

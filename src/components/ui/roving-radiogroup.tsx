@@ -14,7 +14,7 @@ const items = (root: HTMLElement | null): HTMLElement[] =>
 export function RovingRadiogroup({
   children,
   ...props
-}: Omit<ComponentProps<'div'>, 'onKeyDown' | 'ref' | 'role'>) {
+}: Omit<ComponentProps<'div'>, 'onKeyDown' | 'ref' | 'role'>): React.JSX.Element {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

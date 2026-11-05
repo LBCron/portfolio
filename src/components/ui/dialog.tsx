@@ -30,7 +30,7 @@ export function Dialog({
   children,
   className,
   hideTitle,
-}: DialogProps) {
+}: DialogProps): React.JSX.Element {
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
 

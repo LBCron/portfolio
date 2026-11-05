@@ -19,6 +19,6 @@ export function Badge({
   className,
   tone,
   ...props
-}: ComponentProps<'span'> & VariantProps<typeof badgeVariants>) {
+}: ComponentProps<'span'> & VariantProps<typeof badgeVariants>): React.JSX.Element {
   return <span className={cn(badgeVariants({ tone }), className)} {...props} />;
 }

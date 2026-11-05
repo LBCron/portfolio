@@ -12,7 +12,7 @@ const MAX_HEADER_LINKS = 3;
 /**
  * Profile icons for the header bar and the mobile menu, rendered on the server.
  */
-export async function HeaderLinks() {
+export async function HeaderLinks(): Promise<null | React.JSX.Element> {
   const locale = await rootLocale();
   const [t, tA11y, links] = await Promise.all([
     getTranslations('header'),

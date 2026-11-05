@@ -12,7 +12,7 @@ export async function AdminShell({
 }: {
   children: ReactNode;
   expiresAt: number;
-}) {
+}): Promise<React.JSX.Element> {
   const source = getAdminStore().label;
 
   return (

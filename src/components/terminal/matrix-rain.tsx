@@ -37,7 +37,7 @@ const COLUMN_DATA = Array.from({ length: COLUMNS }, () => ({
  * reduced motion, and the global reduced-motion rule stops it if Pause
  * animations is switched on mid-way.
  */
-export function MatrixRain() {
+export function MatrixRain(): React.JSX.Element {
   return (
     <div
       aria-hidden="true"

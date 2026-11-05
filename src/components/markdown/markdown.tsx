@@ -85,12 +85,12 @@ export function Markdown({
   newTabLabel,
   scrollRegionLabel,
   className,
-}: MarkdownProps) {
+}: MarkdownProps): React.JSX.Element {
   const shift = topHeadingLevel - topLevel(children);
   const usedIds = new Map<string, number>();
 
   const heading = (level: Level) =>
-    function Heading({ children: content }: { children?: ReactNode }) {
+    function Heading({ children: content }: { children?: ReactNode }): React.JSX.Element {
       const target = Math.min(Math.max(level + shift, topHeadingLevel), 6);
       const Tag = `h${target}` as 'h2';
       const base = `${idPrefix}-${slugify(textOf(content)) || 'section'}`;

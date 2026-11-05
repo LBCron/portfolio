@@ -13,7 +13,7 @@ const itemClass = 'inline-flex min-h-11 shrink-0 items-center rounded-md px-3 te
  * Sidebar on desktop, a scrolling tab bar on mobile (one component, two
  * placements).
  */
-export function AdminNav({ className }: { className?: string }) {
+export function AdminNav({ className }: { className?: string }): React.JSX.Element {
   const pathname = usePathname();
 
   return (

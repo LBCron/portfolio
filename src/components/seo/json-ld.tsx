@@ -5,7 +5,7 @@ import { serializeJsonLd } from '@/lib/seo/json-ld';
 /**
  * The page's single structured-data block.
  */
-export function JsonLd({ data }: { data: Graph }) {
+export function JsonLd({ data }: { data: Graph }): React.JSX.Element {
   return (
     <script
       type="application/ld+json"

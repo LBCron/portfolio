@@ -31,7 +31,7 @@ export async function Stack({
 }: {
   practices: Practice[];
   technologies: Technology[];
-}) {
+}): Promise<React.JSX.Element> {
   const t = await getTranslations('stack');
 
   return (

@@ -8,7 +8,7 @@ interface IconProps extends Omit<LucideProps, 'ref'> {
   label?: string;
 }
 
-export function Icon({ icon: Glyph, label, ...props }: IconProps) {
+export function Icon({ icon: Glyph, label, ...props }: IconProps): React.JSX.Element {
   if (label) {
     return <Glyph role="img" aria-label={label} focusable="false" {...props} />;
   }

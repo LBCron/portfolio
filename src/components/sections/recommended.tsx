@@ -13,7 +13,11 @@ import { externalRel } from './links';
 /**
  * "Worth following": hidden when no profile is visible.
  */
-export async function Recommended({ profiles }: { profiles: RecommendedProfile[] }) {
+export async function Recommended({
+  profiles,
+}: {
+  profiles: RecommendedProfile[];
+}): Promise<null | React.JSX.Element> {
   if (profiles.length === 0) return null;
 
   const t = await getTranslations('recommended');

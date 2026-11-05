@@ -13,7 +13,7 @@ export function JobDetails({
   children: ReactNode;
   className?: string;
   openByDefault: boolean;
-}) {
+}): React.JSX.Element {
   const [open, setOpen] = useState(openByDefault);
 
   function onToggle(event: ToggleEvent<HTMLDetailsElement>): void {

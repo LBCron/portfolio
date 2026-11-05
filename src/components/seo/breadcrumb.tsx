@@ -3,7 +3,11 @@ import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { type Crumb } from '@/lib/seo/json-ld';
 
-export async function Breadcrumb({ crumbs }: { crumbs: readonly Crumb[] }) {
+export async function Breadcrumb({
+  crumbs,
+}: {
+  crumbs: readonly Crumb[];
+}): Promise<React.JSX.Element> {
   const t = await getTranslations('a11y');
   const last = crumbs.length - 1;
 

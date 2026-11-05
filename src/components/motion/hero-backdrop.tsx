@@ -12,7 +12,7 @@ const EASE = 0.12;
  * The loops pause while the hero is off screen; the spotlight runs a rAF loop
  * only while it is catching up with the pointer.
  */
-export function HeroBackdrop() {
+export function HeroBackdrop(): React.JSX.Element {
   const rootRef = useRef<HTMLDivElement>(null);
   const spotRef = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotionPreference();

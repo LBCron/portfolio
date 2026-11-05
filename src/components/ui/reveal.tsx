@@ -16,7 +16,7 @@ interface RevealProps extends ComponentProps<'div'> {
  * renders content fully visible; only elements that start below the fold are
  * hidden after hydration, so nothing flashes and no-JS visitors see it all.
  */
-export function Reveal({ index = 0, className, style, ...props }: RevealProps) {
+export function Reveal({ index = 0, className, style, ...props }: RevealProps): React.JSX.Element {
   const ref = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {

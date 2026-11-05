@@ -19,7 +19,13 @@ export function coverTransitionName(slug: string): string {
  * Every slug may appear at most once per page: duplicate names abort the
  * browser's transition.
  */
-export function CoverTransition({ slug, children }: { children: ReactNode; slug: string }) {
+export function CoverTransition({
+  slug,
+  children,
+}: {
+  children: ReactNode;
+  slug: string;
+}): React.JSX.Element {
   return (
     <ViewTransition name={coverTransitionName(slug)} share="project-cover" default="none">
       {children}

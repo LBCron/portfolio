@@ -12,7 +12,13 @@ const MAX_TILT_DEG = 6;
  * Tilts (max 6°) and lifts its content toward the pointer. Also feeds the card
  * spotlight (`--mx`/`--my`). Fine pointers only; off for reduced motion.
  */
-export function Tilt({ children, className }: { children: ReactNode; className?: string }) {
+export function Tilt({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}): React.JSX.Element {
   const ref = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotionPreference();
 

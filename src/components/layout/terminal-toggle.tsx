@@ -15,7 +15,7 @@ import { useShortcutLabel } from './use-shortcut-label';
 /**
  * The labelled terminal button in the header; its tooltip shows the shortcut.
  */
-export function TerminalToggle() {
+export function TerminalToggle(): React.JSX.Element {
   const t = useTranslations('window');
   const shortcut = useShortcutLabel();
 

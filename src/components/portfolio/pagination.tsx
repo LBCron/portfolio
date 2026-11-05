@@ -12,7 +12,11 @@ interface PaginationProps {
   totalPages: number;
 }
 
-export async function Pagination({ page, totalPages, kind }: PaginationProps) {
+export async function Pagination({
+  page,
+  totalPages,
+  kind,
+}: PaginationProps): Promise<null | React.JSX.Element> {
   if (totalPages <= 1) return null;
 
   const t = await getTranslations('projects');

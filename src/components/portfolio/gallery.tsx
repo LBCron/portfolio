@@ -11,7 +11,7 @@ interface GalleryProps {
   images: readonly GalleryImage[];
 }
 
-export function Gallery({ images }: GalleryProps) {
+export function Gallery({ images }: GalleryProps): null | React.JSX.Element {
   const t = useTranslations('project');
   const titleId = useId();
   const dialogRef = useRef<HTMLDialogElement>(null);

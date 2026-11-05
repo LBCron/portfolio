@@ -6,7 +6,9 @@ import { DocumentEditor } from '@/components/admin/editor/form';
 import { requireAdmin } from '@/lib/auth/session';
 import { getAdminStore } from '@/lib/content/admin';
 
-export default async function EditPage({ params }: PageProps<'/admin/[area]/[id]'>) {
+export default async function EditPage({
+  params,
+}: PageProps<'/admin/[area]/[id]'>): Promise<React.JSX.Element> {
   await requireAdmin();
 
   const { area: slug, id } = await params;

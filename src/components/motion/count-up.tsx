@@ -19,7 +19,12 @@ interface CountUpProps {
  * hydration, a value still below the fold restarts at zero and counts up once
  * in view, writing text through the ref.
  */
-export function CountUp({ to, prefix = '', suffix = '', localeTag }: CountUpProps) {
+export function CountUp({
+  to,
+  prefix = '',
+  suffix = '',
+  localeTag,
+}: CountUpProps): React.JSX.Element {
   const ref = useRef<HTMLSpanElement>(null);
 
   useLayoutEffect(() => {

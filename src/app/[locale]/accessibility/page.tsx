@@ -26,7 +26,7 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
-export default async function AccessibilityPage() {
+export default async function AccessibilityPage(): Promise<React.JSX.Element> {
   const [t, tProjects, format] = await Promise.all([
     getTranslations('accessibility'),
     getTranslations('projects'),

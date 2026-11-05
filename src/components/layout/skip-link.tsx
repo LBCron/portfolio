@@ -1,6 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 
-export async function SkipLink() {
+export async function SkipLink(): Promise<React.JSX.Element> {
   const t = await getTranslations('a11y');
 
   return (

@@ -66,7 +66,7 @@ function newest(...dates: Array<string | undefined>): string {
     .reduce((latest, date) => (date > latest ? date : latest), '');
 }
 
-export default async function HomePage() {
+export default async function HomePage(): Promise<React.JSX.Element> {
   const locale = await currentLocale();
   const content = getContent();
   const [

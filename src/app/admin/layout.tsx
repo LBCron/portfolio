@@ -28,7 +28,9 @@ export const viewport: Viewport = {
   themeColor: THEME_COLOR,
 };
 
-export default async function AdminLayout({ children }: LayoutProps<'/admin'>) {
+export default async function AdminLayout({
+  children,
+}: LayoutProps<'/admin'>): Promise<React.JSX.Element> {
   const session = await requireAdmin();
 
   return (

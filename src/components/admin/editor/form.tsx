@@ -96,7 +96,7 @@ export function DocumentEditor({
   singleton = false,
   deleteConfirm,
   children,
-}: DocumentEditorProps) {
+}: DocumentEditorProps): React.JSX.Element {
   const router = useRouter();
   const [values, setValues] = useState<Values>(initial);
   const [baseline, setBaseline] = useState<Values>(initial);
@@ -375,7 +375,7 @@ function DeleteSection({
   id: string;
   rev: string | undefined;
   type: string;
-}) {
+}): React.JSX.Element {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [typed, setTyped] = useState('');

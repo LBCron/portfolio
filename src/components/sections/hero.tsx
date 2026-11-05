@@ -25,7 +25,7 @@ interface HeroProps {
   profile: null | Profile;
 }
 
-export async function Hero({ profile, nextSection }: HeroProps) {
+export async function Hero({ profile, nextSection }: HeroProps): Promise<React.JSX.Element> {
   const t = await getTranslations('hero');
   const jobTitle = profile?.jobTitle ?? owner.jobTitle;
   const photo = profile?.photo;
@@ -84,7 +84,7 @@ export async function Hero({ profile, nextSection }: HeroProps) {
   );
 }
 
-function RoleCallout({ title }: { title: string }) {
+function RoleCallout({ title }: { title: string }): React.JSX.Element {
   return (
     <div className="pointer-events-none absolute top-[6%] left-[22%] z-[2] hidden lg:block">
       <span
@@ -106,7 +106,7 @@ function Portrait({
   photo: Profile['photo'];
   photoLg: Profile['photoLg'];
   role: string;
-}) {
+}): React.JSX.Element {
   const frameClass = cn(
     'relative shrink-0',
     'size-24 overflow-hidden rounded-lg p-[2px] shadow-[0_20px_60px_-20px_rgb(139_124_255/0.55)] max-lg:bg-gradient-accent',

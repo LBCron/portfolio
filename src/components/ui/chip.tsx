@@ -2,7 +2,7 @@ import { type ComponentProps } from 'react';
 
 import { cn } from '@/lib/cn';
 
-export function Chip({ className, ...props }: ComponentProps<'span'>) {
+export function Chip({ className, ...props }: ComponentProps<'span'>): React.JSX.Element {
   return (
     <span
       className={cn(

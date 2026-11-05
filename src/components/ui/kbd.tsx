@@ -2,7 +2,7 @@ import { type ComponentProps } from 'react';
 
 import { cn } from '@/lib/cn';
 
-export function Kbd({ className, ...props }: ComponentProps<'kbd'>) {
+export function Kbd({ className, ...props }: ComponentProps<'kbd'>): React.JSX.Element {
   return (
     <kbd
       className={cn(

@@ -16,7 +16,13 @@ function lucideFor(name: string) {
 /**
  * Decorative icon for a featured link; the link carries the name.
  */
-export function LinkIcon({ icon, className }: { className?: string; icon: LinkIconData }) {
+export function LinkIcon({
+  icon,
+  className,
+}: {
+  className?: string;
+  icon: LinkIconData;
+}): React.JSX.Element {
   if (icon.type === 'lucide') {
     return createElement(lucideFor(icon.name), {
       'aria-hidden': true,

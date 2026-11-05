@@ -10,7 +10,13 @@ import { type Metric, type Profile } from '@/lib/content';
 
 const MAX_METRICS = 4;
 
-function MetricValue({ metric, locale }: { locale: AppLocale; metric: Metric }) {
+function MetricValue({
+  metric,
+  locale,
+}: {
+  locale: AppLocale;
+  metric: Metric;
+}): React.JSX.Element | string {
   if (metric.countTo === undefined) return metric.value;
 
   return (
@@ -23,7 +29,13 @@ function MetricValue({ metric, locale }: { locale: AppLocale; metric: Metric }) 
   );
 }
 
-export async function About({ locale, profile }: { locale: AppLocale; profile: Profile }) {
+export async function About({
+  locale,
+  profile,
+}: {
+  locale: AppLocale;
+  profile: Profile;
+}): Promise<React.JSX.Element> {
   const [t, tSummary, tA11y] = await Promise.all([
     getTranslations('about'),
     getTranslations('summary'),

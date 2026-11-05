@@ -12,7 +12,7 @@ const WARN_MS = 2 * 60_000;
 /**
  * Countdown, the WCAG 2.2.1 expiry warning and Sign out.
  */
-export function SessionControls({ expiresAt: initial }: { expiresAt: number }) {
+export function SessionControls({ expiresAt: initial }: { expiresAt: number }): React.JSX.Element {
   const [expiresAt, setExpiresAt] = useState(initial);
   const [now, setNow] = useState(initial - 30 * 60_000);
   const [warning, setWarning] = useState(false);

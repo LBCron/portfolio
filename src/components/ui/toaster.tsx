@@ -10,7 +10,7 @@ const icons = { neutral: Info, success: CheckCircle2, error: CircleAlert };
 /**
  * Polite live region for toasts. Always mounted so announcements fire.
  */
-export function Toaster() {
+export function Toaster(): React.JSX.Element {
   const toasts = useToastStore((state) => state.toasts);
 
   return (

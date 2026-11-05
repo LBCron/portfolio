@@ -16,7 +16,7 @@ import { SelectField, TextField } from './fields';
 import { useForm } from './form';
 import { hintClass, inputClass, labelClass, smallButton } from './styles';
 
-function TechIconPreview({ icon }: { icon: TechIcon }) {
+function TechIconPreview({ icon }: { icon: TechIcon }): React.JSX.Element {
   return (
     <span
       role="img"
@@ -49,7 +49,7 @@ function IconSearch({
   onPick: (slug: string) => void;
   query: string;
   source: IconSearchSource;
-}) {
+}): null | React.JSX.Element {
   const [hits, setHits] = useState<IconHit[]>([]);
 
   useEffect(() => {
@@ -91,7 +91,7 @@ const SOURCES = [
 /**
  * Icon source, search, custom SVG and a live preview for a technology.
  */
-export function TechIconFields() {
+export function TechIconFields(): React.JSX.Element {
   const form = useForm();
   const source = String(form.get('iconSource') ?? 'monogram');
   const slug = String(form.get('iconSlug') ?? '');
@@ -253,7 +253,7 @@ const LINK_MODES = [
 /**
  * `link`, `simple-icons:<slug>` or `lucide:<name>`, with search and preview.
  */
-export function LinkIconField({ path }: { path: string }) {
+export function LinkIconField({ path }: { path: string }): React.JSX.Element {
   const form = useForm();
   const value = String(form.get(path) ?? 'link');
   const mode = value === 'link' ? 'link' : (value.split(':')[0] ?? 'link');

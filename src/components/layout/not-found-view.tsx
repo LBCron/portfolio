@@ -11,7 +11,13 @@ interface NotFoundViewProps {
 /**
  * Terminal-flavored 404 body shared by the localized and global pages.
  */
-export function NotFoundView({ title, text, prompt, homeHref, homeLabel }: NotFoundViewProps) {
+export function NotFoundView({
+  title,
+  text,
+  prompt,
+  homeHref,
+  homeLabel,
+}: NotFoundViewProps): React.JSX.Element {
   return (
     <section className="container-page flex min-h-[70dvh] flex-col justify-center py-32">
       <p className="mb-6 font-mono text-small break-all text-term-green">{prompt}</p>

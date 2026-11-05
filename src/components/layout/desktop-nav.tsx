@@ -10,7 +10,7 @@ import { cn } from '@/lib/cn';
 import { NAV_SECTIONS } from './nav-items';
 import { useActiveSection } from './use-active-section';
 
-export function DesktopNav() {
+export function DesktopNav(): React.JSX.Element {
   const t = useTranslations('header');
   const pathname = usePathname();
   const isHome = pathname === '/';

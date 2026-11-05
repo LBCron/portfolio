@@ -54,7 +54,9 @@ export async function generateMetadata(): Promise<Metadata> {
   );
 }
 
-export default async function LocaleLayout({ children }: LayoutProps<'/[locale]'>) {
+export default async function LocaleLayout({
+  children,
+}: LayoutProps<'/[locale]'>): Promise<React.JSX.Element> {
   const locale = await rootLocale();
 
   if (!isAppLocale(locale)) notFound();

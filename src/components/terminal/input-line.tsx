@@ -43,7 +43,7 @@ interface InputLineProps {
  * A hidden native <input> takes the real typing (IME, paste, mobile keyboards);
  * the visible line and block caret are mirrored from it.
  */
-export function InputLine(props: InputLineProps) {
+export function InputLine(props: InputLineProps): React.JSX.Element {
   const { inputRef } = props;
   const [value, setValue] = useState('');
   const [selection, setSelection] = useState({ start: 0, end: 0 });

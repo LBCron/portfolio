@@ -83,7 +83,7 @@ function useDockHint(enabled: boolean): boolean {
 /**
  * The first window of the manager: the terminal.
  */
-export function TerminalWindow() {
+export function TerminalWindow(): React.JSX.Element {
   const t = useTranslations('window');
   const locale = useLocale() as AppLocale;
   const reduced = useReducedMotionPreference();

@@ -17,7 +17,7 @@ export interface Option {
 
 const blank = (): { en: string; pt: string } => ({ en: '', pt: '' });
 
-export function ExperienceForm({ techOptions }: { techOptions: Option[] }) {
+export function ExperienceForm({ techOptions }: { techOptions: Option[] }): React.JSX.Element {
   return (
     <>
       <Section title="Company">
@@ -88,7 +88,7 @@ export function ExperienceForm({ techOptions }: { techOptions: Option[] }) {
   );
 }
 
-export function EducationForm() {
+export function EducationForm(): React.JSX.Element {
   return (
     <Section title="Education">
       <SelectField

@@ -29,7 +29,12 @@ const HIDE_DELAY_MS = 120;
  * with Esc, hoverable, and persistent while hovered or focused. The trigger
  * keeps its own accessible name; the tooltip only describes it.
  */
-export function Tooltip({ content, children, side = 'bottom', className }: TooltipProps) {
+export function Tooltip({
+  content,
+  children,
+  side = 'bottom',
+  className,
+}: TooltipProps): React.JSX.Element {
   const id = useId();
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLSpanElement>(null);

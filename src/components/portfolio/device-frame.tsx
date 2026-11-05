@@ -8,7 +8,13 @@ const DOTS = ['bg-danger/80', 'bg-warn/80', 'bg-term-green/80'] as const;
 /**
  * Decorative browser / device chrome around a cover. Hidden from AT.
  */
-export function DeviceFrame({ kind, children }: { children: ReactNode; kind: ProjectKind }) {
+export function DeviceFrame({
+  kind,
+  children,
+}: {
+  children: ReactNode;
+  kind: ProjectKind;
+}): React.JSX.Element {
   const phone = kind === 'mobile';
 
   return (

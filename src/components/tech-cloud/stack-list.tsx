@@ -16,7 +16,7 @@ export function StackList({
   practices: Practice[];
   practicesTitle: string;
   technologies: StackTech[];
-}) {
+}): React.JSX.Element {
   const groups = techCategories
     .map((category) => ({
       category,

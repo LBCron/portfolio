@@ -7,7 +7,7 @@ import { useMotionPaused } from '@/lib/motion-preference';
 
 const loadFeatures = () => import('./motion-features').then((module) => module.domAnimation);
 
-export function MotionProvider({ children }: { children: ReactNode }) {
+export function MotionProvider({ children }: { children: ReactNode }): React.JSX.Element {
   const paused = useMotionPaused();
 
   return (

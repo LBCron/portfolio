@@ -33,7 +33,7 @@ export function ResumePanes({
   experience: ReactNode;
   experienceLabel: string;
   tablistLabel: string;
-}) {
+}): null | React.JSX.Element {
   const hasExperience = experience !== null && experience !== undefined;
   const hasEducation = education !== null && education !== undefined;
 

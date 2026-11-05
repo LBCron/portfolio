@@ -86,7 +86,7 @@ export function MarkdownEditor({
   invalid,
   describedBy,
   gallery,
-}: MarkdownEditorProps) {
+}: MarkdownEditorProps): React.JSX.Element {
   const ref = useRef<HTMLTextAreaElement>(null);
   const [preview, setPreview] = useState(false);
 

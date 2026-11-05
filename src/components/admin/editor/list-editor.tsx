@@ -35,7 +35,7 @@ export function ListEditor({
   max = Number.POSITIVE_INFINITY,
   hint,
   children,
-}: ListEditorProps) {
+}: ListEditorProps): React.JSX.Element {
   const form = useForm();
   const items = (form.get(path) as undefined | unknown[]) ?? [];
   const [dragging, setDragging] = useState<null | number>(null);

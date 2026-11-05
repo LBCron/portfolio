@@ -75,7 +75,7 @@ export function GeoidSphere({
   onSelect,
   selectedId,
   className,
-}: GeoidSphereProps) {
+}: GeoidSphereProps): React.JSX.Element {
   const stageRef = useRef<HTMLDivElement>(null);
   const itemsRef = useRef<ItemRuntime[]>([]);
   const dragRef = useRef({

@@ -52,7 +52,7 @@ function DateRange({
   locale: AppLocale;
   presentLabel?: string;
   start?: string;
-}) {
+}): null | React.JSX.Element {
   if (!start && !end) return null;
 
   const showEnd = Boolean(end) || Boolean(presentLabel);
@@ -66,7 +66,7 @@ function DateRange({
   );
 }
 
-function RoleBody({ role }: { role: ExperienceRole }) {
+function RoleBody({ role }: { role: ExperienceRole }): React.JSX.Element {
   return (
     <>
       <p className="mt-3 text-text-2">{role.summary}</p>
@@ -94,7 +94,7 @@ export async function Resume({
   technologies,
   resume,
   links,
-}: ResumeProps) {
+}: ResumeProps): Promise<React.JSX.Element> {
   const [t, tA11y, tHeader] = await Promise.all([
     getTranslations('resume'),
     getTranslations('a11y'),

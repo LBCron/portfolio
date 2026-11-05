@@ -10,7 +10,7 @@ import { setMotionPaused, useMotionPaused } from '@/lib/motion-preference';
  * "Pause animations" (WCAG 2.2.2). A toggle button with a stable label and
  * `aria-pressed`, persisted in localStorage.
  */
-export function MotionToggle({ className }: { className?: string }) {
+export function MotionToggle({ className }: { className?: string }): React.JSX.Element {
   const t = useTranslations('a11y');
   const paused = useMotionPaused();
 

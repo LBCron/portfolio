@@ -9,7 +9,7 @@ import { findAttention } from '@/lib/content/admin/attention';
 import { type AdminDoc } from '@/lib/content/admin/types';
 import { type DocumentType } from '@/lib/content/schema';
 
-export default async function Dashboard() {
+export default async function Dashboard(): Promise<React.JSX.Element> {
   await requireAdmin();
 
   const store = getAdminStore();

@@ -12,7 +12,7 @@ import { getContent } from '@/lib/content';
 import { MotionToggle } from './motion-toggle';
 import { ShortcutKbd } from './shortcut-kbd';
 
-export async function Footer() {
+export async function Footer(): Promise<React.JSX.Element> {
   const locale = await rootLocale();
   const [t, tA11y, links] = await Promise.all([
     getTranslations('footer'),
