@@ -59,7 +59,7 @@ export function createSanitySource(fetchGroq: GroqFetch): ContentSource {
           contentTags.technologies,
         ]),
       ),
-    experience: async () => {
+    experience: async (): Promise<{ entries: unknown[]; technologies: unknown[] }> => {
       const value = await fetchGroq(EXPERIENCE_QUERY, {}, [
         contentTags.experience,
         contentTags.technologies,

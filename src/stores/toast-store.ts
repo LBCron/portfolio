@@ -17,13 +17,13 @@ let nextId = 1;
 
 export const useToastStore = create<ToastState>()((set, get) => ({
   toasts: [],
-  push: (message, tone = 'neutral') => {
+  push: (message, tone = 'neutral'): void => {
     const id = nextId++;
 
     set({ toasts: [...get().toasts.slice(-2), { id, message, tone }] });
     window.setTimeout(() => get().dismiss(id), TOAST_DURATION_MS);
   },
-  dismiss: (id) => set({ toasts: get().toasts.filter((t) => t.id !== id) }),
+  dismiss: (id): void => set({ toasts: get().toasts.filter((t) => t.id !== id) }),
 }));
 
 export function toast(message: string, tone?: ToastItem['tone']): void {

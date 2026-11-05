@@ -82,7 +82,7 @@ export const useWindowStore = create<WindowStore>()((set) => ({
   viewport: { width: 0, height: 0, top: 0 },
   zCounter: 0,
 
-  setViewport: (viewport) =>
+  setViewport: (viewport): void =>
     set((state) => ({
       viewport,
       windows: Object.fromEntries(
@@ -93,7 +93,7 @@ export const useWindowStore = create<WindowStore>()((set) => ({
       ),
     })),
 
-  hydrate: (id, title, saved) =>
+  hydrate: (id, title, saved): void =>
     set((state) => {
       if (state.windows[id]) return {};
 
@@ -109,7 +109,7 @@ export const useWindowStore = create<WindowStore>()((set) => ({
       return { windows: { ...state.windows, [id]: win } };
     }),
 
-  open: (id, title) =>
+  open: (id, title): void =>
     set((state) => {
       const existing = state.windows[id];
       const base: WindowState = existing ?? {
@@ -132,11 +132,11 @@ export const useWindowStore = create<WindowStore>()((set) => ({
       return raise(next, id);
     }),
 
-  close: (id) => set((state) => patch(state, id, { status: 'closed', focused: false })),
+  close: (id): void => set((state) => patch(state, id, { status: 'closed', focused: false })),
 
-  minimize: (id) => set((state) => patch(state, id, { status: 'minimized', focused: false })),
+  minimize: (id): void => set((state) => patch(state, id, { status: 'minimized', focused: false })),
 
-  restore: (id) =>
+  restore: (id): void =>
     set((state) =>
       raise(
         {
@@ -152,25 +152,25 @@ export const useWindowStore = create<WindowStore>()((set) => ({
       ),
     ),
 
-  toggleMaximize: (id) =>
+  toggleMaximize: (id): void =>
     set((state) => {
       const win = state.windows[id];
 
       return win ? patch(state, id, { maximized: !win.maximized }) : {};
     }),
 
-  focus: (id) => set((state) => raise(state, id)),
+  focus: (id): void => set((state) => raise(state, id)),
 
-  setTitle: (id, title) => set((state) => patch(state, id, { title })),
+  setTitle: (id, title): void => set((state) => patch(state, id, { title })),
 
-  blur: () =>
+  blur: (): void =>
     set((state) => ({
       windows: Object.fromEntries(
         Object.entries(state.windows).map(([id, win]) => [id, { ...win, focused: false }]),
       ),
     })),
 
-  moveTo: (id, x, y) =>
+  moveTo: (id, x, y): void =>
     set((state) => {
       const win = state.windows[id];
 
@@ -181,10 +181,10 @@ export const useWindowStore = create<WindowStore>()((set) => ({
       });
     }),
 
-  resizeTo: (id, rect) =>
+  resizeTo: (id, rect): void =>
     set((state) => patch(state, id, { rect: clampRect(rect, state.viewport) })),
 
-  resizeBy: (id, edge, dx, dy) =>
+  resizeBy: (id, edge, dx, dy): void =>
     set((state) => {
       const win = state.windows[id];
 
@@ -195,7 +195,7 @@ export const useWindowStore = create<WindowStore>()((set) => ({
       });
     }),
 
-  snap: (id, side) =>
+  snap: (id, side): void =>
     set((state) =>
       side === 'top'
         ? patch(state, id, { maximized: true })

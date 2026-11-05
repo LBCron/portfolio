@@ -255,7 +255,7 @@ export const studioSchemaTypes = schemaTypes.map((type) => {
 
       return {
         ...field,
-        validation: (rule: StudioRule) => {
+        validation: (rule: StudioRule): StudioRule => {
           const checked = rule.custom(validator.validate);
 
           return validator.required ? checked.required() : checked;

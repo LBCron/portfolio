@@ -12,5 +12,5 @@ interface SessionStore {
 
 export const useSessionStore = create<SessionStore>()((set) => ({
   session: null,
-  set: (session) => set({ session }),
+  set: (session): void => set({ session }),
 }));

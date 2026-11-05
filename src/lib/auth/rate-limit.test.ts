@@ -10,8 +10,8 @@ function setup() {
 
   return {
     limiter,
-    advance: (ms: number) => (time += ms),
-    fail: async (key: string, times: number) => {
+    advance: (ms: number): number => (time += ms),
+    fail: async (key: string, times: number): Promise<void> => {
       for (let i = 0; i < times; i += 1) await limiter.reserve(key);
     },
   };

@@ -28,7 +28,7 @@ export function useTerminalActions(): Omit<CommandActions, 'effect'> {
   return useMemo(
     () => ({
       navigate: (href) => router.push(href),
-      scrollToSection: (id) => {
+      scrollToSection: (id): void => {
         if (pathname === '/') window.location.hash = id;
         else router.push(`/#${id}`);
       },

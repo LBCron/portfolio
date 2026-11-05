@@ -20,7 +20,7 @@ const t = (key: string, values?: Record<string, string>): string => {
 };
 
 vi.mock('next-intl/server', () => ({
-  getTranslations: async () => t,
+  getTranslations: async (): Promise<(key: string, values?: Record<string, string>) => string> => t,
 }));
 
 vi.mock('@/i18n/navigation', () => ({
@@ -31,7 +31,7 @@ vi.mock('@/i18n/navigation', () => ({
   }: {
     children?: unknown;
     href: { pathname?: string } | string;
-  }) => (
+  }): React.JSX.Element => (
     <a href={typeof href === 'string' ? href : (href.pathname ?? '/')} {...props}>
       {children as never}
     </a>
@@ -39,7 +39,7 @@ vi.mock('@/i18n/navigation', () => ({
 }));
 
 vi.mock('next/image', () => ({
-  default: (props: Record<string, unknown>) => (
+  default: (props: Record<string, unknown>): React.JSX.Element => (
     // Test stub; next/image is not available under Vitest.
     // eslint-disable-next-line @next/next/no-img-element
     <img alt="" {...props} />

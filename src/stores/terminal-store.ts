@@ -54,7 +54,7 @@ export const useTerminalStore = create<TerminalStore>()((set) => ({
   running: false,
   skipTyping: false,
 
-  hydrate: (saved) =>
+  hydrate: (saved): void =>
     set((state) => {
       if (state.hydrated) return {};
 
@@ -70,7 +70,7 @@ export const useTerminalStore = create<TerminalStore>()((set) => ({
       };
     }),
 
-  append: (node, options) =>
+  append: (node, options): void =>
     set((state) => {
       const block: Block = {
         id: state.nextId,
@@ -84,21 +84,21 @@ export const useTerminalStore = create<TerminalStore>()((set) => ({
       };
     }),
 
-  setRunning: (running) => set({ running }),
+  setRunning: (running): void => set({ running }),
 
-  endRun: () =>
+  endRun: (): void =>
     set((state) => ({
       running: false,
       blocks: withoutTrailingSpinner(state.blocks),
     })),
 
-  markBooted: () => set({ booted: true }),
-  skipBoot: () => set({ skipTyping: true }),
-  clear: () => set({ blocks: [] }),
-  setCwd: (cwd) => set({ cwd }),
-  record: (line) => set((state) => ({ history: addHistory(state.history, line) })),
+  markBooted: (): void => set({ booted: true }),
+  skipBoot: (): void => set({ skipTyping: true }),
+  clear: (): void => set({ blocks: [] }),
+  setCwd: (cwd): void => set({ cwd }),
+  record: (line): void => set((state) => ({ history: addHistory(state.history, line) })),
 
-  endSession: () =>
+  endSession: (): void =>
     set({
       blocks: [],
       cwd: HOME,

@@ -79,7 +79,7 @@ function firstDifference(a: unknown, b: unknown, at = ''): null | string {
 
 const warnings: string[] = [];
 const logger = {
-  warn: (event: string) => {
+  warn: (event: string): void => {
     warnings.push(event);
   },
 };

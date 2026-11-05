@@ -171,8 +171,8 @@ export function DocumentEditor({
   const api = useMemo<FormApi>(
     () => ({
       values,
-      get: (path) => getIn(values, path),
-      set: (path, value) => {
+      get: (path): unknown => getIn(values, path),
+      set: (path, value): void => {
         setValues((current) => setIn(current, path, value));
         setErrors((current) => {
           if (!(path in current)) return current;
@@ -182,7 +182,7 @@ export function DocumentEditor({
           return rest;
         });
       },
-      error: (path) => errors[path],
+      error: (path): string | undefined => errors[path],
       disabled,
     }),
     [values, errors, disabled],

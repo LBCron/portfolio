@@ -7,7 +7,7 @@ import { MAX_PDF_BYTES } from '@/lib/admin/upload/pdf';
 import { POST } from './route';
 
 vi.mock('@/lib/auth/session', () => ({
-  getSession: async () => ({ start: 1 }),
+  getSession: async (): Promise<{ start: number }> => ({ start: 1 }),
 }));
 
 const upload = (headers: Record<string, string>): NextRequest =>
