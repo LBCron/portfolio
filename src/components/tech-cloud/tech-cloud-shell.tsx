@@ -34,18 +34,20 @@ function toCloudTech(tech: StackTech): CloudTech {
   };
 }
 
+const NARROW_QUERY = '(max-width: 767px)';
+
 function useMobileCull(technologies: CloudTech[]): CloudTech[] {
-  const [narrow, setNarrow] = useState(false);
+  const narrow = useSyncExternalStore(
+    (onChange) => {
+      const media = window.matchMedia(NARROW_QUERY);
 
-  useEffect(() => {
-    const media = window.matchMedia('(max-width: 767px)');
-    const update = (): void => setNarrow(media.matches);
+      media.addEventListener('change', onChange);
 
-    update();
-    media.addEventListener('change', update);
-
-    return (): void => media.removeEventListener('change', update);
-  }, []);
+      return (): void => media.removeEventListener('change', onChange);
+    },
+    () => window.matchMedia(NARROW_QUERY).matches,
+    () => false,
+  );
 
   return useMemo(() => {
     if (!narrow) return technologies;

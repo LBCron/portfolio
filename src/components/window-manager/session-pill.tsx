@@ -16,11 +16,13 @@ export function SessionPill(): null | React.JSX.Element {
 
     const tick = (): void => setNow(Date.now());
 
-    tick();
-
+    const first = window.setTimeout(tick, 0);
     const timer = window.setInterval(tick, 15_000);
 
-    return (): void => window.clearInterval(timer);
+    return (): void => {
+      window.clearTimeout(first);
+      window.clearInterval(timer);
+    };
   }, [session]);
 
   if (!session) return null;
