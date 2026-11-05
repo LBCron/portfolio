@@ -11,6 +11,7 @@ const actions = vi.hoisted(() => ({
 
 vi.mock('@/lib/auth/actions', () => actions);
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- inferred type is the clearest description
 const loadSecret = () => import('.');
 const session = { expiresAt: Date.now() + 600_000, base: '/admin' };
 

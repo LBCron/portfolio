@@ -467,6 +467,7 @@ test.describe('uploads', () => {
 
     await signIn(page);
 
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- inferred type is the clearest description
     const send = (file: { buffer: Buffer; mimeType: string; name: string }, kind: string) =>
       page.evaluate(
         async ({ data, name, mimeType, kind }) => {

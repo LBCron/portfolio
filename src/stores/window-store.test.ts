@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { useWindowStore, type WindowState } from '@/stores/window-store';
 
 const viewport = { width: 1280, height: 800, top: 64 };
-const get = () => useWindowStore.getState();
+const get = (): ReturnType<typeof useWindowStore.getState> => useWindowStore.getState();
 const win = (): WindowState => get().windows['t']!;
 
 beforeEach(() => {

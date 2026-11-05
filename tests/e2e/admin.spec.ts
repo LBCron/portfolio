@@ -56,6 +56,7 @@ test.describe('anonymous access', () => {
     for (const method of ['post', 'put', 'delete'] as const) {
       for (const action of [false, true]) {
         const headers: Record<string, string> = action ? { 'next-action': 'abc' } : {};
+        // eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- inferred type is the clearest description
         const send = (path: string) => request[method](path, { maxRedirects: 0, headers });
         const unknown = await send('/zz-no-such-page');
         const admin = await send('/admin');

@@ -21,6 +21,7 @@ const wordCount = (markdown: string): number =>
  */
 export function describeRepositoryContract(name: string, factory: RepositoryFactory): void {
   describe(`ContentRepository contract: ${name}`, () => {
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- inferred type is the clearest description
     function setup(mutate?: (dataset: FixtureDataset) => void) {
       const dataset = createFixtureDataset();
 

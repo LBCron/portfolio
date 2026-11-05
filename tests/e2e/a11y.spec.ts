@@ -9,6 +9,7 @@ import { expect, type Page, test } from '@playwright/test';
 
 const AXE_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'];
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- inferred type is the clearest description
 const axe = (page: Page) =>
   new AxeBuilder({ page }).withTags(AXE_TAGS).exclude('[data-reveal=pending]').analyze();
 

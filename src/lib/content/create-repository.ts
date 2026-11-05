@@ -264,7 +264,7 @@ export function createRepository(
       });
     },
 
-    async getResume() {
+    async getResume(): ReturnType<ContentRepository['getResume']> {
       const resume = parseDocument('resume', await source.resume(), logger);
 
       if (!resume) return null;
@@ -282,7 +282,7 @@ export function createRepository(
       return files;
     },
 
-    async getFeaturedLinks(locale) {
+    async getFeaturedLinks(locale): ReturnType<ContentRepository['getFeaturedLinks']> {
       const links = parseCollection('featuredLink', await source.featuredLinks(), logger);
 
       return Promise.all(
@@ -454,7 +454,7 @@ export function createRepository(
       );
     },
 
-    async getTechnologies() {
+    async getTechnologies(): ReturnType<ContentRepository['getTechnologies']> {
       const technologies = parseCollection('technology', await source.technologies(), logger);
 
       return Promise.all(

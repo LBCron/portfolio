@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const set = vi.fn();
 
-vi.mock('next/headers', () => ({ cookies: async () => ({ set }) }));
+vi.mock('next/headers', () => ({ cookies: async (): Promise<{ set: typeof set }> => ({ set }) }));
 vi.mock('next/navigation', () => ({ notFound: vi.fn() }));
 
 afterEach(() => {

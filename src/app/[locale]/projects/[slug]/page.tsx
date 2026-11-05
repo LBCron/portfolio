@@ -17,6 +17,7 @@ import { JsonLd } from '@/components/seo/json-ld';
 import { ButtonAnchor, ButtonLink } from '@/components/ui/button';
 import { currentLocale } from '@/i18n/locale';
 import { getContent } from '@/lib/content';
+import { type Project } from '@/lib/content/types';
 import { projectNeighbors, relatedProjects } from '@/lib/projects';
 import { breadcrumbNode, graph, personNode, projectNode, websiteNode } from '@/lib/seo/json-ld';
 import { pageMetadata } from '@/lib/seo/metadata';
@@ -32,7 +33,9 @@ export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
   return routes.map((route) => ({ slug: route.slug }));
 }
 
-async function loadProject(slug: string) {
+async function loadProject(
+  slug: string,
+): Promise<{ locale: Awaited<ReturnType<typeof currentLocale>>; project: Project }> {
   const locale = await currentLocale();
   const lookup = await getContent().getProject(locale, slug);
 

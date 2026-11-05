@@ -11,7 +11,8 @@ const allowed = createWindowCounter(60, 10 * 60_000);
 const MULTIPART_OVERHEAD = 64 * 1024;
 const MB = 1024 * 1024;
 
-const fail = (status: number, error: string) => NextResponse.json({ error }, { status });
+const fail = (status: number, error: string): NextResponse<{ error: string }> =>
+  NextResponse.json({ error }, { status });
 
 /**
  * Same-origin browser requests only: Origin and Sec-Fetch-Site must agree.
@@ -25,7 +26,7 @@ function sameOrigin(request: NextRequest): boolean {
   return origin !== null && new URL(origin).host === request.headers.get('host');
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest): Promise<NextResponse> {
   const session = await getSession();
 
   if (!session) notFound();

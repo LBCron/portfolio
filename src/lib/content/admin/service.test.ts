@@ -3,7 +3,9 @@ import { describe, expect, it } from 'vitest';
 import { createFixtureDataset } from '../fixtures/dataset';
 import { createFixturesAdminStore } from './fixtures-store';
 import { createAdminService } from './service';
+import { type AdminDoc } from './types';
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- inferred type is the clearest description
 function setup(writable = true) {
   const dataset = createFixtureDataset();
   const store = createFixturesAdminStore(dataset, {
@@ -21,7 +23,7 @@ function setup(writable = true) {
   return { store, service, revalidated, audits };
 }
 
-async function firstProject(store: ReturnType<typeof setup>['store']) {
+async function firstProject(store: ReturnType<typeof setup>['store']): Promise<AdminDoc> {
   const [project] = (await store.list('project')).filter((doc) => doc['visible'] !== false);
 
   return (await store.get('project', project!.id))!;
