@@ -2,7 +2,7 @@ import { formatPartialDate } from '@/lib/format';
 
 import { type OutputNode, text } from '../../output';
 import { errorText, lines, periodLabel } from '../helpers';
-import type { Command, CommandContext } from '../types';
+import { type Command, type CommandContext } from '../types';
 
 const CATEGORIES = [
   'language',
@@ -14,14 +14,7 @@ const CATEGORIES = [
   'ai',
 ] as const;
 
-const KINDS = [
-  'web',
-  'mobile',
-  'desktop',
-  'automation',
-  'integration',
-  'open-source',
-] as const;
+const KINDS = ['web', 'mobile', 'desktop', 'automation', 'integration', 'open-source'] as const;
 
 const about: Command = {
   name: 'about',
@@ -32,12 +25,11 @@ const about: Command = {
   needsContent: true,
   async run(ctx) {
     const { profile } = ctx.content;
+
     if (!profile) return [text(ctx.t('terminal.empty'), 'warn')];
+
     return [
-      lines(
-        { text: profile.displayName, tone: 'bold' },
-        { text: profile.jobTitle, tone: 'dim' },
-      ),
+      lines({ text: profile.displayName, tone: 'bold' }, { text: profile.jobTitle, tone: 'dim' }),
       { type: 'blank' },
       text(profile.bio),
       { type: 'blank' },
@@ -56,8 +48,11 @@ const experience: Command = {
   needsContent: true,
   async run(ctx) {
     const entries = ctx.content.experience;
+
     if (entries.length === 0) return [text(ctx.t('terminal.empty'), 'warn')];
+
     const date = (value: string) => formatPartialDate(ctx.locale, value);
+
     return entries.flatMap((entry): OutputNode[] => [
       lines(
         { text: entry.company, tone: 'bold' },
@@ -85,17 +80,18 @@ const education: Command = {
   needsContent: true,
   async run(ctx) {
     const entries = ctx.content.education;
+
     if (entries.length === 0) return [text(ctx.t('terminal.empty'), 'warn')];
+
     const date = (value: string) => formatPartialDate(ctx.locale, value);
+
     return [
       lines(
         ...entries.flatMap((entry) => [
           { text: entry.title, tone: 'bold' as const },
           {
             text: `${ctx.t(`resume.kinds.${entry.kind}`)} · ${entry.institution}${
-              entry.start || entry.end
-                ? ` · ${periodLabel(ctx, date, entry.start, entry.end)}`
-                : ''
+              entry.start || entry.end ? ` · ${periodLabel(ctx, date, entry.start, entry.end)}` : ''
             }`,
             tone: 'dim' as const,
           },
@@ -116,6 +112,7 @@ const contact: Command = {
   async run(ctx) {
     const { contact: parts, links } = ctx.content;
     const output: OutputNode[] = [];
+
     if (parts) {
       output.push({
         type: 'kv',
@@ -145,6 +142,7 @@ const contact: Command = {
         ],
       });
     }
+
     if (links.length > 0) {
       output.push(text(ctx.t('terminal.labels.links'), 'dim'), {
         type: 'link',
@@ -155,6 +153,7 @@ const contact: Command = {
         })),
       });
     }
+
     return output.length > 0 ? output : [text(ctx.t('terminal.empty'), 'warn')];
   },
 };
@@ -170,6 +169,7 @@ const links: Command = {
     if (ctx.content.links.length === 0) {
       return [text(ctx.t('terminal.empty'), 'warn')];
     }
+
     return [
       {
         type: 'link',
@@ -195,6 +195,7 @@ const recommend: Command = {
     if (ctx.content.recommended.length === 0) {
       return [text(ctx.t('terminal.empty'), 'warn')];
     }
+
     return ctx.content.recommended.flatMap((person): OutputNode[] => [
       lines(
         { text: person.name, tone: 'bold' },
@@ -211,11 +212,12 @@ const recommend: Command = {
 
 function matchCategory(ctx: CommandContext, value: string) {
   const needle = value.toLowerCase();
+
   return CATEGORIES.find(
     (id) =>
-      id === needle ||
-      `${id}s` === needle ||
-      ctx.t(`stack.categories.${id}`).toLowerCase().startsWith(needle),
+      id === needle
+      || `${id}s` === needle
+      || ctx.t(`stack.categories.${id}`).toLowerCase().startsWith(needle),
   );
 }
 
@@ -236,38 +238,43 @@ const skills: Command = {
         : [],
   async run(ctx, args) {
     const requested = args.flags['category'];
-    let selected: readonly (typeof CATEGORIES)[number][] = CATEGORIES;
+    let selected: ReadonlyArray<(typeof CATEGORIES)[number]> = CATEGORIES;
+
     if (typeof requested === 'string') {
       const match = matchCategory(ctx, requested);
+
       if (!match) {
         return [
           errorText(ctx.t('terminal.skills.unknown', { category: requested })),
-          text(
-            ctx.t('terminal.skills.available', { list: CATEGORIES.join(', ') }),
-            'dim',
-          ),
+          text(ctx.t('terminal.skills.available', { list: CATEGORIES.join(', ') }), 'dim'),
         ];
       }
+
       selected = [match];
     }
+
     const output: OutputNode[] = [];
     for (const id of selected) {
       const names = ctx.content.technologies
         .filter((tech) => tech.category === id)
         .map((tech) => tech.name);
+
       if (names.length === 0) continue;
+
       output.push(
         text(ctx.t(`stack.categories.${id}`), 'bold'),
         text(names.join(' · '), 'accent'),
         { type: 'blank' },
       );
     }
+
     if (typeof requested !== 'string' && ctx.content.practices.length > 0) {
       output.push(
         text(ctx.t('stack.practicesTitle'), 'bold'),
         text(ctx.content.practices.join(' · '), 'accent'),
       );
     }
+
     return output.length > 0 ? output : [text(ctx.t('terminal.empty'), 'warn')];
   },
 };
@@ -281,54 +288,45 @@ const projects: Command = {
   valueFlags: ['kind'],
   needsContent: true,
   complete: (ctx, args, partial) => {
-    if (args.at(-1) === '--kind')
-      return KINDS.filter((k) => k.startsWith(partial));
+    if (args.at(-1) === '--kind') return KINDS.filter((k) => k.startsWith(partial));
+
     if (args[0] === 'open') {
       return ctx.content.projects
         .map((project) => project.slug)
         .filter((slug) => slug.startsWith(partial));
     }
-    return ['open', '--kind', '--featured'].filter((c) =>
-      c.startsWith(partial),
-    );
+
+    return ['open', '--kind', '--featured'].filter((c) => c.startsWith(partial));
   },
   async run(ctx, args) {
     if (args.positionals[0] === 'open') {
       const slug = args.positionals[1];
       const project = ctx.content.projects.find((item) => item.slug === slug);
+
       if (!project) {
-        return [
-          errorText(ctx.t('terminal.open.unknown', { target: slug ?? '' })),
-        ];
+        return [errorText(ctx.t('terminal.open.unknown', { target: slug ?? '' }))];
       }
+
       ctx.actions.navigate(`/projects/${project.slug}`);
-      return [
-        text(
-          ctx.t('terminal.open.project', { title: project.title }),
-          'success',
-        ),
-      ];
+
+      return [text(ctx.t('terminal.open.project', { title: project.title }), 'success')];
     }
+
     const kind = args.flags['kind'];
-    if (
-      typeof kind === 'string' &&
-      !(KINDS as readonly string[]).includes(kind)
-    ) {
+
+    if (typeof kind === 'string' && !(KINDS as readonly string[]).includes(kind)) {
       return [
         errorText(ctx.t('terminal.projects.unknownKind', { kind })),
-        text(
-          ctx.t('terminal.projects.kinds', { list: KINDS.join(', ') }),
-          'dim',
-        ),
+        text(ctx.t('terminal.projects.kinds', { list: KINDS.join(', ') }), 'dim'),
       ];
     }
+
     const rows = ctx.content.projects
-      .filter((project) =>
-        typeof kind === 'string' ? project.kind === kind : true,
-      )
+      .filter((project) => (typeof kind === 'string' ? project.kind === kind : true))
       .filter((project) => (args.flags['featured'] ? project.featured : true));
-    if (rows.length === 0)
-      return [text(ctx.t('terminal.projects.none'), 'warn')];
+
+    if (rows.length === 0) return [text(ctx.t('terminal.projects.none'), 'warn')];
+
     return [
       {
         type: 'table',
@@ -357,18 +355,21 @@ const resume: Command = {
   group: 'explore',
   visibility: 'public',
   needsContent: true,
-  complete: (_ctx, _args, partial) =>
-    '--download'.startsWith(partial) ? ['--download'] : [],
+  complete: (_ctx, _args, partial) => ('--download'.startsWith(partial) ? ['--download'] : []),
   async run(ctx, args) {
     const available = ctx.content.resume[ctx.locale];
+
     if (args.flags['download']) {
-      if (!available)
-        return [text(ctx.t('terminal.resume.unavailable'), 'warn')];
+      if (!available) return [text(ctx.t('terminal.resume.unavailable'), 'warn')];
+
       ctx.actions.downloadResume(ctx.locale);
+
       return [text(ctx.t('terminal.open.resume'), 'success')];
     }
+
     const latest = ctx.content.experience[0]?.roles[0];
     const company = ctx.content.experience[0]?.company;
+
     return [
       lines(
         {
@@ -427,7 +428,9 @@ const neofetch: Command = {
   needsContent: true,
   async run(ctx) {
     const { profile } = ctx.content;
+
     if (!profile) return [text(ctx.t('terminal.empty'), 'warn')];
+
     return [
       { type: 'ascii', lines: MARK, fallback: 'JM' },
       {
@@ -451,12 +454,15 @@ const neofetch: Command = {
   },
 };
 
-/** FNV-1a, folded to 7 hex digits: a stable, commit-looking id. */
+/**
+ * FNV-1a, folded to 7 hex digits: a stable, commit-looking id.
+ */
 export function shortHash(input: string) {
   let hash = 0x811c9dc5;
   for (const char of input) {
     hash = Math.imul(hash ^ char.charCodeAt(0), 0x01000193) >>> 0;
   }
+
   return hash.toString(16).padStart(8, '0').slice(0, 7);
 }
 
@@ -474,8 +480,10 @@ const git: Command = {
   async *run(ctx, args) {
     if (args.positionals[0] !== 'log' || !args.flags['oneline']) {
       yield errorText(ctx.t('terminal.git.onlyLog'));
+
       return;
     }
+
     const commits = ctx.content.experience
       .flatMap((entry) =>
         entry.roles.map((role) => ({
@@ -488,18 +496,19 @@ const git: Command = {
         })),
       )
       .sort((a, b) => b.start.localeCompare(a.start));
+
     if (commits.length === 0) {
       yield text(ctx.t('terminal.empty'), 'warn');
+
       return;
     }
+
     for (const [index, commit] of commits.entries()) {
       yield {
         type: 'text',
         spans: [
           { text: `${commit.hash} `, tone: 'warn' },
-          ...(index === 0
-            ? [{ text: '(HEAD -> main) ', tone: 'accent' as const }]
-            : []),
+          ...(index === 0 ? [{ text: '(HEAD -> main) ', tone: 'accent' as const }] : []),
           { text: commit.message },
         ],
       };

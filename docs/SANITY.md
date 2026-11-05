@@ -91,23 +91,18 @@ export default defineConfig({
                 .child(S.document().schemaType(type).documentId(type)),
             ),
             S.divider(),
-            ...S.documentTypeListItems().filter(
-              (item) => !singletons.has(item.getId() ?? ''),
-            ),
+            ...S.documentTypeListItems().filter((item) => !singletons.has(item.getId() ?? '')),
           ]),
     }),
   ],
   schema: {
     types: studioSchemaTypes,
-    templates: (templates) =>
-      templates.filter((template) => !singletons.has(template.schemaType)),
+    templates: (templates) => templates.filter((template) => !singletons.has(template.schemaType)),
   },
   document: {
     actions: (actions, { schemaType }) =>
       singletons.has(schemaType)
-        ? actions.filter(
-            ({ action }) => action !== 'duplicate' && action !== 'delete',
-          )
+        ? actions.filter(({ action }) => action !== 'duplicate' && action !== 'delete')
         : actions,
   },
 });

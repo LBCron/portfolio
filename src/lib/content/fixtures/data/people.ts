@@ -1,7 +1,7 @@
-import type { DocumentInput } from '../../schema';
-import { L, fixtureAvatar, meta } from '../helpers';
+import { type DocumentInput } from '../../schema';
+import { fixtureAvatar, L, meta } from '../helpers';
 
-export const featuredLinks: DocumentInput<'featuredLink'>[] = [
+export const featuredLinks: Array<DocumentInput<'featuredLink'>> = [
   {
     ...meta('featuredLink', 'github'),
     label: L('GitHub', 'GitHub'),
@@ -48,7 +48,7 @@ export const featuredLinks: DocumentInput<'featuredLink'>[] = [
   },
 ];
 
-export const recommendedProfiles: DocumentInput<'recommendedProfile'>[] = [
+export const recommendedProfiles: Array<DocumentInput<'recommendedProfile'>> = [
   {
     ...meta('recommendedProfile', 'ada-sample'),
     name: 'Ada Sample',

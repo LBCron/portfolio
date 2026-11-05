@@ -13,16 +13,18 @@ import {
 import { adminCsp, isHttpsSite } from '@/lib/security/headers';
 
 /**
- * Rewrite target for every request that must produce the global 404. Its
- * first segment is not a locale, so the `[locale]` root layout rejects it.
+ * Rewrite target for every request that must produce the global 404. Its first
+ * segment is not a locale, so the `[locale]` root layout rejects it.
  */
 const NOT_FOUND_PATH = '/404';
 
-/** Root-level files and route trees that are not localized. */
+/**
+ * Root-level files and route trees that are not localized.
+ */
 const ROOT_PASSTHROUGH = new Set([
   'api',
-  'fixtures',
   'apple-icon',
+  'fixtures',
   'icon',
   'icon.svg',
   'manifest.webmanifest',
@@ -55,8 +57,8 @@ const ADMIN_HEADERS = {
 async function guardAdmin(request: NextRequest) {
   const secret = process.env['SESSION_SECRET'];
   const token = request.cookies.get(SESSION_COOKIE)?.value;
-  const session =
-    isStrongSecret(secret) && token ? await verifySession(secret, token) : null;
+  const session = isStrongSecret(secret) && token ? await verifySession(secret, token) : null;
+
   if (!isStrongSecret(secret) || !session) return notFound(request);
 
   // Next reads the nonce from the request's CSP header and stamps it on its
@@ -64,20 +66,23 @@ async function guardAdmin(request: NextRequest) {
   const nonce = btoa(crypto.randomUUID());
   const csp = adminCsp(nonce, securityOptions);
   const requestHeaders = new Headers(request.headers);
+
   requestHeaders.set('Content-Security-Policy', csp);
+
   const response = NextResponse.next({ request: { headers: requestHeaders } });
+
   response.headers.set('Content-Security-Policy', csp);
   for (const [name, value] of Object.entries(ADMIN_HEADERS)) {
     response.headers.set(name, value);
   }
+
   // Sliding renewal at most once a minute; session checks (actions) never extend it.
-  if (
-    !request.headers.has('next-action') &&
-    nowSeconds() - session.iat >= RENEW_AFTER_SECONDS
-  ) {
+  if (!request.headers.has('next-action') && nowSeconds() - session.iat >= RENEW_AFTER_SECONDS) {
     const next = await signSession(secret, session.start);
+
     response.cookies.set(sessionCookie(next.token, next.exp));
   }
+
   return response;
 }
 
@@ -85,9 +90,11 @@ export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
 
   const lowercased = pathname.toLowerCase();
+
   if (lowercased !== pathname) {
     const url = request.nextUrl.clone();
     url.pathname = lowercased;
+
     return NextResponse.redirect(url, 308);
   }
 
@@ -96,12 +103,11 @@ export async function proxy(request: NextRequest) {
       request.cookies.get(LOCALE_COOKIE)?.value,
       request.headers.get('accept-language'),
     );
-    const response = NextResponse.redirect(
-      new URL(`/${locale}${search}`, request.url),
-      307,
-    );
+    const response = NextResponse.redirect(new URL(`/${locale}${search}`, request.url), 307);
+
     response.headers.set('Vary', 'Accept-Language, Cookie');
     response.headers.set('Cache-Control', 'private, no-store');
+
     return response;
   }
 

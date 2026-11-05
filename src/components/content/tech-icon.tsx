@@ -1,8 +1,8 @@
-import type { CSSProperties } from 'react';
+import { type CSSProperties } from 'react';
 
 import { cn } from '@/lib/cn';
-import type { TechIcon as TechIconData } from '@/lib/content';
-import type { PublicTechIcon } from '@/lib/content/icon-src';
+import { type TechIcon as TechIconData } from '@/lib/content';
+import { type PublicTechIcon } from '@/lib/content/icon-src';
 
 /**
  * Logo in `currentColor` or a monogram badge. A `src` icon is a cached file
@@ -12,8 +12,8 @@ export function TechIcon({
   icon,
   className,
 }: {
-  icon: TechIconData | PublicTechIcon;
   className?: string;
+  icon: PublicTechIcon | TechIconData;
 }) {
   if ('monogram' in icon) {
     return (
@@ -28,8 +28,10 @@ export function TechIcon({
       </span>
     );
   }
+
   if ('src' in icon) {
     const mask = `url("${icon.src}") center / contain no-repeat`;
+
     return (
       <span
         aria-hidden="true"
@@ -41,6 +43,7 @@ export function TechIcon({
       />
     );
   }
+
   return (
     <svg
       viewBox={icon.viewBox}

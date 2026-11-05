@@ -1,17 +1,17 @@
-import type { DocumentInput, TechCategory } from '../../schema';
+import { type DocumentInput, type TechCategory } from '../../schema';
 import { meta } from '../helpers';
 
 type Icon =
-  | { iconSource: 'simple-icons'; iconSlug: string }
-  | { iconSource: 'devicon'; iconSlug: string }
+  | { iconSlug: string; iconSource: 'devicon' }
+  | { iconSlug: string; iconSource: 'simple-icons' }
   | { iconSource: 'monogram'; monogram?: string };
 
 interface Entry {
+  brandColor?: string;
+  icon: Icon;
   name: string;
   priority: 1 | 2 | 3;
-  icon: Icon;
   url: string;
-  brandColor?: string;
 }
 
 const si = (iconSlug: string): Icon => ({
@@ -588,18 +588,17 @@ const inventory: Record<TechCategory, Entry[]> = {
   ],
 };
 
-export const technologies: DocumentInput<'technology'>[] = Object.entries(
-  inventory,
-).flatMap(([category, entries], categoryIndex) =>
-  entries.map((entry, index) => ({
-    ...meta('technology', entry.name),
-    name: entry.name,
-    category: category as TechCategory,
-    ...entry.icon,
-    priority: entry.priority,
-    url: entry.url,
-    ...(entry.brandColor ? { brandColor: entry.brandColor } : {}),
-    order: (categoryIndex + 1) * 100 + index * 10,
-    visible: true,
-  })),
+export const technologies: Array<DocumentInput<'technology'>> = Object.entries(inventory).flatMap(
+  ([category, entries], categoryIndex) =>
+    entries.map((entry, index) => ({
+      ...meta('technology', entry.name),
+      name: entry.name,
+      category: category as TechCategory,
+      ...entry.icon,
+      priority: entry.priority,
+      url: entry.url,
+      ...(entry.brandColor ? { brandColor: entry.brandColor } : {}),
+      order: (categoryIndex + 1) * 100 + index * 10,
+      visible: true,
+    })),
 );

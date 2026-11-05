@@ -13,6 +13,7 @@ describe('plainText', () => {
 
   it('keeps literal #, _, ~ and * in ordinary text', () => {
     const text = 'C# interop for snake_case_names and ~/dotfiles, 2 * 3 = 6';
+
     expect(plainText(text)).toBe(text);
     expect(truncate(text, 100)).toBe(text);
   });

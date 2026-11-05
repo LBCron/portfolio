@@ -11,29 +11,36 @@ import { toast } from '@/stores/toast-store';
 import { inputClass, smallButton } from './editor/styles';
 
 export interface ListRow {
+  /**
+   * First cell is the row's link.
+   */
+  cells: string[];
+  featured?: boolean;
+  href: string;
   id: string;
   rev: string | undefined;
-  href: string;
   visible: boolean;
-  featured?: boolean;
-  /** First cell is the row's link. */
-  cells: string[];
 }
 
 interface CollectionListProps {
-  type: string;
-  singular: string;
-  plural: string;
   columns: string[];
-  rows: ListRow[];
-  newHref: string;
-  /** Column indexes that get a filter menu. */
+  /**
+   * Column indexes that get a filter menu.
+   */
   filterColumns?: number[];
   hasFeatured?: boolean;
+  newHref: string;
+  plural: string;
   readOnly: boolean;
+  rows: ListRow[];
+  singular: string;
+  type: string;
 }
 
-/** Searchable, filterable table with visibility and featured toggles and reordering. */
+/**
+ * Searchable, filterable table with visibility and featured toggles and
+ * reordering.
+ */
 export function CollectionList({
   type,
   singular,
@@ -48,32 +55,30 @@ export function CollectionList({
   const [rows, setRows] = useState(initial);
   const [query, setQuery] = useState('');
   const [filters, setFilters] = useState<Record<number, string>>({});
-  const [dragging, setDragging] = useState<string | null>(null);
+  const [dragging, setDragging] = useState<null | string>(null);
 
   const filtered = rows.filter(
     (row) =>
-      row.cells.join(' ').toLowerCase().includes(query.toLowerCase()) &&
-      filterColumns.every(
-        (column) => !filters[column] || row.cells[column] === filters[column],
-      ),
+      row.cells.join(' ').toLowerCase().includes(query.toLowerCase())
+      && filterColumns.every((column) => !filters[column] || row.cells[column] === filters[column]),
   );
   const narrowed = filtered.length !== rows.length;
 
-  async function toggle(row: ListRow, field: 'visible' | 'featured') {
+  async function toggle(row: ListRow, field: 'featured' | 'visible') {
     const next = !row[field];
     const before = rows;
+
     setRows((current) =>
-      current.map((item) =>
-        item.id === row.id ? { ...item, [field]: next } : item,
-      ),
+      current.map((item) => (item.id === row.id ? { ...item, [field]: next } : item)),
     );
+
     try {
       const result = await setFlagAction(type, row.id, field, next, row.rev);
+
       if (!result.ok) throw new Error(result.kind);
+
       setRows((current) =>
-        current.map((item) =>
-          item.id === row.id ? { ...item, rev: result.rev } : item,
-        ),
+        current.map((item) => (item.id === row.id ? { ...item, rev: result.rev } : item)),
       );
     } catch {
       setRows(before);
@@ -83,16 +88,22 @@ export function CollectionList({
 
   async function move(id: string, to: number) {
     const from = rows.findIndex((row) => row.id === id);
+
     if (from === to || to < 0 || to >= rows.length) return;
+
     const before = rows;
     const next = moveItem(rows, from, to);
+
     setRows(next);
+
     try {
       const result = await reorderAction(
         type,
         next.map((row) => row.id),
       );
+
       if (!result.ok) throw new Error(result.kind);
+
       // Revisions changed server-side; the next toggle would conflict, so refresh them.
       setRows((current) => current.map((row) => ({ ...row, rev: undefined })));
       toast('Order saved', 'success');
@@ -119,10 +130,7 @@ export function CollectionList({
         </div>
         {filterColumns.map((column) => (
           <div key={column} className="flex flex-col gap-1">
-            <label
-              htmlFor={`filter-${column}`}
-              className="text-small text-text-2"
-            >
+            <label htmlFor={`filter-${column}`} className="text-small text-text-2">
               {columns[column]}
             </label>
             <select
@@ -137,13 +145,11 @@ export function CollectionList({
               className={inputClass}
             >
               <option value="">All</option>
-              {[...new Set(rows.map((row) => row.cells[column] ?? ''))]
-                .sort()
-                .map((value) => (
-                  <option key={value} value={value}>
-                    {value}
-                  </option>
-                ))}
+              {[...new Set(rows.map((row) => row.cells[column] ?? ''))].sort().map((value) => (
+                <option key={value} value={value}>
+                  {value}
+                </option>
+              ))}
             </select>
           </div>
         ))}
@@ -200,16 +206,14 @@ export function CollectionList({
           <tbody>
             {filtered.length === 0 ? (
               <tr>
-                <td
-                  colSpan={columns.length + 3}
-                  className="px-3 py-6 text-text-3"
-                >
+                <td colSpan={columns.length + 3} className="px-3 py-6 text-text-3">
                   Nothing here yet.
                 </td>
               </tr>
             ) : null}
             {filtered.map((row) => {
               const index = rows.findIndex((item) => item.id === row.id);
+
               return (
                 <tr
                   key={row.id}
@@ -217,7 +221,9 @@ export function CollectionList({
                   onDragOver={(event) => dragging && event.preventDefault()}
                   onDrop={(event) => {
                     event.preventDefault();
+
                     if (dragging) void move(dragging, index);
+
                     setDragging(null);
                   }}
                   className={cn(
@@ -289,9 +295,7 @@ export function CollectionList({
                       <button
                         type="button"
                         aria-label={`Move ${row.cells[0] ?? row.id} down`}
-                        disabled={
-                          readOnly || narrowed || index === rows.length - 1
-                        }
+                        disabled={readOnly || narrowed || index === rows.length - 1}
                         onClick={() => void move(row.id, index + 1)}
                         className={smallButton}
                       >

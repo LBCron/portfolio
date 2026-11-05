@@ -1,8 +1,10 @@
-import type { ContentSource } from '../create-repository';
-import type { DocumentInput } from '../schema';
+import { type ContentSource } from '../create-repository';
+import { type DocumentInput } from '../schema';
 import { createFixtureDataset, type FixtureDataset } from './dataset';
 
-type Visible = { visible?: boolean };
+interface Visible {
+  visible?: boolean;
+}
 
 const isVisible = (document: Visible) => document.visible !== false;
 
@@ -15,6 +17,7 @@ function technologyRefs(dataset: FixtureDataset) {
 
 function withoutLongForm(project: DocumentInput<'project'>) {
   const { body, gallery, ...summary } = project;
+
   return summary;
 }
 
@@ -25,8 +28,7 @@ function withoutLongForm(project: DocumentInput<'project'>) {
 export function createFixtureSource(
   dataset: FixtureDataset = createFixtureDataset(),
 ): ContentSource {
-  const read = <T>(value: T): Promise<T> =>
-    Promise.resolve(structuredClone(value));
+  const read = <T>(value: T): Promise<T> => Promise.resolve(structuredClone(value));
 
   return {
     name: 'fixtures',
@@ -34,8 +36,7 @@ export function createFixtureSource(
     contact: () => read(dataset.contact[0] ?? null),
     resume: () => read(dataset.resume[0] ?? null),
     featuredLinks: () => read(dataset.featuredLink.filter(isVisible)),
-    recommendedProfiles: () =>
-      read(dataset.recommendedProfile.filter(isVisible)),
+    recommendedProfiles: () => read(dataset.recommendedProfile.filter(isVisible)),
     projects: () =>
       read({
         projects: dataset.project.filter(isVisible).map(withoutLongForm),
@@ -45,9 +46,8 @@ export function createFixtureSource(
       read({
         projects: dataset.project.filter(
           (project) =>
-            isVisible(project) &&
-            (project.slug === slug ||
-              (project.previousSlugs ?? []).includes(slug)),
+            isVisible(project)
+            && (project.slug === slug || (project.previousSlugs ?? []).includes(slug)),
         ),
         technologies: technologyRefs(dataset),
       }),

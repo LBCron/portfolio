@@ -2,9 +2,12 @@ import { useId } from 'react';
 
 import { cn } from '@/lib/cn';
 
-/** "JM" mark. Decorative: the surrounding link carries the accessible name. */
+/**
+ * "JM" mark. Decorative: the surrounding link carries the accessible name.
+ */
 export function Monogram({ className }: { className?: string }) {
   const gradientId = useId();
+
   return (
     <svg
       viewBox="0 0 32 32"

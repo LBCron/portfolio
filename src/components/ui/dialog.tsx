@@ -6,14 +6,16 @@ import { type ReactNode, useEffect, useId, useRef } from 'react';
 import { cn } from '@/lib/cn';
 
 interface DialogProps {
-  open: boolean;
-  onClose: () => void;
-  title: ReactNode;
-  closeLabel: string;
   children: ReactNode;
   className?: string;
-  /** Visually hide the title (it still names the dialog). */
+  closeLabel: string;
+  /**
+   * Visually hide the title (it still names the dialog).
+   */
   hideTitle?: boolean;
+  onClose: () => void;
+  open: boolean;
+  title: ReactNode;
 }
 
 /**
@@ -34,8 +36,11 @@ export function Dialog({
 
   useEffect(() => {
     const dialog = ref.current;
+
     if (!dialog) return;
+
     if (open && !dialog.open) dialog.showModal();
+
     if (!open && dialog.open) dialog.close();
   }, [open]);
 
@@ -43,11 +48,15 @@ export function Dialog({
   // the keyboard paths. A click on the backdrop targets the dialog itself.
   useEffect(() => {
     const dialog = ref.current;
+
     if (!dialog) return;
+
     const onClick = (event: MouseEvent) => {
       if (event.target === dialog) onClose();
     };
+
     dialog.addEventListener('click', onClick);
+
     return () => dialog.removeEventListener('click', onClick);
   }, [onClose]);
 

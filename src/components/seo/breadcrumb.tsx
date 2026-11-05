@@ -1,7 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 
 import { Link } from '@/i18n/navigation';
-import type { Crumb } from '@/lib/seo/json-ld';
+import { type Crumb } from '@/lib/seo/json-ld';
 
 export async function Breadcrumb({ crumbs }: { crumbs: readonly Crumb[] }) {
   const t = await getTranslations('a11y');
@@ -11,10 +11,7 @@ export async function Breadcrumb({ crumbs }: { crumbs: readonly Crumb[] }) {
     <nav aria-label={t('breadcrumb')}>
       <ol className="flex flex-wrap items-center gap-x-2 gap-y-1 text-small text-text-3">
         {crumbs.map((crumb, index) => (
-          <li
-            key={`${crumb.path}:${crumb.name}`}
-            className="flex items-center gap-2"
-          >
+          <li key={`${crumb.path}:${crumb.name}`} className="flex items-center gap-2">
             {index > 0 ? (
               <span aria-hidden="true" className="text-text-3">
                 /

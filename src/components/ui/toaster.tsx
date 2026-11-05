@@ -7,7 +7,9 @@ import { useToastStore } from '@/stores/toast-store';
 
 const icons = { neutral: Info, success: CheckCircle2, error: CircleAlert };
 
-/** Polite live region for toasts. Always mounted so announcements fire. */
+/**
+ * Polite live region for toasts. Always mounted so announcements fire.
+ */
 export function Toaster() {
   const toasts = useToastStore((state) => state.toasts);
 
@@ -19,6 +21,7 @@ export function Toaster() {
     >
       {toasts.map((item) => {
         const Glyph = icons[item.tone];
+
         return (
           <p
             key={item.id}

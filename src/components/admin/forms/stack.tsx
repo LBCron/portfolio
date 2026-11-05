@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  LocalizedField,
-  Section,
-  SelectField,
-  TextField,
-  ToggleField,
-} from '../editor/fields';
+import { LocalizedField, Section, SelectField, TextField, ToggleField } from '../editor/fields';
 import { TechIconFields } from '../editor/icon-fields';
 
 const CATEGORIES = [

@@ -1,15 +1,15 @@
 /**
  * Client bundle checks (SPEC §15, §16, §18) against the last `next build`:
  *
- * - first-load JS budgets per public route (gzip), from Next's own
+ * - First-load JS budgets per public route (gzip), from Next's own
  *   `.next/diagnostics/route-bundle-stats.json`;
- * - lazy chunk budgets (terminal, secret commands, tech sphere);
- * - public routes never load admin code and no chunk outside the admin's
- *   first load mentions the admin path;
- * - the secret commands stay out of every first load and the terminal chunk;
- * - no server-only variable name or value appears in any client file.
+ * - Lazy chunk budgets (terminal, secret commands, tech sphere);
+ * - Public routes never load admin code and no chunk outside the admin's first
+ *   load mentions the admin path;
+ * - The secret commands stay out of every first load and the terminal chunk;
+ * - No server-only variable name or value appears in any client file.
  *
- *   bun run build && bun run check:bundle
+ *   Bun run build && bun run check:bundle.
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
@@ -56,12 +56,11 @@ const ADMIN_PATH = /["'`]\/admin(?:[/"'`?]|$)/;
 // The analytics filter in ClickTracker (`url.includes('/admin')`) must ship
 // publicly to drop admin page views; it is not a route reference.
 const ANALYTICS_FILTER = /\.includes\((["'`])\/admin\1\)/g;
-const mentionsAdmin = (text: string) =>
-  ADMIN_PATH.test(text.replace(ANALYTICS_FILTER, ''));
+const mentionsAdmin = (text: string) => ADMIN_PATH.test(text.replace(ANALYTICS_FILTER, ''));
 
 interface RouteStats {
-  route: string;
   firstLoadChunkPaths: string[];
+  route: string;
 }
 
 const errors: string[] = [];
@@ -73,6 +72,7 @@ const fail = (message: string) => {
 function walk(dir: string): string[] {
   return readdirSync(dir).flatMap((name) => {
     const path = join(dir, name);
+
     return statSync(path).isDirectory() ? walk(path) : [path];
   });
 }
@@ -80,10 +80,12 @@ function walk(dir: string): string[] {
 const contents = new Map<string, string>();
 const read = (path: string) => {
   let text = contents.get(path);
+
   if (text === undefined) {
     text = readFileSync(path, 'utf8');
     contents.set(path, text);
   }
+
   return text;
 };
 const gzip = (path: string) => gzipSync(readFileSync(path)).length;
@@ -100,9 +102,7 @@ const firstLoad = (routes: RouteStats[]) =>
 const publicChunks = firstLoad(publicRoutes);
 const adminChunks = firstLoad(stats.filter((r) => isAdmin(r.route)));
 
-const clientFiles = walk(STATIC_DIR).filter((path) =>
-  /\.(js|css|json|txt|map)$/.test(path),
-);
+const clientFiles = walk(STATIC_DIR).filter((path) => /\.(js|css|json|txt|map)$/.test(path));
 const jsChunks = clientFiles.filter((path) => path.endsWith('.js'));
 
 // 1. First-load budgets.
@@ -110,9 +110,9 @@ console.log('First-load JS (gzip):');
 for (const { route, firstLoadChunkPaths } of stats) {
   const total = firstLoadChunkPaths.reduce((sum, p) => sum + gzip(p), 0);
   const budget = ROUTE_BUDGETS[route];
-  console.log(
-    `  ${route.padEnd(30)} ${kb(total).padStart(10)}${budget ? ` / ${budget} KB` : ''}`,
-  );
+
+  console.log(`  ${route.padEnd(30)} ${kb(total).padStart(10)}${budget ? ` / ${budget} KB` : ''}`);
+
   if (budget && total > budget * KB) {
     fail(`${route} first load is ${kb(total)}, over its ${budget} KB budget`);
   }
@@ -125,24 +125,31 @@ for (const route of Object.keys(ROUTE_BUDGETS)) {
 
 // 2. Lazy chunks.
 console.log('Lazy chunks (gzip):');
+
 const lazyFiles: Record<string, string[]> = {};
 for (const [name, { marker, budget, exclusive }] of Object.entries(LAZY)) {
   const files = jsChunks.filter(
     (path) =>
-      read(path).includes(marker) &&
-      !publicChunks.has(normalize(path)) &&
-      !adminChunks.has(normalize(path)),
+      read(path).includes(marker)
+      && !publicChunks.has(normalize(path))
+      && !adminChunks.has(normalize(path)),
   );
+
   lazyFiles[name] = files.map(normalize);
+
   if (files.length === 0) {
     fail(`no chunk contains the ${name} marker "${marker}"`);
     continue;
   }
+
   const total = files.reduce((sum, p) => sum + gzip(p), 0);
+
   console.log(`  ${name.padEnd(30)} ${kb(total).padStart(10)} / ${budget} KB`);
+
   if (total > budget * KB) {
     fail(`${name} chunk is ${kb(total)}, over its ${budget} KB budget`);
   }
+
   if (exclusive) {
     for (const file of publicChunks) {
       if (read(`.next/${file}`).includes(marker)) {
@@ -192,4 +199,5 @@ if (errors.length > 0) {
   console.error(`\n${errors.length} bundle check(s) failed.`);
   process.exit(1);
 }
+
 console.log('\nBundle checks passed.');

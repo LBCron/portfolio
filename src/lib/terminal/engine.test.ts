@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import type { AppLocale } from '@/i18n/routing';
+import { type AppLocale } from '@/i18n/routing';
 
-import type { Command } from './commands/types';
+import { type Command } from './commands/types';
 import { defaultRegistry, publicCommands } from './registry';
 import { createHarness, flatten } from './test-utils';
 
@@ -25,9 +25,8 @@ describe.each(LOCALES)('commands (%s)', (locale) => {
     for (const command of publicCommands) {
       for (const flag of ['--help', '-h']) {
         const output = flatten(await harness.run(`${command.name} ${flag}`));
-        expect(output, command.name).toContain(
-          harness.deps.t(command.usageKey),
-        );
+
+        expect(output, command.name).toContain(harness.deps.t(command.usageKey));
       }
     }
   });
@@ -36,10 +35,9 @@ describe.each(LOCALES)('commands (%s)', (locale) => {
     const harness = await createHarness(locale);
     const nodes = await harness.run('help');
     const chips = nodes.flatMap((node) =>
-      node.type === 'kv'
-        ? node.items.flatMap((item) => item.command ?? [])
-        : [],
+      node.type === 'kv' ? node.items.flatMap((item) => item.command ?? []) : [],
     );
+
     expect(chips.sort()).toEqual(publicCommands.map((c) => c.name).sort());
     expect(flatten(nodes)).toContain('Ctrl /');
     expect(flatten(await harness.run('man about'))).toContain('about');
@@ -47,7 +45,9 @@ describe.each(LOCALES)('commands (%s)', (locale) => {
 
   it('about, experience, education and whoami', async () => {
     const harness = await createHarness(locale);
+
     expect(flatten(await harness.run('about'))).toContain('Julio');
+
     const experience = flatten(await harness.run('experience'));
     for (const company of ['Lumen Works', 'Northbridge Labs', 'Fable']) {
       expect(experience).toContain(company);
@@ -59,6 +59,7 @@ describe.each(LOCALES)('commands (%s)', (locale) => {
   it('contact shows the address but never a phone number', async () => {
     const harness = await createHarness(locale);
     const output = flatten(await harness.run('contact'));
+
     expect(output).toContain('hello@example.com');
     expect(output).not.toMatch(/\+\d|tel:/);
     expect(flatten(await harness.run('socials'))).toBe(output);
@@ -67,9 +68,12 @@ describe.each(LOCALES)('commands (%s)', (locale) => {
   it('links and recommend skip hidden items', async () => {
     const harness = await createHarness(locale);
     const links = await harness.run('links');
+
     expect(flatten(links)).toContain('GitHub');
     expect(links[0]).toMatchObject({ type: 'link' });
+
     const recommended = flatten(await harness.run('recommend'));
+
     expect(recommended).toContain('Ada Sample');
     expect(recommended).not.toContain('Sofia Demo');
     expect(flatten(await harness.run('following'))).toBe(recommended);
@@ -78,37 +82,40 @@ describe.each(LOCALES)('commands (%s)', (locale) => {
   it('skills groups technologies and never shows levels', async () => {
     const harness = await createHarness(locale);
     const all = flatten(await harness.run('skills'));
+
     expect(all).toContain('TypeScript');
     expect(all).not.toMatch(/%|★/);
+
     const frontend = flatten(await harness.run('skills --category frontend'));
+
     expect(frontend).toContain('React');
     expect(frontend).not.toContain('PostgreSQL');
-    expect(flatten(await harness.run('stack --category=frontend'))).toBe(
-      frontend,
-    );
-    expect(flatten(await harness.run('skills --category nope'))).toContain(
-      'nope',
-    );
+    expect(flatten(await harness.run('stack --category=frontend'))).toBe(frontend);
+    expect(flatten(await harness.run('skills --category nope'))).toContain('nope');
   });
 
   it('projects lists visible projects only and filters', async () => {
     const harness = await createHarness(locale);
     const all = flatten(await harness.run('projects'));
+
     expect(all).toContain('orbit-dashboard');
     expect(all).not.toContain('scratch-pad');
+
     const web = flatten(await harness.run('projects --kind web'));
+
     expect(web).toContain('orbit-dashboard');
     expect(web).not.toContain('pocket-ledger');
+
     const featured = flatten(await harness.run('projects --featured'));
+
     expect(featured).toContain('pay-bridge');
     expect(featured).not.toContain('tidy-desk');
-    expect(flatten(await harness.run('projects --kind nope'))).toContain(
-      'nope',
-    );
+    expect(flatten(await harness.run('projects --kind nope'))).toContain('nope');
   });
 
   it('open and projects open navigate, goto scrolls', async () => {
     const harness = await createHarness(locale);
+
     await harness.run('open pay-bridge');
     await harness.run('projects open orbit-dashboard');
     await harness.run('open projects/tidy-desk.md');
@@ -121,15 +128,14 @@ describe.each(LOCALES)('commands (%s)', (locale) => {
       'scroll:stack',
       'scroll:contact',
     ]);
-    expect(flatten(await harness.run('open scratch-pad'))).toContain(
-      'scratch-pad',
-    );
+    expect(flatten(await harness.run('open scratch-pad'))).toContain('scratch-pad');
     expect(flatten(await harness.run('open paybridge'))).toContain('paybridge');
     expect(flatten(await harness.run('goto nowhere'))).toContain('nowhere');
   });
 
   it('open resume.pdf and resume --download use the current locale', async () => {
     const harness = await createHarness(locale);
+
     await harness.run('open resume.pdf');
     await harness.run('resume --download');
     expect(harness.calls).toEqual([`download:${locale}`, `download:${locale}`]);
@@ -138,6 +144,7 @@ describe.each(LOCALES)('commands (%s)', (locale) => {
 
   it('opens a featured link in a new tab', async () => {
     const harness = await createHarness(locale);
+
     await harness.run('open github');
     expect(harness.calls[0]).toMatch(/^external:https:\/\//);
   });
@@ -145,6 +152,7 @@ describe.each(LOCALES)('commands (%s)', (locale) => {
   it('neofetch only shows snapshot data', async () => {
     const harness = await createHarness(locale);
     const nodes = await harness.run('neofetch');
+
     expect(nodes.map((node) => node.type)).toEqual(['ascii', 'kv']);
     expect(flatten(nodes)).toContain('Curitiba');
   });
@@ -153,18 +161,18 @@ describe.each(LOCALES)('commands (%s)', (locale) => {
     const harness = await createHarness(locale);
     const nodes = await harness.run('git log --oneline');
     const lines = nodes.map((node) => flatten([node]));
+
     expect(lines.length).toBeGreaterThanOrEqual(3);
     expect(lines[0]).toMatch(/^[0-9a-f]{7} \(HEAD -> main\) /);
     expect(lines[1]).toMatch(/^[0-9a-f]{7} /);
-    expect(flatten(await harness.run('git status'))).toContain(
-      'git log --oneline',
-    );
+    expect(flatten(await harness.run('git status'))).toContain('git log --oneline');
   });
 
   it('lang confirms before asking the site to switch', async () => {
     const harness = await createHarness(locale);
     const other = locale === 'en' ? 'pt' : 'en';
     const nodes = await harness.run(`lang ${other}`);
+
     expect(nodes).toHaveLength(1);
     expect(harness.calls).toEqual([`locale:${other}`]);
     expect(flatten(await harness.run(`lang ${locale}`))).not.toBe('');
@@ -174,6 +182,7 @@ describe.each(LOCALES)('commands (%s)', (locale) => {
 
   it('system commands act through the actions', async () => {
     const harness = await createHarness(locale, { history: ['ls', 'help'] });
+
     await harness.run('clear');
     await harness.run('exit');
     await harness.run('minimize');
@@ -187,13 +196,10 @@ describe.each(LOCALES)('commands (%s)', (locale) => {
 
   it('file system commands read the snapshot', async () => {
     const harness = await createHarness(locale);
+
     expect(flatten(await harness.run('ls'))).toContain('experience/');
-    expect(flatten(await harness.run('ls projects'))).toContain(
-      'orbit-dashboard.md',
-    );
-    expect(flatten(await harness.run('ls projects'))).not.toContain(
-      'scratch-pad',
-    );
+    expect(flatten(await harness.run('ls projects'))).toContain('orbit-dashboard.md');
+    expect(flatten(await harness.run('ls projects'))).not.toContain('scratch-pad');
     await harness.run('cd projects');
     await harness.run('cd ..');
     await harness.run('cd /stack');
@@ -202,16 +208,14 @@ describe.each(LOCALES)('commands (%s)', (locale) => {
     expect(flatten(await harness.run('cd nope'))).toContain('nope');
     expect(flatten(await harness.run('pwd'))).toBe('~');
     expect(flatten(await harness.run('cat about.md'))).toContain('Julio');
-    expect(flatten(await harness.run('cat projects/pay-bridge.md'))).toContain(
-      'Pay',
-    );
-    expect(flatten(await harness.run('cat resume.pdf'))).toContain(
-      'open resume.pdf',
-    );
+    expect(flatten(await harness.run('cat projects/pay-bridge.md'))).toContain('Pay');
+    expect(flatten(await harness.run('cat resume.pdf'))).toContain('open resume.pdf');
     expect(flatten(await harness.run('cat projects'))).toContain('projects');
     expect(flatten(await harness.run('cat ghost.md'))).toContain('ghost.md');
     expect(flatten(await harness.run('tree'))).toContain('└──');
+
     const relative = await createHarness(locale, { cwd: '~/projects' });
+
     expect(flatten(await relative.run('ls'))).toContain('pay-bridge.md');
     expect(flatten(await relative.run('cat ../about.md'))).toContain('Julio');
   });
@@ -221,15 +225,9 @@ describe('engine behavior', () => {
   it('reports unsupported shell syntax in both languages', async () => {
     for (const locale of LOCALES) {
       const harness = await createHarness(locale);
-      for (const line of [
-        'ls; pwd',
-        'ls | cat',
-        'ls > x',
-        'ls *',
-        'echo $HOME',
-        'echo "x',
-      ]) {
+      for (const line of ['ls; pwd', 'ls | cat', 'ls > x', 'ls *', 'echo $HOME', 'echo "x']) {
         const nodes = await harness.run(line);
+
         expect(nodes, line).toHaveLength(1);
         expect(nodes[0]).toMatchObject({ type: 'text' });
       }
@@ -239,6 +237,7 @@ describe('engine behavior', () => {
   it('suggests close public commands for unknown input', async () => {
     const harness = await createHarness('en');
     const typo = flatten(await harness.run('hepl'));
+
     expect(typo).toContain('command not found: hepl');
     expect(typo).toContain('Did you mean help?');
     expect(flatten(await harness.run('xyzzy'))).not.toContain('Did you mean');
@@ -247,6 +246,7 @@ describe('engine behavior', () => {
 
   it('ignores blank lines', async () => {
     const harness = await createHarness('en');
+
     expect(await harness.run('   ')).toEqual([]);
   });
 
@@ -255,16 +255,13 @@ describe('engine behavior', () => {
     const harness = await createHarness('en', {
       loadContent: async () => {
         if (fail) throw new Error('offline');
+
         return (await createHarness('en')).deps.loadContent();
       },
     });
     const first: string[] = [];
     const { execute } = await import('./engine');
-    for await (const node of execute(
-      'projects',
-      harness.deps,
-      new AbortController().signal,
-    )) {
+    for await (const node of execute('projects', harness.deps, new AbortController().signal)) {
       first.push(node.type);
     }
     expect(first).toEqual(['spinner', 'text']);
@@ -280,11 +277,7 @@ describe('engine behavior', () => {
     const controller = new AbortController();
     const { execute } = await import('./engine');
     const seen: string[] = [];
-    for await (const node of execute(
-      'git log --oneline',
-      harness.deps,
-      controller.signal,
-    )) {
+    for await (const node of execute('git log --oneline', harness.deps, controller.signal)) {
       if (node.type === 'text') {
         seen.push('line');
         controller.abort();
@@ -297,10 +290,9 @@ describe('engine behavior', () => {
 describe('secret commands', () => {
   it('never appear in help, suggestions or recordable history', async () => {
     const harness = await createHarness('en', { extraCommands: [secret] });
+
     expect(flatten(await harness.run('help'))).not.toContain('zyzzyva');
-    expect(flatten(await harness.run('zyzzyv'))).not.toContain(
-      'Did you mean zyzzyva',
-    );
+    expect(flatten(await harness.run('zyzzyv'))).not.toContain('Did you mean zyzzyva');
     expect(harness.deps.registry.suggest('zyzzyva')).toBeNull();
     expect(harness.deps.registry.isSecret('zyzzyva')).toBe(true);
     expect(defaultRegistry.isSecret('zyzzyva')).toBe(false);
@@ -310,6 +302,7 @@ describe('secret commands', () => {
     const unavailable = await createHarness('en');
     const typed = await unavailable.run('zyzzyva');
     const unknown = await unavailable.run('zyzzyx');
+
     expect(flatten(typed)).toBe(flatten(unknown).replace('zyzzyx', 'zyzzyva'));
   });
 });

@@ -11,8 +11,8 @@ import {
 import { ListEditor } from '../editor/list-editor';
 
 export interface Option {
-  value: string;
   label: string;
+  value: string;
 }
 
 const blank = () => ({ en: '', pt: '' });
@@ -22,16 +22,9 @@ export function ExperienceForm({ techOptions }: { techOptions: Option[] }) {
     <>
       <Section title="Company">
         <TextField path="company" label="Company" maxLength={80} />
-        <TextField
-          path="companyUrl"
-          label="Company website (optional)"
-          type="url"
-        />
+        <TextField path="companyUrl" label="Company website (optional)" type="url" />
         <LocalizedField path="location" label="Location" max={80} />
-        <ToggleField
-          path="collapsedByDefault"
-          label="Collapsed by default on the site"
-        />
+        <ToggleField path="collapsedByDefault" label="Collapsed by default on the site" />
         <ToggleField path="visible" label="Visible on the site" />
       </Section>
 
@@ -54,11 +47,7 @@ export function ExperienceForm({ techOptions }: { techOptions: Option[] }) {
         >
           {(_, itemPath) => (
             <>
-              <LocalizedField
-                path={`${itemPath}.title`}
-                label="Title"
-                max={80}
-              />
+              <LocalizedField path={`${itemPath}.title`} label="Title" max={80} />
               <div className="grid gap-4 sm:grid-cols-2">
                 <TextField
                   path={`${itemPath}.start`}
@@ -75,12 +64,7 @@ export function ExperienceForm({ techOptions }: { techOptions: Option[] }) {
                   maxLength={7}
                 />
               </div>
-              <LocalizedField
-                path={`${itemPath}.summary`}
-                label="Summary"
-                max={400}
-                multiline
-              />
+              <LocalizedField path={`${itemPath}.summary`} label="Summary" max={400} multiline />
               <ListEditor
                 path={`${itemPath}.bullets`}
                 label="Highlights"
@@ -89,11 +73,7 @@ export function ExperienceForm({ techOptions }: { techOptions: Option[] }) {
                 newItem={blank}
               >
                 {(__, bulletPath) => (
-                  <LocalizedField
-                    path={bulletPath}
-                    label="Highlight"
-                    max={200}
-                  />
+                  <LocalizedField path={bulletPath} label="Highlight" max={200} />
                 )}
               </ListEditor>
             </>
@@ -102,12 +82,7 @@ export function ExperienceForm({ techOptions }: { techOptions: Option[] }) {
       </Section>
 
       <Section title="Technologies">
-        <CheckboxGroup
-          path="techIds"
-          label="Technologies used"
-          options={techOptions}
-          max={32}
-        />
+        <CheckboxGroup path="techIds" label="Technologies used" options={techOptions} max={32} />
       </Section>
     </>
   );
@@ -127,18 +102,8 @@ export function EducationForm() {
       <LocalizedField path="title" label="Title" max={120} />
       <TextField path="institution" label="Institution" maxLength={120} />
       <div className="grid gap-4 sm:grid-cols-2">
-        <TextField
-          path="start"
-          label="Start (YYYY or YYYY-MM, optional)"
-          mono
-          maxLength={7}
-        />
-        <TextField
-          path="end"
-          label="End (YYYY or YYYY-MM, optional)"
-          mono
-          maxLength={7}
-        />
+        <TextField path="start" label="Start (YYYY or YYYY-MM, optional)" mono maxLength={7} />
+        <TextField path="end" label="End (YYYY or YYYY-MM, optional)" mono maxLength={7} />
       </div>
       <TextField path="url" label="Credential URL (optional)" type="url" />
       <ToggleField path="visible" label="Visible on the site" />

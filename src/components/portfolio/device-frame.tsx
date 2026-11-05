@@ -1,20 +1,14 @@
-import type { ReactNode } from 'react';
+import { type ReactNode } from 'react';
 
 import { cn } from '@/lib/cn';
-import type { ProjectKind } from '@/lib/content';
+import { type ProjectKind } from '@/lib/content';
 
 const DOTS = ['bg-danger/80', 'bg-warn/80', 'bg-term-green/80'] as const;
 
 /**
  * Decorative browser / device chrome around a cover. Hidden from AT.
  */
-export function DeviceFrame({
-  kind,
-  children,
-}: {
-  kind: ProjectKind;
-  children: ReactNode;
-}) {
+export function DeviceFrame({ kind, children }: { children: ReactNode; kind: ProjectKind }) {
   const phone = kind === 'mobile';
 
   return (
@@ -37,12 +31,7 @@ export function DeviceFrame({
           <span className="ml-3 h-5 flex-1 rounded-full bg-bg-0/60" />
         </div>
       )}
-      <div
-        className={cn(
-          'relative aspect-[16/10] overflow-hidden',
-          phone && 'rounded-[1.25rem]',
-        )}
-      >
+      <div className={cn('relative aspect-[16/10] overflow-hidden', phone && 'rounded-[1.25rem]')}>
         {children}
       </div>
     </div>

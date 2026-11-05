@@ -3,13 +3,17 @@
 import { ArrowDown } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 
-/** Hint to scroll that fades out over the first 240px of scroll. */
+/**
+ * Hint to scroll that fades out over the first 240px of scroll.
+ */
 export function ScrollCue({ href, label }: { href: string; label: string }) {
   const ref = useRef<HTMLAnchorElement>(null);
 
   useEffect(() => {
     const element = ref.current;
+
     if (!element) return;
+
     let frame = 0;
     const update = () => {
       frame = 0;
@@ -20,8 +24,10 @@ export function ScrollCue({ href, label }: { href: string; label: string }) {
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(update);
     };
+
     update();
     window.addEventListener('scroll', onScroll, { passive: true });
+
     return () => {
       window.removeEventListener('scroll', onScroll);
       cancelAnimationFrame(frame);

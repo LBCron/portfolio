@@ -2,15 +2,17 @@
 
 import { type ReactNode, type ToggleEvent, useState } from 'react';
 
-/** Uncontrolled-feeling `<details>` that can start open (D46). */
+/**
+ * Uncontrolled-feeling `<details>` that can start open (D46).
+ */
 export function JobDetails({
   openByDefault,
   className,
   children,
 }: {
-  openByDefault: boolean;
-  className?: string;
   children: ReactNode;
+  className?: string;
+  openByDefault: boolean;
 }) {
   const [open, setOpen] = useState(openByDefault);
 

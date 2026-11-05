@@ -23,7 +23,9 @@ describe('window store', () => {
 
   it('minimizes, restores and closes without losing geometry', () => {
     get().open('t', 'Terminal');
+
     const { rect } = win();
+
     get().minimize('t');
     expect(win()).toMatchObject({ status: 'minimized', focused: false, rect });
     get().restore('t');
@@ -34,7 +36,9 @@ describe('window store', () => {
 
   it('toggles maximize and keeps the restored rect', () => {
     get().open('t', 'Terminal');
+
     const { rect } = win();
+
     get().toggleMaximize('t');
     expect(win().maximized).toBe(true);
     expect(win().rect).toEqual(rect);
@@ -69,20 +73,18 @@ describe('window store', () => {
   it('raises with an incrementing counter and blurs the others', () => {
     get().open('a', 'A');
     get().open('b', 'B');
-    expect(get().windows['b']!.zIndex).toBeGreaterThan(
-      get().windows['a']!.zIndex,
-    );
+    expect(get().windows['b']!.zIndex).toBeGreaterThan(get().windows['a']!.zIndex);
     get().focus('a');
     expect(get().windows['a']).toMatchObject({ focused: true });
     expect(get().windows['b']!.focused).toBe(false);
-    expect(get().windows['a']!.zIndex).toBeGreaterThan(
-      get().windows['b']!.zIndex,
-    );
+    expect(get().windows['a']!.zIndex).toBeGreaterThan(get().windows['b']!.zIndex);
   });
 
   it('does not grow the counter when refocusing the top window', () => {
     get().open('t', 'Terminal');
+
     const before = get().zCounter;
+
     get().focus('t');
     get().focus('t');
     expect(get().zCounter).toBe(before);

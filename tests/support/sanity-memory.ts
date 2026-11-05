@@ -1,15 +1,11 @@
+import { evaluate, parse } from 'groq-js';
 import { createHash } from 'node:crypto';
 
-import { evaluate, parse } from 'groq-js';
-
+import { type FixtureDataset } from '@/lib/content/fixtures/dataset';
 import { FIXTURE_UPDATED_AT } from '@/lib/content/fixtures/helpers';
-import type { FixtureDataset } from '@/lib/content/fixtures/dataset';
-import type { FileAsset, ImageAsset } from '@/lib/content/schema';
-import {
-  toSanityDocuments,
-  type SanityDocument,
-} from '@/lib/content/sanity/documents';
-import type { GroqFetch } from '@/lib/content/sanity/source';
+import { type SanityDocument, toSanityDocuments } from '@/lib/content/sanity/documents';
+import { type GroqFetch } from '@/lib/content/sanity/source';
+import { type FileAsset, type ImageAsset } from '@/lib/content/schema';
 
 const sha1 = (value: string) => createHash('sha1').update(value).digest('hex');
 
@@ -17,14 +13,13 @@ const sha1 = (value: string) => createHash('sha1').update(value).digest('hex');
  * A Content Lake stand-in: the fixture dataset converted to Sanity storage
  * documents plus synthesized asset documents, queried with groq-js.
  */
-export function createSanityMemoryDataset(
-  dataset: FixtureDataset,
-): SanityDocument[] {
+export function createSanityMemoryDataset(dataset: FixtureDataset): SanityDocument[] {
   const assets = new Map<string, SanityDocument>();
 
   const resolver = {
     image(asset: ImageAsset) {
       const id = `image-${sha1(asset.url)}-${asset.width}x${asset.height}-webp`;
+
       assets.set(id, {
         _id: id,
         _type: 'sanity.imageAsset',
@@ -39,10 +34,12 @@ export function createSanityMemoryDataset(
           lqip: asset.lqip,
         },
       });
+
       return id;
     },
     file(asset: FileAsset) {
       const id = `file-${sha1(asset.url)}-pdf`;
+
       assets.set(id, {
         _id: id,
         _type: 'sanity.fileAsset',
@@ -50,6 +47,7 @@ export function createSanityMemoryDataset(
         size: asset.size,
         mimeType: asset.mimeType,
       });
+
       return id;
     },
   };
@@ -59,6 +57,7 @@ export function createSanityMemoryDataset(
     _rev: 'fixture',
     _updatedAt: FIXTURE_UPDATED_AT,
   }));
+
   return [...documents, ...assets.values()];
 }
 
@@ -68,8 +67,10 @@ export function createMemoryGroqFetch(
 ): GroqFetch {
   return async (query, params, tags) => {
     onQuery?.(query, tags);
+
     const tree = parse(query, { params });
     const value = await evaluate(tree, { dataset: [...documents], params });
+
     return value.get();
   };
 }

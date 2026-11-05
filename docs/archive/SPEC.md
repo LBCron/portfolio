@@ -180,22 +180,25 @@ Define in `globals.css` via `@theme`, and set `color-scheme: dark`, `<meta name=
 
 ```css
 @theme {
-  --color-bg-0: #07080b;       /* page */
-  --color-bg-1: #0c0e13;       /* alternate sections */
-  --color-surface-1: #11141b;  /* cards */
-  --color-surface-2: #171b24;  /* raised, chips */
+  --color-bg-0: #07080b; /* page */
+  --color-bg-1: #0c0e13; /* alternate sections */
+  --color-surface-1: #11141b; /* cards */
+  --color-surface-2: #171b24; /* raised, chips */
   --color-line: rgb(255 255 255 / 0.08);
   --color-line-strong: rgb(255 255 255 / 0.16);
-  --color-text-1: #e8eaf0;     /* headings, primary text */
-  --color-text-2: #a3a9b8;     /* body secondary */
-  --color-text-3: #7a8196;     /* meta; still >= 4.5:1 on bg-0 */
-  --color-accent-1: #8b7cff;   /* violet */
-  --color-accent-2: #4cc9f0;   /* cyan, focus ring */
+  --color-text-1: #e8eaf0; /* headings, primary text */
+  --color-text-2: #a3a9b8; /* body secondary */
+  --color-text-3: #7a8196; /* meta; still >= 4.5:1 on bg-0 */
+  --color-accent-1: #8b7cff; /* violet */
+  --color-accent-2: #4cc9f0; /* cyan, focus ring */
   --color-term-green: #4ade80; /* terminal prompt and success */
   --color-warn: #fbbf24;
   --color-danger: #f87171;
   --gradient-accent: linear-gradient(120deg, #8b7cff 0%, #4cc9f0 100%);
-  --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px; --radius-xl: 24px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
   --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
 }
 ```
@@ -261,13 +264,13 @@ Native `scroll-behavior: smooth` guarded by reduced motion; `scroll-margin-top: 
 ```ts
 type TechCategory = 'language' | 'frontend' | 'backend' | 'data' | 'cloud' | 'integration' | 'ai';
 interface Technology {
-  id: string;                       // Sanity _id
-  name: string;                     // proper noun, never localized
+  id: string; // Sanity _id
+  name: string; // proper noun, never localized
   category: TechCategory;
-  icon: { viewBox: string; paths: string[] } | { monogram: string };   // resolved on the server
-  brandColor?: string;              // hex; used on hover only, after luminance correction
-  url?: string;                     // official site (https)
-  priority: 1 | 2 | 3;              // 1 = always in the cloud; 3 = list view only on small screens
+  icon: { viewBox: string; paths: string[] } | { monogram: string }; // resolved on the server
+  brandColor?: string; // hex; used on hover only, after luminance correction
+  url?: string; // official site (https)
+  priority: 1 | 2 | 3; // 1 = always in the cloud; 3 = list view only on small screens
   order: number;
 }
 ```
@@ -311,28 +314,38 @@ Practices and concepts without logos (Clean Architecture, SOLID, DDD, microservi
 type ProjectKind = 'web' | 'mobile' | 'desktop' | 'automation' | 'integration' | 'open-source';
 type ProjectStatus = 'live' | 'in-progress' | 'archived' | 'private';
 interface ImageRef {
-  url: string; width: number; height: number;
-  lqip: string;                        // base64 blur placeholder from Sanity metadata
-  alt: string;                         // required, localized
-  focal?: { x: number; y: number };    // 0–1 focal point for cropping
+  url: string;
+  width: number;
+  height: number;
+  lqip: string; // base64 blur placeholder from Sanity metadata
+  alt: string; // required, localized
+  focal?: { x: number; y: number }; // 0–1 focal point for cropping
 }
-interface Project {                     // as returned by the data layer for ONE locale
-  id: string; slug: string;
-  previousSlugs: string[];              // old slugs; the route answers 308 to the current one
-  featured: boolean; visible: boolean; order: number;
-  year: number; kind: ProjectKind; status: ProjectStatus;
-  techIds: string[];                    // must reference existing technologies
-  cover?: ImageRef;                     // 16:10 recommended; omit to use the generated cover
+interface Project {
+  // as returned by the data layer for ONE locale
+  id: string;
+  slug: string;
+  previousSlugs: string[]; // old slugs; the route answers 308 to the current one
+  featured: boolean;
+  visible: boolean;
+  order: number;
+  year: number;
+  kind: ProjectKind;
+  status: ProjectStatus;
+  techIds: string[]; // must reference existing technologies
+  cover?: ImageRef; // 16:10 recommended; omit to use the generated cover
   gallery: (ImageRef & { caption?: string })[];
   links: { live?: string; repo?: string };
   title: string;
-  tagline: string;                      // one line, <= 90 chars
-  summary: string;                      // card description, <= 160 chars
-  role: string; context: string; approach: string;
-  highlights: string[];                 // 3–5 outcome bullets
+  tagline: string; // one line, <= 90 chars
+  summary: string; // card description, <= 160 chars
+  role: string;
+  context: string;
+  approach: string;
+  highlights: string[]; // 3–5 outcome bullets
   outcome?: string;
-  body?: string;                        // Markdown (GFM) for the expanded page
-  updatedAt: string;                    // Sanity _updatedAt, used for sitemap lastmod
+  body?: string; // Markdown (GFM) for the expanded page
+  updatedAt: string; // Sanity _updatedAt, used for sitemap lastmod
 }
 ```
 
@@ -378,11 +391,13 @@ Build a small, reusable window system. The terminal is its first and only window
 
 ```ts
 interface WindowState {
-  id: string; title: string;
+  id: string;
+  title: string;
   status: 'closed' | 'open' | 'minimized';
   maximized: boolean;
-  rect: { x: number; y: number; width: number; height: number };   // restored geometry, px
-  zIndex: number; focused: boolean;
+  rect: { x: number; y: number; width: number; height: number }; // restored geometry, px
+  zIndex: number;
+  focused: boolean;
 }
 ```
 
@@ -419,24 +434,35 @@ A convincing, fast, **fake** shell: no real execution, no `eval`, and no network
 
 ```ts
 interface CommandContext {
-  locale: Locale; cwd: string;
+  locale: Locale;
+  cwd: string;
   t: (key: string, values?: Record<string, unknown>) => string;
   vfs: VirtualFS;
-  content: ContentSnapshot;                        // public, localized snapshot (§11.7)
-  auth: { isAdmin: boolean; expiresAt?: number };  // mirrors the server session; a UI hint, never used to authorize
+  content: ContentSnapshot; // public, localized snapshot (§11.7)
+  auth: { isAdmin: boolean; expiresAt?: number }; // mirrors the server session; a UI hint, never used to authorize
   actions: {
-    navigate(href: string): void; scrollToSection(id: string): void;
-    setLocale(locale: Locale): void; setCwd(path: string): void; clear(): void;
+    navigate(href: string): void;
+    scrollToSection(id: string): void;
+    setLocale(locale: Locale): void;
+    setCwd(path: string): void;
+    clear(): void;
     downloadResume(locale: Locale): void;
     window: { close(): void; minimize(): void; maximize(): void };
-    readSecret(label: string): Promise<string | null>;   // masked input; null when cancelled
+    readSecret(label: string): Promise<string | null>; // masked input; null when cancelled
   };
 }
 interface Command {
-  name: string; aliases?: string[]; summaryKey: string; usageKey: string;
-  visibility: 'public' | 'secret';                 // secret: never in help, completion, suggestions or history
+  name: string;
+  aliases?: string[];
+  summaryKey: string;
+  usageKey: string;
+  visibility: 'public' | 'secret'; // secret: never in help, completion, suggestions or history
   complete?(ctx: CommandContext, args: string[], partial: string): string[];
-  run(ctx: CommandContext, args: ParsedArgs, signal: AbortSignal): Promise<OutputNode[]> | AsyncGenerator<OutputNode>;
+  run(
+    ctx: CommandContext,
+    args: ParsedArgs,
+    signal: AbortSignal,
+  ): Promise<OutputNode[]> | AsyncGenerator<OutputNode>;
 }
 ```
 
@@ -814,23 +840,23 @@ At the end of every phase: run the gate commands, summarize the results in at mo
 
 **Phase 0 — Plan (no code).** Read this spec fully. Produce an architecture summary, the resolved library versions (especially Next.js and Tailwind v4), the caching and CSP decisions, a list of risks and assumptions, and any contradictions you found in this spec with how you resolve them. Save to `docs/DECISIONS.md`. Stop and wait for ‘go’.
 
-**Phase 1 — Foundation.** Scaffold (`create-next-app@latest`, `src/app`, TypeScript, Tailwind v4), tooling, `env.ts`, tokens, fonts, next-intl routing and `proxy.ts`, locale layout, header, footer, language switcher, skip link, mobile menu, motion-pause toggle, `.cursor/rules`, CI skeleton, `/dev/ui` page. *Gate:* `lint`, `typecheck` and `build` pass; `/en` and `/pt` render server-side; axe is clean on the shell.
+**Phase 1 — Foundation.** Scaffold (`create-next-app@latest`, `src/app`, TypeScript, Tailwind v4), tooling, `env.ts`, tokens, fonts, next-intl routing and `proxy.ts`, locale layout, header, footer, language switcher, skip link, mobile menu, motion-pause toggle, `.cursor/rules`, CI skeleton, `/dev/ui` page. _Gate:_ `lint`, `typecheck` and `build` pass; `/en` and `/pt` render server-side; axe is clean on the shell.
 
-**Phase 2 — Data layer.** zod schemas, `ContentRepository`, the fixtures adapter with the Appendix A dataset and generated images, the Sanity read adapter (GROQ, tags, image projection), the seed script, contract tests, `i18n:check`, `icons:audit`. *Gate:* contract tests pass for both adapters; both locales are complete.
+**Phase 2 — Data layer.** zod schemas, `ContentRepository`, the fixtures adapter with the Appendix A dataset and generated images, the Sanity read adapter (GROQ, tags, image projection), the seed script, contract tests, `i18n:check`, `icons:audit`. _Gate:_ contract tests pass for both adapters; both locales are complete.
 
-**Phase 3 — Public pages.** Home sections, `/projects`, the detail page, the résumé route, the accessibility page, not-found and error pages, the motion system, and baseline SEO (metadata, JSON-LD, sitemap, robots, OG images). *Gate:* Lighthouse and axe budgets met; `check:seo` green; screenshots at 3 widths reviewed.
+**Phase 3 — Public pages.** Home sections, `/projects`, the detail page, the résumé route, the accessibility page, not-found and error pages, the motion system, and baseline SEO (metadata, JSON-LD, sitemap, robots, OG images). _Gate:_ Lighthouse and axe budgets met; `check:seo` green; screenshots at 3 widths reviewed.
 
-**Phase 4 — Technology cloud (§7).** *Gate:* at least 50 fps with 4× CPU throttling; List view; touch behavior verified in mobile emulation; reduced-motion fallback.
+**Phase 4 — Technology cloud (§7).** _Gate:_ at least 50 fps with 4× CPU throttling; List view; touch behavior verified in mobile emulation; reduced-motion fallback.
 
-**Phase 5 — Window manager (§9).** *Gate:* e2e for drag, resize, snap, maximize, minimize, restore and close; mobile bottom sheet; persistence; keyboard moves.
+**Phase 5 — Window manager (§9).** _Gate:_ e2e for drag, resize, snap, maximize, minimize, restore and close; mobile bottom sheet; persistence; keyboard moves.
 
-**Phase 6 — Public terminal (§10.1–10.5).** The lib first with tests, then the UI, then integration (navigate, scroll, language, résumé, snapshot endpoint). *Gate:* unit tests and e2e flows pass; axe with the terminal open.
+**Phase 6 — Public terminal (§10.1–10.5).** The lib first with tests, then the UI, then integration (navigate, scroll, language, résumé, snapshot endpoint). _Gate:_ unit tests and e2e flows pass; axe with the terminal open.
 
-**Phase 7 — Auth, secret commands and admin shell (§10.6, §12.1–12.5).** Session, password check, rate limiting, proxy gate, the secret module, admin layout and dashboard, 404 behavior, non-indexability headers. *Gate:* the leak tests and the anonymous-404 tests pass.
+**Phase 7 — Auth, secret commands and admin shell (§10.6, §12.1–12.5).** Session, password check, rate limiting, proxy gate, the secret module, admin layout and dashboard, 404 behavior, non-indexability headers. _Gate:_ the leak tests and the anonymous-404 tests pass.
 
-**Phase 8 — Admin modules and write path (§11.6, §12.6–12.8).** Shared editor components, every admin page, uploads and sanitizers, the Sanity write adapter, revalidation, the webhook. *Gate:* admin e2e on the writable fixtures adapter; a manual smoke run against a real Sanity dataset documented in `docs/SANITY.md`.
+**Phase 8 — Admin modules and write path (§11.6, §12.6–12.8).** Shared editor components, every admin page, uploads and sanitizers, the Sanity write adapter, revalidation, the webhook. _Gate:_ admin e2e on the writable fixtures adapter; a manual smoke run against a real Sanity dataset documented in `docs/SANITY.md`.
 
-**Phase 9 — Hardening.** CSP and security headers, performance pass (bundle analysis, lazy chunks), accessibility pass (§14.9 including the manual checklist), SEO pass (§13), cross-browser pass, Lighthouse CI thresholds enforced, README and docs. *Gate:* Definition of Done.
+**Phase 9 — Hardening.** CSP and security headers, performance pass (bundle analysis, lazy chunks), accessibility pass (§14.9 including the manual checklist), SEO pass (§13), cross-browser pass, Lighthouse CI thresholds enforced, README and docs. _Gate:_ Definition of Done.
 
 **Phase 10 — Optional polish (MAY).** View Transitions card → detail, snap preview refinement, more easter eggs, Studio-ready schemas.
 
@@ -876,15 +902,15 @@ At the end of every phase: run the gate commands, summarize the results in at mo
 
 **Projects (7).** Each has title, tagline, summary, role, context, approach, 3–5 highlights and an outcome, in both languages.
 
-| Slug | Kind | Status | Featured | Links | Notes |
-| --- | --- | --- | --- | --- | --- |
-| orbit-dashboard | web | live | yes | live | Analytics dashboard concept; long Markdown body (≥ 400 words); gallery of 3 images; 5 technologies |
-| pocket-ledger | mobile | in-progress | yes | none | Personal finance app concept; cover only |
-| tidy-desk | desktop | archived | no | repo | Cross-platform file organizer concept |
-| invoice-bot | automation | private | no | none | Back-office automation concept; no cover (generated cover) |
-| pay-bridge | integration | live | yes | live + repo | Payment connector concept; `previousSlugs: ['paybridge']` |
-| lint-kit | open-source | live | no | repo | Shareable lint ruleset concept |
-| scratch-pad | web | in-progress | no | none | `visible: false`; must never appear anywhere |
+| Slug            | Kind        | Status      | Featured | Links       | Notes                                                                                              |
+| --------------- | ----------- | ----------- | -------- | ----------- | -------------------------------------------------------------------------------------------------- |
+| orbit-dashboard | web         | live        | yes      | live        | Analytics dashboard concept; long Markdown body (≥ 400 words); gallery of 3 images; 5 technologies |
+| pocket-ledger   | mobile      | in-progress | yes      | none        | Personal finance app concept; cover only                                                           |
+| tidy-desk       | desktop     | archived    | no       | repo        | Cross-platform file organizer concept                                                              |
+| invoice-bot     | automation  | private     | no       | none        | Back-office automation concept; no cover (generated cover)                                         |
+| pay-bridge      | integration | live        | yes      | live + repo | Payment connector concept; `previousSlugs: ['paybridge']`                                          |
+| lint-kit        | open-source | live        | no       | repo        | Shareable lint ruleset concept                                                                     |
+| scratch-pad     | web         | in-progress | no       | none        | `visible: false`; must never appear anywhere                                                       |
 
 ## Appendix B — Copy and microcopy (English source; write Portuguese natively)
 

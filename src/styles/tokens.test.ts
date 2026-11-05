@@ -7,10 +7,10 @@ const css = readFileSync(join(__dirname, 'globals.css'), 'utf8');
 const themeBlock = /@theme\s*\{([\s\S]*?)\n\}/.exec(css)?.[1] ?? '';
 
 function token(name: string) {
-  const match = new RegExp(`--color-${name}:\\s*(#[0-9a-f]{6})`, 'i').exec(
-    themeBlock,
-  );
+  const match = new RegExp(`--color-${name}:\\s*(#[0-9a-f]{6})`, 'i').exec(themeBlock);
+
   if (!match?.[1]) throw new Error(`Missing token --color-${name}`);
+
   return match[1];
 }
 
@@ -39,16 +39,12 @@ describe('design tokens', () => {
   });
 
   it('primary button label (bg-0 on text-1) reaches 7:1', () => {
-    expect(
-      contrastRatio(token('bg-0'), token('text-1')),
-    ).toBeGreaterThanOrEqual(7);
+    expect(contrastRatio(token('bg-0'), token('text-1'))).toBeGreaterThanOrEqual(7);
   });
 
   it('focus ring (accent-2) reaches 3:1 on every surface', () => {
     for (const bg of surfaces) {
-      expect(
-        contrastRatio(token('accent-2'), token(bg)),
-      ).toBeGreaterThanOrEqual(3);
+      expect(contrastRatio(token('accent-2'), token(bg))).toBeGreaterThanOrEqual(3);
     }
   });
 });

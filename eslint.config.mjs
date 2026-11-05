@@ -18,8 +18,7 @@ export default defineConfig([
           patterns: [
             {
               group: ['@sanity/*', 'groq-js', '**/lib/content/sanity/*'],
-              message:
-                'Components never talk to Sanity; go through @/lib/content.',
+              message: 'Components never talk to Sanity; go through @/lib/content.',
             },
           ],
         },

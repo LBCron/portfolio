@@ -6,7 +6,7 @@ import { useLocale, useTranslations } from 'next-intl';
 export default function LocaleError({
   retry,
 }: {
-  error: Error & { digest?: string };
+  error: { digest?: string } & Error;
   retry: () => void;
 }) {
   const t = useTranslations('errors');

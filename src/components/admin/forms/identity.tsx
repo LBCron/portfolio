@@ -32,19 +32,12 @@ export function ProfileForm() {
           max={6}
           newItem={blank}
         >
-          {(_, itemPath) => (
-            <LocalizedField path={itemPath} label="Language" max={60} />
-          )}
+          {(_, itemPath) => <LocalizedField path={itemPath} label="Language" max={60} />}
         </ListEditor>
       </Section>
 
       <Section title="Hero">
-        <LocalizedField
-          path="heroLead"
-          label="Lead paragraph"
-          max={120}
-          multiline
-        />
+        <LocalizedField path="heroLead" label="Lead paragraph" max={120} multiline />
         <SelectField
           path="titleFont"
           label="Title font"
@@ -55,14 +48,8 @@ export function ProfileForm() {
             label: titleFontLabels[value],
           }))}
         />
-        <ImageField
-          path="photo"
-          label="Photo (square, hero and social image)"
-        />
-        <ImageField
-          path="photoLg"
-          label="Large photo (3:4, from large screens up)"
-        />
+        <ImageField path="photo" label="Photo (square, hero and social image)" />
+        <ImageField path="photoLg" label="Large photo (3:4, from large screens up)" />
       </Section>
 
       <Section title="About">
@@ -82,11 +69,7 @@ export function ProfileForm() {
                 maxLength={12}
                 hint="Shown as is, e.g. 12+"
               />
-              <LocalizedField
-                path={`${itemPath}.label`}
-                label="Label"
-                max={48}
-              />
+              <LocalizedField path={`${itemPath}.label`} label="Label" max={48} />
               <div className="grid gap-4 sm:grid-cols-3">
                 <NumberField
                   path={`${itemPath}.countTo`}
@@ -94,16 +77,8 @@ export function ProfileForm() {
                   min={0}
                   hint="Optional animation target"
                 />
-                <TextField
-                  path={`${itemPath}.prefix`}
-                  label="Prefix"
-                  maxLength={4}
-                />
-                <TextField
-                  path={`${itemPath}.suffix`}
-                  label="Suffix"
-                  maxLength={4}
-                />
+                <TextField path={`${itemPath}.prefix`} label="Prefix" maxLength={4} />
+                <TextField path={`${itemPath}.suffix`} label="Suffix" maxLength={4} />
               </div>
             </>
           )}
@@ -128,12 +103,7 @@ export function ContactForm() {
         label="Show the phone number publicly"
         hint="Off by default. When off, the number is never sent to visitors."
       />
-      <TextField
-        path="bookingUrl"
-        label="Booking link (optional)"
-        type="url"
-        hint="https only"
-      />
+      <TextField path="bookingUrl" label="Booking link (optional)" type="url" hint="https only" />
       <LocalizedField path="ctaHeading" label="Contact heading" max={80} />
       <LocalizedField path="ctaText" label="Contact text" max={280} multiline />
     </Section>
@@ -143,6 +113,7 @@ export function ContactForm() {
 export function ResumeForm() {
   const form = useForm();
   const updated = form.get('updatedAt');
+
   return (
     <Section
       title="Résumé files"

@@ -1,4 +1,4 @@
-import type { DocumentInput, DocumentType } from '../schema';
+import { type DocumentInput, type DocumentType } from '../schema';
 import { education, experience } from './data/career';
 import { contact, resume } from './data/contact';
 import { featuredLinks, recommendedProfiles } from './data/people';
@@ -8,10 +8,12 @@ import { projects } from './data/projects';
 import { technologies } from './data/technologies';
 
 export type FixtureDataset = {
-  [T in DocumentType]: DocumentInput<T>[];
+  [T in DocumentType]: Array<DocumentInput<T>>;
 };
 
-/** The fictional dataset of Appendix A, keyed by document type. */
+/**
+ * The fictional dataset of Appendix A, keyed by document type.
+ */
 export function createFixtureDataset(): FixtureDataset {
   return structuredClone({
     profile: [profile],

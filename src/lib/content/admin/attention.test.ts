@@ -2,16 +2,14 @@ import { describe, expect, it } from 'vitest';
 
 import { createFixtureDataset } from '../fixtures/dataset';
 import { findAttention } from './attention';
-import type { AdminDoc } from './types';
+import { type AdminDoc } from './types';
 
 const asDocs = <T>(list: T[]) => list as unknown as AdminDoc[];
 
 describe('findAttention', () => {
   it('flags a missing translation, a missing alt text and SEO lengths', () => {
     const items = findAttention({
-      practice: asDocs([
-        { id: 'practice.1', label: { en: 'Testing', pt: ' ' } },
-      ]),
+      practice: asDocs([{ id: 'practice.1', label: { en: 'Testing', pt: ' ' } }]),
       project: asDocs([
         {
           id: 'project.1',
@@ -26,9 +24,8 @@ describe('findAttention', () => {
       ]),
     });
     const text = items.map((item) => item.issue).join('\n');
-    expect(items.find((item) => item.id === 'practice.1')?.issue).toMatch(
-      /missing in Portuguese/,
-    );
+
+    expect(items.find((item) => item.id === 'practice.1')?.issue).toMatch(/missing in Portuguese/);
     expect(text).toMatch(/Title \(en\) is 70/);
     expect(text).toMatch(/Summary \(en\) is 5/);
     expect(text).toMatch(/no alt text/);
@@ -36,10 +33,9 @@ describe('findAttention', () => {
 
   it('flags a missing translation on array items that carry a _key', () => {
     const items = findAttention({
-      practice: asDocs([
-        { id: 'practice.1', label: { _key: 'k1', en: 'Testing', pt: '' } },
-      ]),
+      practice: asDocs([{ id: 'practice.1', label: { _key: 'k1', en: 'Testing', pt: '' } }]),
     });
+
     expect(items[0]?.issue).toMatch(/missing in Portuguese/);
   });
 
@@ -53,6 +49,7 @@ describe('findAttention', () => {
       ]),
     });
     const thin = items.filter((item) => /thin page/.test(item.issue));
+
     expect(thin.map((item) => item.id)).toEqual(['project.thin']);
     expect(thin[0]?.issue).toBe(
       'Write-up has 2 words (en) and 0 (pt); under 150 reads as a thin page',
@@ -66,6 +63,7 @@ describe('findAttention', () => {
       visible: true,
     }));
     const items = findAttention({ project: asDocs(many) });
+
     expect(items.at(-1)?.issue).toBe('7 projects are featured; Home shows 6');
   });
 
@@ -75,6 +73,7 @@ describe('findAttention', () => {
       profile: asDocs(dataset.profile),
       featuredLink: asDocs(dataset.featuredLink),
     });
+
     expect(items.filter((item) => /Portuguese/.test(item.issue))).toEqual([]);
   });
 });

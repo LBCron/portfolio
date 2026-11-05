@@ -1,9 +1,9 @@
 import { expect, type Page, test } from '@playwright/test';
 
 /**
- * §18 visual snapshots of the hero and the project cards at 375, 768 and
- * 1440 px (D61). Baselines are Linux PNGs: CI compares them, and locally they
- * run only with VISUAL=1 (add --update-snapshots to regenerate). The
+ * §18 visual snapshots of the hero and the project cards at 375, 768 and 1440
+ * px (D61). Baselines are Linux PNGs: CI compares them, and locally they run
+ * only with VISUAL=1 (add --update-snapshots to regenerate). The
  * `visual-baselines` workflow regenerates them on the CI image.
  */
 
@@ -35,7 +35,9 @@ for (const width of WIDTHS) {
   test(`cards ${width}`, async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== 'chromium', 'one renderer');
     await settle(page, width, '/en/projects');
+
     const firstCard = page.locator('main ul > li').first();
+
     await firstCard.scrollIntoViewIfNeeded();
     await expect(firstCard).toHaveScreenshot(`card-${width}.png`);
   });

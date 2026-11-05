@@ -1,9 +1,6 @@
 import Image from 'next/image';
-import type { ComponentProps, ReactNode } from 'react';
-import ReactMarkdown, {
-  type Components,
-  defaultUrlTransform,
-} from 'react-markdown';
+import { type ComponentProps, type ReactNode } from 'react';
+import ReactMarkdown, { type Components, defaultUrlTransform } from 'react-markdown';
 import rehypeSanitize from 'rehype-sanitize';
 import remarkGfm from 'remark-gfm';
 
@@ -13,26 +10,36 @@ import { slugify } from '@/lib/content/slugify';
 import { markdownSchema } from './schema';
 
 export interface MarkdownImage {
+  alt: string;
+  height: number;
+  lqip?: string;
   url: string;
   width: number;
-  height: number;
-  alt: string;
-  lqip?: string;
 }
 
 interface MarkdownProps {
   children: string;
-  /** Level the document's top heading maps to (the page keeps one `h1`). */
-  topHeadingLevel?: 2 | 3 | 4;
-  /** Prefix for heading ids, unique per page. */
-  idPrefix?: string;
-  /** Allowed images: `![alt](gallery:1)` or the exact asset URL. */
-  images?: readonly MarkdownImage[];
-  /** Appended to external links for screen readers. */
-  newTabLabel: string;
-  /** Accessible name for scrollable tables and code blocks. */
-  scrollRegionLabel: string;
   className?: string;
+  /**
+   * Prefix for heading ids, unique per page.
+   */
+  idPrefix?: string;
+  /**
+   * Allowed images: `![alt](gallery:1)` or the exact asset URL.
+   */
+  images?: readonly MarkdownImage[];
+  /**
+   * Appended to external links for screen readers.
+   */
+  newTabLabel: string;
+  /**
+   * Accessible name for scrollable tables and code blocks.
+   */
+  scrollRegionLabel: string;
+  /**
+   * Level the document's top heading maps to (the page keeps one `h1`).
+   */
+  topHeadingLevel?: 2 | 3 | 4;
 }
 
 type Level = 1 | 2 | 3 | 4 | 5 | 6;
@@ -43,16 +50,21 @@ function topLevel(markdown: string): Level {
   for (const match of withoutCode.matchAll(/^(#{1,6})[ \t]/gm)) {
     min = Math.min(min, match[1]?.length ?? 6);
   }
+
   return min as Level;
 }
 
 function textOf(node: ReactNode): string {
   if (typeof node === 'string' || typeof node === 'number') return `${node}`;
+
   if (Array.isArray(node)) return node.map(textOf).join('');
+
   if (node && typeof node === 'object' && 'props' in node) {
     const props = node.props as { children?: ReactNode };
+
     return textOf(props.children);
   }
+
   return '';
 }
 
@@ -61,9 +73,9 @@ function isExternal(href: string) {
 }
 
 /**
- * Markdown (GFM) rendered on the server through a strict sanitize schema.
- * Raw HTML is dropped, links are allowlisted (https, mailto, relative) and
- * images resolve only to the project's own gallery.
+ * Markdown (GFM) rendered on the server through a strict sanitize schema. Raw
+ * HTML is dropped, links are allowlisted (https, mailto, relative) and images
+ * resolve only to the project's own gallery.
  */
 export function Markdown({
   children,
@@ -83,14 +95,19 @@ export function Markdown({
       const Tag = `h${target}` as 'h2';
       const base = `${idPrefix}-${slugify(textOf(content)) || 'section'}`;
       const count = usedIds.get(base) ?? 0;
+
       usedIds.set(base, count + 1);
+
       const id = count === 0 ? base : `${base}-${count + 1}`;
+
       return <Tag id={id}>{content}</Tag>;
     };
 
   const resolveImage = (src: string) => {
     const galleryIndex = /^gallery:(\d+)$/.exec(src)?.[1];
+
     if (galleryIndex) return images[Number(galleryIndex) - 1];
+
     return images.find((image) => image.url === src);
   };
 
@@ -114,7 +131,9 @@ export function Markdown({
       ),
     img: ({ src, alt }) => {
       const image = typeof src === 'string' ? resolveImage(src) : undefined;
+
       if (!image) return null;
+
       return (
         <Image
           src={image.url}
@@ -155,9 +174,7 @@ export function Markdown({
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[[rehypeSanitize, markdownSchema]]}
         skipHtml
-        urlTransform={(url) =>
-          /^gallery:\d+$/.test(url) ? url : defaultUrlTransform(url)
-        }
+        urlTransform={(url) => (/^gallery:\d+$/.test(url) ? url : defaultUrlTransform(url))}
         components={components}
       >
         {children}

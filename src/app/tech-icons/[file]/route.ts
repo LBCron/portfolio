@@ -7,26 +7,26 @@ const FILL = /^[0-9a-f]{6}$/;
 const notFound = () => new Response(null, { status: 404 });
 
 /**
- * Content-addressed technology logos (D59). The name is a hash of the paths,
- * so a changed icon gets a new URL and each file can be cached forever. Only
+ * Content-addressed technology logos (D59). The name is a hash of the paths, so
+ * a changed icon gets a new URL and each file can be cached forever. Only
  * visible technologies resolve. The document holds nothing but `<path>`
  * elements built from sanitized data (D54), so it cannot carry script.
  */
-export async function GET(
-  request: Request,
-  context: RouteContext<'/tech-icons/[file]'>,
-) {
+export async function GET(request: Request, context: RouteContext<'/tech-icons/[file]'>) {
   const { file } = await context.params;
   const hash = FILE.exec(file)?.[1];
+
   if (!hash) return notFound();
 
   const fill = new URL(request.url).searchParams.get('fill') ?? undefined;
+
   if (fill !== undefined && !FILL.test(fill)) return notFound();
 
   const technologies = await getContent().getTechnologies('en');
   const icon = technologies
     .map((tech) => tech.icon)
     .find((candidate) => 'paths' in candidate && iconHash(candidate) === hash);
+
   if (!icon || !('paths' in icon)) return notFound();
 
   return new Response(renderIconSvg(icon, fill), {

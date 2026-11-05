@@ -3,36 +3,39 @@
 import { ChevronDown } from 'lucide-react';
 import { type ReactNode, useEffect, useRef, useState } from 'react';
 
-import { cn } from '@/lib/cn';
 import { fieldId } from '@/lib/admin/path';
+import { cn } from '@/lib/cn';
 
 import { useForm } from './form';
 import { MarkdownEditor } from './markdown-editor';
 import { hintClass, inputClass, labelClass, smallButton } from './styles';
 
 interface ControlProps {
-  id: string;
   'aria-describedby': string | undefined;
   'aria-invalid': true | undefined;
-  disabled: boolean;
+  'disabled': boolean;
+  'id': string;
 }
 
 interface FieldProps {
-  path: string;
-  label: string;
-  hint?: ReactNode;
   children: (props: ControlProps) => ReactNode;
+  hint?: ReactNode;
+  label: string;
+  path: string;
 }
 
-/** Label, hint and error wiring (`aria-describedby`, `aria-invalid`) for one control. */
+/**
+ * Label, hint and error wiring (`aria-describedby`, `aria-invalid`) for one
+ * control.
+ */
 export function Field({ path, label, hint, children }: FieldProps) {
   const form = useForm();
   const id = fieldId(path);
   const error = form.error(path);
   const describedBy =
-    [hint ? `${id}-hint` : null, error ? `${id}-error` : null]
-      .filter(Boolean)
-      .join(' ') || undefined;
+    [hint ? `${id}-hint` : null, error ? `${id}-error` : null].filter(Boolean).join(' ')
+    || undefined;
+
   return (
     <div className="flex flex-col gap-1.5">
       <label htmlFor={id} className={labelClass}>
@@ -42,7 +45,7 @@ export function Field({ path, label, hint, children }: FieldProps) {
         id,
         'aria-describedby': describedBy,
         'aria-invalid': error ? true : undefined,
-        disabled: form.disabled,
+        'disabled': form.disabled,
       })}
       {hint ? (
         <p id={`${id}-hint`} className={hintClass}>
@@ -69,15 +72,16 @@ export function TextField({
   maxLength,
   placeholder,
 }: {
-  path: string;
-  label: string;
   hint?: ReactNode;
-  type?: 'text' | 'url' | 'email' | 'tel';
-  mono?: boolean;
+  label: string;
   maxLength?: number;
+  mono?: boolean;
+  path: string;
   placeholder?: string;
+  type?: 'email' | 'tel' | 'text' | 'url';
 }) {
   const form = useForm();
+
   return (
     <Field path={path} label={label} hint={hint}>
       {(props) => (
@@ -104,14 +108,15 @@ export function TextAreaField({
   rows = 4,
   maxLength,
 }: {
-  path: string;
-  label: string;
   hint?: ReactNode;
-  rows?: number;
+  label: string;
   maxLength?: number;
+  path: string;
+  rows?: number;
 }) {
   const form = useForm();
   const value = asText(form.get(path));
+
   return (
     <Field
       path={path}
@@ -142,14 +147,15 @@ export function NumberField({
   min,
   max,
 }: {
-  path: string;
-  label: string;
   hint?: ReactNode;
-  min?: number;
+  label: string;
   max?: number;
+  min?: number;
+  path: string;
 }) {
   const form = useForm();
   const value = form.get(path);
+
   return (
     <Field path={path} label={label} hint={hint}>
       {(props) => (
@@ -161,12 +167,7 @@ export function NumberField({
           max={max}
           value={typeof value === 'number' ? value : ''}
           onChange={(event) =>
-            form.set(
-              path,
-              event.target.value === ''
-                ? undefined
-                : Number(event.target.value),
-            )
+            form.set(path, event.target.value === '' ? undefined : Number(event.target.value))
           }
           className={inputClass}
         />
@@ -182,15 +183,18 @@ export function SelectField({
   options,
   emptyLabel,
 }: {
-  path: string;
-  label: string;
-  hint?: ReactNode;
-  options: readonly { value: string | number; label: string }[];
-  /** Optional field: an always-available empty choice that unsets it. */
+  /**
+   * Optional field: an always-available empty choice that unsets it.
+   */
   emptyLabel?: string;
+  hint?: ReactNode;
+  label: string;
+  options: ReadonlyArray<{ label: string; value: number | string }>;
+  path: string;
 }) {
   const form = useForm();
   const value = form.get(path);
+
   return (
     <Field path={path} label={label} hint={hint}>
       {(props) => (
@@ -198,9 +202,8 @@ export function SelectField({
           {...props}
           value={value === undefined ? '' : String(value)}
           onChange={(event) => {
-            const chosen = options.find(
-              (option) => String(option.value) === event.target.value,
-            );
+            const chosen = options.find((option) => String(option.value) === event.target.value);
+
             form.set(
               path,
               event.target.value === '' && emptyLabel
@@ -229,12 +232,13 @@ export function ToggleField({
   label,
   hint,
 }: {
-  path: string;
-  label: string;
   hint?: ReactNode;
+  label: string;
+  path: string;
 }) {
   const form = useForm();
   const id = fieldId(path);
+
   return (
     <div className="flex flex-col gap-1">
       <label htmlFor={id} className="flex min-h-11 items-center gap-3">
@@ -258,7 +262,9 @@ export function ToggleField({
   );
 }
 
-/** A set of checkboxes bound to a string array (placements, technologies). */
+/**
+ * A set of checkboxes bound to a string array (placements, technologies).
+ */
 export function CheckboxGroup({
   path,
   label,
@@ -266,11 +272,11 @@ export function CheckboxGroup({
   options,
   max,
 }: {
-  path: string;
-  label: string;
   hint?: ReactNode;
-  options: readonly { value: string; label: string }[];
+  label: string;
   max?: number;
+  options: ReadonlyArray<{ label: string; value: string }>;
+  path: string;
 }) {
   const form = useForm();
   const [query, setQuery] = useState('');
@@ -279,9 +285,9 @@ export function CheckboxGroup({
   const id = fieldId(path);
   const shown = options.filter(
     (option) =>
-      selected.includes(option.value) ||
-      option.label.toLowerCase().includes(query.toLowerCase()),
+      selected.includes(option.value) || option.label.toLowerCase().includes(query.toLowerCase()),
   );
+
   return (
     <fieldset
       id={id}
@@ -310,23 +316,19 @@ export function CheckboxGroup({
       <div className="flex max-h-72 flex-wrap gap-2 overflow-y-auto">
         {shown.map((option) => {
           const on = selected.includes(option.value);
+
           return (
             <label
               key={option.value}
               className={cn(
                 'inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full border px-3 text-small',
-                on
-                  ? 'border-accent-1 text-text-1'
-                  : 'border-line-strong text-text-2',
+                on ? 'border-accent-1 text-text-1' : 'border-line-strong text-text-2',
               )}
             >
               <input
                 type="checkbox"
                 checked={on}
-                disabled={
-                  form.disabled ||
-                  (!on && max !== undefined && selected.length >= max)
-                }
+                disabled={form.disabled || (!on && max !== undefined && selected.length >= max)}
                 onChange={() =>
                   form.set(
                     path,
@@ -353,26 +355,32 @@ export function CheckboxGroup({
 }
 
 interface LocalizedProps {
-  path: string;
-  label: string;
-  hint?: ReactNode;
-  max: number;
-  multiline?: boolean;
-  rows?: number;
-  markdown?: boolean;
-  /** Recommended length range (SEO), shown as guidance. */
-  range?: [number, number];
-  /** Images that `![alt](gallery:N)` may point at (markdown only). */
-  gallery?: {
+  /**
+   * Images that `![alt](gallery:N)` may point at (markdown only).
+   */
+  gallery?: Array<{
+    alt: string;
+    height: number;
+    lqip?: string;
     url: string;
     width: number;
-    height: number;
-    alt: string;
-    lqip?: string;
-  }[];
+  }>;
+  hint?: ReactNode;
+  label: string;
+  markdown?: boolean;
+  max: number;
+  multiline?: boolean;
+  path: string;
+  /**
+   * Recommended length range (SEO), shown as guidance.
+   */
+  range?: [number, number];
+  rows?: number;
 }
 
-/** Discreet dropdown that copies one language into the other. */
+/**
+ * Discreet dropdown that copies one language into the other.
+ */
 function CopyMenu({
   label,
   disabled,
@@ -381,37 +389,47 @@ function CopyMenu({
   onCopyToPt,
   onCopyToEn,
 }: {
-  label: string;
-  disabled: boolean;
-  canCopyToPt: boolean;
   canCopyToEn: boolean;
-  onCopyToPt: () => void;
+  canCopyToPt: boolean;
+  disabled: boolean;
+  label: string;
   onCopyToEn: () => void;
+  onCopyToPt: () => void;
 }) {
   const ref = useRef<HTMLDetailsElement>(null);
+
   useEffect(() => {
     const close = (event: Event) => {
       const el = ref.current;
+
       if (!el?.open) return;
+
       if (event.type === 'keydown') {
         if ((event as KeyboardEvent).key !== 'Escape') return;
+
         el.querySelector('summary')?.focus();
       } else if (el.contains(event.target as Node)) return;
+
       el.open = false;
     };
+
     document.addEventListener('pointerdown', close);
     document.addEventListener('keydown', close);
+
     return () => {
       document.removeEventListener('pointerdown', close);
       document.removeEventListener('keydown', close);
     };
   }, []);
+
   const item =
     'flex min-h-11 w-full items-center rounded px-3 text-left text-small font-normal text-text-1 hover-fine:bg-surface-2 disabled:opacity-40';
   const pick = (action: () => void) => () => {
     action();
+
     if (ref.current) ref.current.open = false;
   };
+
   return (
     <details ref={ref} className="relative ml-auto">
       <summary
@@ -432,20 +450,10 @@ function CopyMenu({
         aria-label={`${label}: copy between languages`}
         className="absolute right-0 z-10 mt-1 flex w-56 flex-col rounded-md border border-line-strong bg-surface-1 p-1 shadow-lg"
       >
-        <button
-          type="button"
-          disabled={!canCopyToPt}
-          onClick={pick(onCopyToPt)}
-          className={item}
-        >
+        <button type="button" disabled={!canCopyToPt} onClick={pick(onCopyToPt)} className={item}>
           Copy English to Portuguese
         </button>
-        <button
-          type="button"
-          disabled={!canCopyToEn}
-          onClick={pick(onCopyToEn)}
-          className={item}
-        >
+        <button type="button" disabled={!canCopyToEn} onClick={pick(onCopyToEn)} className={item}>
           Copy Portuguese to English
         </button>
       </div>
@@ -453,7 +461,9 @@ function CopyMenu({
   );
 }
 
-/** English and Portuguese inputs side by side from 1024 px, as tabs below. */
+/**
+ * English and Portuguese inputs side by side from 1024 px, as tabs below.
+ */
 export function LocalizedField({
   path,
   label,
@@ -480,9 +490,7 @@ export function LocalizedField({
 
   return (
     <fieldset className="flex flex-col gap-2">
-      <legend
-        className={cn(labelClass, 'flex w-full flex-wrap items-center gap-3')}
-      >
+      <legend className={cn(labelClass, 'flex w-full flex-wrap items-center gap-3')}>
         {label}
         <span
           className={cn(
@@ -527,20 +535,15 @@ export function LocalizedField({
           const error = form.error(childPath);
           const id = fieldId(childPath);
           const outOfRange =
-            range &&
-            value.length > 0 &&
-            (value.length < range[0] || value.length > range[1]);
+            range && value.length > 0 && (value.length < range[0] || value.length > range[1]);
           const describedBy = [`${id}-count`, error ? `${id}-error` : null]
             .filter(Boolean)
             .join(' ');
+
           return (
             <div
               key={lang}
-              className={cn(
-                'flex-col gap-1.5',
-                tab === lang ? 'flex' : 'hidden',
-                'lg:flex',
-              )}
+              className={cn('flex-col gap-1.5', tab === lang ? 'flex' : 'hidden', 'lg:flex')}
             >
               <label htmlFor={id} className="text-xs text-text-3">
                 {lang === 'en' ? 'English' : 'Português'}
@@ -580,10 +583,7 @@ export function LocalizedField({
               )}
               <p
                 id={`${id}-count`}
-                className={cn(
-                  hintClass,
-                  (value.length > max || outOfRange) && 'text-warn',
-                )}
+                className={cn(hintClass, (value.length > max || outOfRange) && 'text-warn')}
               >
                 {value.length}/{max}
                 {range ? ` · aim for ${range[0]}–${range[1]}` : ''}
@@ -599,8 +599,7 @@ export function LocalizedField({
       </div>
       {complete && en.trim() === pt.trim() && en.trim().length > 12 ? (
         <p className="text-small text-warn">
-          English and Portuguese are identical. Fine for names, otherwise
-          translate.
+          English and Portuguese are identical. Fine for names, otherwise translate.
         </p>
       ) : null}
       {hint ? <p className={hintClass}>{hint}</p> : null}
@@ -613,17 +612,15 @@ export function Section({
   children,
   description,
 }: {
-  title: string;
-  description?: string;
   children: ReactNode;
+  description?: string;
+  title: string;
 }) {
   return (
     <section className="flex flex-col gap-5 rounded-xl border border-line p-5">
       <div>
         <h2 className="text-h3">{title}</h2>
-        {description ? (
-          <p className="mt-1 text-small text-text-3">{description}</p>
-        ) : null}
+        {description ? <p className="mt-1 text-small text-text-3">{description}</p> : null}
       </div>
       {children}
     </section>

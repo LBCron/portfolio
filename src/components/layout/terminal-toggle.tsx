@@ -12,7 +12,9 @@ import { cn } from '@/lib/cn';
 
 import { useShortcutLabel } from './use-shortcut-label';
 
-/** The labelled terminal button in the header; its tooltip shows the shortcut. */
+/**
+ * The labelled terminal button in the header; its tooltip shows the shortcut.
+ */
 export function TerminalToggle() {
   const t = useTranslations('window');
   const shortcut = useShortcutLabel();
@@ -34,10 +36,7 @@ export function TerminalToggle() {
           track('terminal_open');
           toggleTerminal();
         }}
-        className={cn(
-          buttonVariants({ variant: 'primary', size: 'sm' }),
-          'px-4',
-        )}
+        className={cn(buttonVariants({ variant: 'primary', size: 'sm' }), 'px-4')}
       >
         <Terminal aria-hidden="true" />
         <span className="md:max-lg:sr-only">{t('buttonLabel')}</span>

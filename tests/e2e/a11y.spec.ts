@@ -7,20 +7,10 @@ import { expect, type Page, test } from '@playwright/test';
  * hidden under the sticky header, and the motion controls.
  */
 
-const AXE_TAGS = [
-  'wcag2a',
-  'wcag2aa',
-  'wcag21a',
-  'wcag21aa',
-  'wcag22aa',
-  'best-practice',
-];
+const AXE_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'];
 
 const axe = (page: Page) =>
-  new AxeBuilder({ page })
-    .withTags(AXE_TAGS)
-    .exclude('[data-reveal=pending]')
-    .analyze();
+  new AxeBuilder({ page }).withTags(AXE_TAGS).exclude('[data-reveal=pending]').analyze();
 
 const chromiumOnly = (projectName: string) =>
   test.skip(projectName !== 'chromium', 'axe and emulation run on Chromium');
@@ -68,41 +58,39 @@ test.describe('reflow', () => {
       '/en/projects/orbit-dashboard',
       '/pt/accessibility',
     ]) {
-      test(`${path} at ${label} has no horizontal scroll`, async ({
-        page,
-      }, testInfo) => {
+      test(`${path} at ${label} has no horizontal scroll`, async ({ page }, testInfo) => {
         chromiumOnly(testInfo.project.name);
         await page.setViewportSize({ width, height: 640 });
         await page.emulateMedia({ reducedMotion: 'reduce' });
         await page.goto(path);
+
         const overflow = await page.evaluate(
-          () =>
-            document.documentElement.scrollWidth -
-            document.documentElement.clientWidth,
+          () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
         );
+
         expect(overflow).toBeLessThanOrEqual(0);
       });
     }
   }
 
-  test('text-spacing overrides do not clip the hero or cards', async ({
-    browser,
-  }, testInfo) => {
+  test('text-spacing overrides do not clip the hero or cards', async ({ browser }, testInfo) => {
     chromiumOnly(testInfo.project.name);
+
     // The CSP rightly blocks the injected stylesheet otherwise.
     const context = await browser.newContext({ bypassCSP: true });
     const page = await context.newPage();
+
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/en/projects');
     await page.addStyleTag({
       content:
         '* { line-height: 1.5 !important; letter-spacing: 0.12em !important; word-spacing: 0.16em !important; } p { margin-bottom: 2em !important; }',
     });
+
     const overflow = await page.evaluate(
-      () =>
-        document.documentElement.scrollWidth -
-        document.documentElement.clientWidth,
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
     );
+
     expect(overflow).toBeLessThanOrEqual(0);
     await context.close();
   });
@@ -110,36 +98,29 @@ test.describe('reflow', () => {
 
 test.describe('keyboard only', () => {
   test.beforeEach(async ({ page }, testInfo) => {
-    test.skip(
-      testInfo.project.name === 'mobile',
-      'keyboard flows target desktop',
-    );
+    test.skip(testInfo.project.name === 'mobile', 'keyboard flows target desktop');
     await page.emulateMedia({ reducedMotion: 'reduce' });
   });
 
-  test('the skip link is the first stop and moves focus to main', async ({
-    page,
-    browserName,
-  }) => {
-    test.skip(
-      browserName === 'webkit',
-      'WebKit skips links on Tab unless the OS setting is on',
-    );
+  test('the skip link is the first stop and moves focus to main', async ({ page, browserName }) => {
+    test.skip(browserName === 'webkit', 'WebKit skips links on Tab unless the OS setting is on');
     await page.goto('/en');
     await page.keyboard.press('Tab');
+
     const skip = page.getByRole('link', { name: 'Skip to main content' });
+
     await expect(skip).toBeFocused();
     await expect(skip).toBeInViewport();
     await page.keyboard.press('Enter');
     await expect(page.locator('main#main')).toBeFocused();
   });
 
-  test('the projects filter is one tab stop with arrow keys', async ({
-    page,
-  }) => {
+  test('the projects filter is one tab stop with arrow keys', async ({ page }) => {
     await page.goto('/en/projects');
+
     const group = page.getByRole('radiogroup', { name: /filter/i });
     const radios = group.getByRole('radio');
+
     await expect(radios.first()).toHaveAttribute('tabindex', '0');
     await expect(radios.nth(1)).toHaveAttribute('tabindex', '-1');
     await radios.first().focus();
@@ -152,19 +133,22 @@ test.describe('keyboard only', () => {
     await page.keyboard.press('ArrowRight');
     await page.keyboard.press(' ');
     await expect(page).toHaveURL(/\?kind=/);
-    await expect(
-      page.getByRole('radio', { checked: true }).first(),
-    ).toHaveAttribute('tabindex', '0');
+    await expect(page.getByRole('radio', { checked: true }).first()).toHaveAttribute(
+      'tabindex',
+      '0',
+    );
   });
 
-  test('the gallery lightbox opens, pages and restores focus', async ({
-    page,
-  }) => {
+  test('the gallery lightbox opens, pages and restores focus', async ({ page }) => {
     await page.goto('/en/projects/orbit-dashboard');
+
     const opener = page.getByRole('button', { name: /open image 1 of/i });
+
     await opener.focus();
     await page.keyboard.press('Enter');
+
     const dialog = page.getByRole('dialog');
+
     await expect(dialog).toBeVisible();
     await expect(dialog.locator(':focus')).toHaveCount(1);
     await page.keyboard.press('ArrowRight');
@@ -176,51 +160,55 @@ test.describe('keyboard only', () => {
 
   test('the language switcher roves with arrows', async ({ page }) => {
     await page.goto('/en');
-    const group = page
-      .getByRole('banner')
-      .getByRole('group', { name: 'Language' });
+
+    const group = page.getByRole('banner').getByRole('group', { name: 'Language' });
     const links = group.getByRole('link');
+
     await expect(links.nth(1)).toHaveAttribute('tabindex', '-1');
     await links.first().focus();
     await page.keyboard.press('ArrowRight');
     await expect(links.nth(1)).toBeFocused();
   });
 
-  test('focus is never hidden under the sticky header', async ({
-    page,
-    browserName,
-  }) => {
+  test('focus is never hidden under the sticky header', async ({ page, browserName }) => {
     test.skip(browserName === 'webkit', 'Tab skips links on WebKit');
     await page.goto('/en/projects/orbit-dashboard');
+
     const hidden: string[] = [];
     for (let step = 0; step < 40; step++) {
       await page.keyboard.press('Tab');
       await page.waitForTimeout(150);
+
       // Obscured = the topmost element at the focus target's centre belongs
       // to the sticky header rather than to the target.
       const result = await page.evaluate(() => {
         const element = document.activeElement as HTMLElement | null;
         const header = document.querySelector('header');
+
         if (!element || !header || header.contains(element)) return null;
+
         const rect = element.getBoundingClientRect();
+
         if (rect.height === 0 || rect.bottom < 0) return null;
+
         const x = rect.left + rect.width / 2;
         const y = Math.max(rect.top + rect.height / 2, 0);
         const top = document.elementFromPoint(x, y);
+
         return top && !element.contains(top) && header.contains(top)
           ? element.outerHTML.slice(0, 80)
           : null;
       });
+
       if (result) hidden.push(result);
     }
     expect(hidden).toEqual([]);
   });
 
-  test('without JavaScript every language and filter link is reachable', async ({
-    browser,
-  }) => {
+  test('without JavaScript every language and filter link is reachable', async ({ browser }) => {
     const context = await browser.newContext({ javaScriptEnabled: false });
     const page = await context.newPage();
+
     await page.goto('/en/projects');
     for (const locator of [
       page.getByRole('radiogroup').getByRole('radio'),
@@ -244,8 +232,8 @@ test.describe('motion', () => {
           .getAnimations()
           .filter(
             (animation) =>
-              animation.playState === 'running' &&
-              animation.effect?.getTiming().iterations === Infinity,
+              animation.playState === 'running'
+              && animation.effect?.getTiming().iterations === Infinity,
           ).length,
     );
 
@@ -256,14 +244,12 @@ test.describe('motion', () => {
     expect(await infinite(page)).toBe(0);
   });
 
-  test('the Pause animations toggle stops them without the media query', async ({
-    page,
-  }) => {
+  test('the Pause animations toggle stops them without the media query', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await page.goto('/en');
-    const toggle = page
-      .getByRole('contentinfo')
-      .getByRole('button', { name: 'Pause animations' });
+
+    const toggle = page.getByRole('contentinfo').getByRole('button', { name: 'Pause animations' });
+
     await toggle.evaluate((element) => {
       element.scrollIntoView({ block: 'center' });
       (element as HTMLButtonElement).click();
@@ -274,18 +260,21 @@ test.describe('motion', () => {
     expect(await infinite(page)).toBe(0);
   });
 
-  test('focus rings stay visible in forced colors', async ({
-    page,
-  }, testInfo) => {
+  test('focus rings stay visible in forced colors', async ({ page }, testInfo) => {
     chromiumOnly(testInfo.project.name);
     await page.emulateMedia({ forcedColors: 'active' });
     await page.goto('/en/projects');
+
     const link = page.getByRole('radiogroup').getByRole('radio').first();
+
     await link.focus();
+
     const outline = await link.evaluate((element) => {
       const style = getComputedStyle(element);
+
       return { style: style.outlineStyle, width: style.outlineWidth };
     });
+
     expect(outline.style).not.toBe('none');
     expect(Number.parseFloat(outline.width)).toBeGreaterThanOrEqual(2);
   });

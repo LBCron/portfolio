@@ -17,9 +17,7 @@ describe('svgBodyToPaths', () => {
   });
 
   it('skips unfilled shapes', () => {
-    expect(
-      svgBodyToPaths('<path d="M0 0h1" fill="none"/><path d="M1 1h1"/>'),
-    ).toEqual(['M1 1h1']);
+    expect(svgBodyToPaths('<path d="M0 0h1" fill="none"/><path d="M1 1h1"/>')).toEqual(['M1 1h1']);
   });
 
   it.each([
@@ -55,6 +53,7 @@ describe('resolveTechIcon', () => {
       iconSource: 'simple-icons',
       iconSlug: 'react',
     });
+
     expect(resolved.source).toBe('simple-icons');
     expect(resolved.defaultBrandColor).toBe('#61DAFB');
     expect(resolved.icon).toMatchObject({ viewBox: '0 0 24 24' });
@@ -66,6 +65,7 @@ describe('resolveTechIcon', () => {
       iconSource: 'devicon',
       iconSlug: 'java',
     });
+
     expect(resolved.source).toBe('devicon-plain');
     expect(resolved.icon).toMatchObject({ viewBox: '0 0 128 128' });
   });
@@ -76,6 +76,7 @@ describe('resolveTechIcon', () => {
       iconSource: 'devicon',
       iconSlug: 'visualbasic',
     });
+
     expect(resolved.source).toBe('devicon-plain');
     expect(resolved.icon).toMatchObject({ viewBox: '0 0 128 128' });
   });

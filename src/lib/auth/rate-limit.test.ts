@@ -7,6 +7,7 @@ const MIN = 60_000;
 function setup() {
   let time = 1_000_000;
   const limiter = createMemoryLimiter(() => time);
+
   return {
     limiter,
     advance: (ms: number) => (time += ms),
@@ -19,6 +20,7 @@ function setup() {
 describe('memory limiter', () => {
   it('locks a client out after 5 failures for 15 minutes', async () => {
     const { limiter, advance, fail } = setup();
+
     await fail('a', 4);
     expect(await limiter.check('a')).toBe(true);
     await fail('a', 1);
@@ -32,9 +34,8 @@ describe('memory limiter', () => {
 
   it('counts concurrent attempts before any of them finishes', async () => {
     const { limiter } = setup();
-    const results = await Promise.all(
-      Array.from({ length: 20 }, () => limiter.reserve('a')),
-    );
+    const results = await Promise.all(Array.from({ length: 20 }, () => limiter.reserve('a')));
+
     expect(results.filter(Boolean)).toHaveLength(5);
     expect(await limiter.check('fresh')).toBe(true);
   });
@@ -50,6 +51,7 @@ describe('memory limiter', () => {
 
   it('doubles the lockout for repeat offenders', async () => {
     const { limiter, advance, fail } = setup();
+
     await fail('a', 5);
     advance(15 * MIN + 1);
     await fail('a', 5);
@@ -61,6 +63,7 @@ describe('memory limiter', () => {
 
   it('forgets failures older than 15 minutes and clears on success', async () => {
     const { limiter, advance, fail } = setup();
+
     await fail('a', 4);
     advance(16 * MIN);
     await fail('a', 4);

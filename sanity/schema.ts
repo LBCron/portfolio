@@ -1,20 +1,20 @@
 /**
- * Studio-ready schema (§11.10), kept as plain data so the app needs no
- * `sanity` dependency. It mirrors the storage shape written by
+ * Studio-ready schema (§11.10), kept as plain data so the app needs no `sanity`
+ * dependency. It mirrors the storage shape written by
  * `src/lib/content/sanity/documents.ts`; validation lives in the zod schemas.
- * Deployed as an MCP-managed workspace schema; print the declaration with
- * `bun run sanity:schema`. A Studio should use `studioSchemaTypes` from
+ * Deployed as an MCP-managed workspace schema; print the declaration with `bun
+ * run sanity:schema`. A Studio should use `studioSchemaTypes` from
  * `./studio.ts`, which adds previews, orderings and zod-backed validation.
  */
 
 import { titleFontLabels, titleFonts } from '../src/lib/content/taxonomy';
 
-type Field = Record<string, unknown> & { name: string; type: string };
-type SchemaType = Record<string, unknown> & {
+type Field = { name: string; type: string } & Record<string, unknown>;
+type SchemaType = {
+  fields: Field[];
   name: string;
   type: string;
-  fields: Field[];
-};
+} & Record<string, unknown>;
 
 const list = (values: readonly string[]) => ({
   list: values.map((value) => ({ title: value, value })),
@@ -107,10 +107,7 @@ const objects: SchemaType[] = [
     name: 'svgData',
     title: 'SVG geometry',
     type: 'object',
-    fields: [
-      field('viewBox', 'string'),
-      field('paths', 'array', { of: [{ type: 'string' }] }),
-    ],
+    fields: [field('viewBox', 'string'), field('paths', 'array', { of: [{ type: 'string' }] })],
   },
 ];
 
@@ -214,14 +211,7 @@ const documents: SchemaType[] = [
       field('featured', 'boolean', { initialValue: false }),
       field('year', 'number'),
       field('kind', 'string', {
-        options: list([
-          'web',
-          'mobile',
-          'desktop',
-          'automation',
-          'integration',
-          'open-source',
-        ]),
+        options: list(['web', 'mobile', 'desktop', 'automation', 'integration', 'open-source']),
       }),
       field('status', 'string', {
         options: list(['live', 'in-progress', 'archived', 'private']),
@@ -233,10 +223,7 @@ const documents: SchemaType[] = [
           {
             type: 'image',
             options: { hotspot: true },
-            fields: [
-              localeString('alt', 'Alternative text'),
-              localeString('caption'),
-            ],
+            fields: [localeString('alt', 'Alternative text'), localeString('caption')],
           },
         ],
       }),
@@ -290,15 +277,7 @@ const documents: SchemaType[] = [
     fields: [
       field('name', 'string'),
       field('category', 'string', {
-        options: list([
-          'language',
-          'frontend',
-          'backend',
-          'data',
-          'cloud',
-          'integration',
-          'ai',
-        ]),
+        options: list(['language', 'frontend', 'backend', 'data', 'cloud', 'integration', 'ai']),
       }),
       field('iconSource', 'string', {
         options: list(['simple-icons', 'devicon', 'custom-svg', 'monogram']),

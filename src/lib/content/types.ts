@@ -1,11 +1,11 @@
-import type {
-  ProjectKind,
-  ProjectStatus,
-  SvgData,
-  TechCategory,
-  TitleFont,
-  linkKinds,
-  linkPlacements,
+import {
+  type linkKinds,
+  type linkPlacements,
+  type ProjectKind,
+  type ProjectStatus,
+  type SvgData,
+  type TechCategory,
+  type TitleFont,
 } from './schema';
 
 /**
@@ -14,51 +14,57 @@ import type {
  */
 
 export interface ImageRef {
-  url: string;
-  width: number;
-  height: number;
-  lqip?: string;
   alt: string;
   focal?: { x: number; y: number };
+  height: number;
+  lqip?: string;
+  url: string;
+  width: number;
 }
 
 export interface FileRef {
-  url: string;
   size: number;
+  url: string;
 }
 
 export interface Metric {
-  value: string;
-  label: string;
   countTo?: number;
+  label: string;
   prefix?: string;
   suffix?: string;
+  value: string;
 }
 
 export interface Profile {
-  displayName: string;
-  jobTitle: string;
-  heroLead: string;
-  titleFont?: TitleFont;
-  photo?: ImageRef;
-  /** Side-by-side hero art (lg+); falls back to `photo` when absent. */
-  photoLg?: ImageRef;
-  /** Markdown. */
+  /**
+   * Markdown.
+   */
   bio: string;
-  location: string;
-  spokenLanguages: string[];
+  displayName: string;
   focus: string;
+  heroLead: string;
+  jobTitle: string;
+  location: string;
   metrics: Metric[];
+  photo?: ImageRef;
+  /**
+   * Side-by-side hero art (lg+); falls back to `photo` when absent.
+   */
+  photoLg?: ImageRef;
+  spokenLanguages: string[];
+  titleFont?: TitleFont;
   updatedAt: string;
 }
 
 export interface Contact {
-  email: string;
-  /** Present only when `showPhone` is enabled. */
-  phone?: string;
   bookingUrl?: string;
   ctaHeading: string;
   ctaText: string;
+  email: string;
+  /**
+   * Present only when `showPhone` is enabled.
+   */
+  phone?: string;
 }
 
 export interface Resume {
@@ -69,41 +75,40 @@ export interface Resume {
 export type LinkKind = (typeof linkKinds)[number];
 export type LinkPlacement = (typeof linkPlacements)[number];
 
-export type LinkIcon =
-  ({ type: 'svg' } & SvgData) | { type: 'lucide'; name: string };
+export type LinkIcon = { name: string; type: 'lucide' } | ({ type: 'svg' } & SvgData);
 
 export interface FeaturedLink {
-  id: string;
-  label: string;
-  url: string;
-  kind: LinkKind;
   icon: LinkIcon;
-  placements: LinkPlacement[];
+  id: string;
   isOwnProfile: boolean;
+  kind: LinkKind;
+  label: string;
   order: number;
+  placements: LinkPlacement[];
+  url: string;
 }
 
 export interface RecommendedProfile {
+  avatar?: ImageRef;
   id: string;
   name: string;
-  role: string;
   note: string;
-  url: string;
-  avatar?: ImageRef;
   order: number;
+  role: string;
+  url: string;
 }
 
-export type TechIcon = SvgData | { monogram: string };
+export type TechIcon = { monogram: string } | SvgData;
 
 export interface Technology {
-  id: string;
-  name: string;
+  brandColor?: string;
   category: TechCategory;
   icon: TechIcon;
-  brandColor?: string;
-  url?: string;
-  priority: 1 | 2 | 3;
+  id: string;
+  name: string;
   order: number;
+  priority: 1 | 2 | 3;
+  url?: string;
 }
 
 export interface Practice {
@@ -117,40 +122,44 @@ export interface GalleryImage extends ImageRef {
 }
 
 export interface Project {
-  id: string;
-  slug: string;
-  previousSlugs: string[];
-  featured: boolean;
-  visible: true;
-  order: number;
-  year: number;
-  kind: ProjectKind;
-  status: ProjectStatus;
-  /** Visible technologies only. */
-  techIds: string[];
-  cover?: ImageRef;
-  gallery: GalleryImage[];
-  links: { live?: string; repo?: string };
-  title: string;
-  tagline: string;
-  summary: string;
-  role: string;
-  context: string;
   approach: string;
-  highlights: string[];
-  outcome?: string;
-  /** Markdown (GFM). */
+  /**
+   * Markdown (GFM).
+   */
   body?: string;
+  context: string;
+  cover?: ImageRef;
+  featured: boolean;
+  gallery: GalleryImage[];
+  highlights: string[];
+  id: string;
+  kind: ProjectKind;
+  links: { live?: string; repo?: string };
+  order: number;
+  outcome?: string;
+  previousSlugs: string[];
+  role: string;
+  slug: string;
+  status: ProjectStatus;
+  summary: string;
+  tagline: string;
+  /**
+   * Visible technologies only.
+   */
+  techIds: string[];
+  title: string;
   updatedAt: string;
+  visible: true;
+  year: number;
 }
 
-/** Cards, lists and the terminal: everything except the long-form parts. */
+/**
+ * Cards, lists and the terminal: everything except the long-form parts.
+ */
 export type ProjectSummary = Omit<Project, 'body' | 'gallery'>;
 
 export type ProjectLookup =
-  | { status: 'found'; project: Project }
-  | { status: 'moved'; slug: string }
-  | { status: 'missing' };
+  { project: Project; status: 'found' } | { slug: string; status: 'moved' } | { status: 'missing' };
 
 export interface ProjectRoute {
   slug: string;
@@ -158,33 +167,35 @@ export interface ProjectRoute {
 }
 
 export interface ExperienceRole {
-  title: string;
-  start: string;
-  end?: string;
-  summary: string;
   bullets: string[];
+  end?: string;
+  start: string;
+  summary: string;
+  title: string;
 }
 
 export interface Experience {
-  id: string;
-  /** Derived from `company`; unique across visible entries. */
-  slug: string;
+  collapsedByDefault: boolean;
   company: string;
   companyUrl?: string;
+  id: string;
   location: string;
-  roles: ExperienceRole[];
-  techIds: string[];
-  collapsedByDefault: boolean;
   order: number;
+  roles: ExperienceRole[];
+  /**
+   * Derived from `company`; unique across visible entries.
+   */
+  slug: string;
+  techIds: string[];
 }
 
 export interface Education {
-  id: string;
-  kind: 'degree' | 'certification';
-  title: string;
-  institution: string;
-  start?: string;
   end?: string;
-  url?: string;
+  id: string;
+  institution: string;
+  kind: 'certification' | 'degree';
   order: number;
+  start?: string;
+  title: string;
+  url?: string;
 }

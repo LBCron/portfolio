@@ -3,10 +3,7 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import { NotFoundView } from '@/components/layout/not-found-view';
 
 export default async function LocaleNotFound() {
-  const [t, locale] = await Promise.all([
-    getTranslations('errors'),
-    getLocale(),
-  ]);
+  const [t, locale] = await Promise.all([getTranslations('errors'), getLocale()]);
 
   return (
     <NotFoundView

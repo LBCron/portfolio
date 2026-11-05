@@ -1,4 +1,4 @@
-import type { ContentSource, ProjectsRead } from '../create-repository';
+import { type ContentSource, type ProjectsRead } from '../create-repository';
 import { contentTags } from '../tags';
 import {
   CONTACT_QUERY,
@@ -14,7 +14,9 @@ import {
   TECHNOLOGIES_QUERY,
 } from './queries';
 
-/** Runs a GROQ query; the HTTP version caches by `tags`. */
+/**
+ * Runs a GROQ query; the HTTP version caches by `tags`.
+ */
 export type GroqFetch = (
   query: string,
   params: Record<string, string>,
@@ -26,10 +28,8 @@ function asArray(value: unknown): unknown[] {
 }
 
 function asProjectsRead(value: unknown): ProjectsRead {
-  const record =
-    value && typeof value === 'object'
-      ? (value as Record<string, unknown>)
-      : {};
+  const record = value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
+
   return {
     projects: asArray(record.projects),
     technologies: asArray(record.technologies),
@@ -46,14 +46,10 @@ export function createSanitySource(fetchGroq: GroqFetch): ContentSource {
     contact: () => fetchGroq(CONTACT_QUERY, {}, [contentTags.contact]),
     resume: () => fetchGroq(RESUME_QUERY, {}, [contentTags.resume]),
     featuredLinks: () => list(FEATURED_LINKS_QUERY, [contentTags.links]),
-    recommendedProfiles: () =>
-      list(RECOMMENDED_QUERY, [contentTags.recommended]),
+    recommendedProfiles: () => list(RECOMMENDED_QUERY, [contentTags.recommended]),
     projects: async () =>
       asProjectsRead(
-        await fetchGroq(PROJECTS_QUERY, {}, [
-          contentTags.projects,
-          contentTags.technologies,
-        ]),
+        await fetchGroq(PROJECTS_QUERY, {}, [contentTags.projects, contentTags.technologies]),
       ),
     projectsBySlug: async (slug) =>
       asProjectsRead(
@@ -68,10 +64,8 @@ export function createSanitySource(fetchGroq: GroqFetch): ContentSource {
         contentTags.experience,
         contentTags.technologies,
       ]);
-      const record =
-        value && typeof value === 'object'
-          ? (value as Record<string, unknown>)
-          : {};
+      const record = value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
+
       return {
         entries: asArray(record.entries),
         technologies: asArray(record.technologies),

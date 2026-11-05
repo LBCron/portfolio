@@ -5,7 +5,7 @@ import { useMemo } from 'react';
 import { switchLocale } from '@/components/layout/switch-locale';
 import { TERMINAL_ID } from '@/components/window-manager/terminal-controls';
 import { usePathname, useRouter } from '@/i18n/navigation';
-import type { CommandActions } from '@/lib/terminal/commands/types';
+import { type CommandActions } from '@/lib/terminal/commands/types';
 import { useSessionStore } from '@/stores/session-store';
 import { useTerminalStore } from '@/stores/terminal-store';
 import { useWindowStore } from '@/stores/window-store';
@@ -18,7 +18,9 @@ function openInNewTab(href: string) {
   anchor.click();
 }
 
-/** What commands may do to the site; the window stays open throughout. */
+/**
+ * What commands may do to the site; the window stays open throughout.
+ */
 export function useTerminalActions(): Omit<CommandActions, 'effect'> {
   const router = useRouter();
   const pathname = usePathname();

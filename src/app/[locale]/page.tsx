@@ -1,6 +1,6 @@
-import type { Metadata } from 'next';
-import { locale as rootLocale } from 'next/root-params';
+import { type Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
+import { locale as rootLocale } from 'next/root-params';
 
 import { About } from '@/components/sections/about';
 import { Contact } from '@/components/sections/contact';
@@ -26,6 +26,7 @@ import { absoluteUrl, localizedPath } from '@/lib/seo/urls';
 
 async function currentLocale(): Promise<AppLocale> {
   const locale = await rootLocale();
+
   return isAppLocale(locale) ? locale : routing.defaultLocale;
 }
 
@@ -35,6 +36,7 @@ export async function generateMetadata(): Promise<Metadata> {
     getTranslations('meta'),
     getContent().getProfile(locale),
   ]);
+
   return pageMetadata({
     locale,
     path: '/',
@@ -55,8 +57,10 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
-/** Newest `updatedAt` among the documents the home page renders. */
-function newest(...dates: (string | undefined)[]) {
+/**
+ * Newest `updatedAt` among the documents the home page renders.
+ */
+function newest(...dates: Array<string | undefined>) {
   return dates
     .filter((date): date is string => Boolean(date))
     .reduce((latest, date) => (date > latest ? date : latest), '');
@@ -115,12 +119,8 @@ export default async function HomePage() {
       <JsonLd data={jsonLd} />
       <Hero locale={locale} profile={profile} nextSection={nextSection} />
       {profile ? <About locale={locale} profile={profile} /> : null}
-      {technologies.length > 0 ? (
-        <Stack technologies={technologies} practices={practices} />
-      ) : null}
-      {featured.length > 0 ? (
-        <Work projects={featured} technologies={technologies} />
-      ) : null}
+      {technologies.length > 0 ? <Stack technologies={technologies} practices={practices} /> : null}
+      {featured.length > 0 ? <Work projects={featured} technologies={technologies} /> : null}
       {experience.length > 0 || education.length > 0 ? (
         <Resume
           locale={locale}
@@ -131,12 +131,7 @@ export default async function HomePage() {
           links={links}
         />
       ) : null}
-      <Contact
-        locale={locale}
-        contact={contact}
-        links={links}
-        resume={resume}
-      />
+      <Contact locale={locale} contact={contact} links={links} resume={resume} />
       <Recommended profiles={recommended} />
     </>
   );

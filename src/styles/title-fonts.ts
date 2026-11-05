@@ -12,10 +12,11 @@ import {
 } from 'next/font/google';
 
 /**
- * Hero title fonts (D67), self-hosted at build time. `preload: false` keeps
- * the browser from fetching all ten: only the chosen font's variable is used
- * by rendered text (the hero H1), so only its file is requested (after first paint, with the
- * size-adjusted fallback in between). Loaders must be module-level consts.
+ * Hero title fonts (D67), self-hosted at build time. `preload: false` keeps the
+ * browser from fetching all ten: only the chosen font's variable is used by
+ * rendered text (the hero H1), so only its file is requested (after first
+ * paint, with the size-adjusted fallback in between). Loaders must be
+ * module-level consts.
  */
 const amita = Amita({
   variable: '--font-title-amita',
@@ -88,8 +89,10 @@ const sacramento = Sacramento({
   subsets: ['latin', 'latin-ext'],
 });
 
-/** Set on `<html>` by the root layout, so the fonts' CSS ships in the layout
- * stylesheet instead of a second render-blocking one (D67). */
+/**
+ * Set on `<html>` by the root layout, so the fonts' CSS ships in the layout
+ * stylesheet instead of a second render-blocking one (D67).
+ */
 export const titleFontVariables = [
   amita,
   courgette,

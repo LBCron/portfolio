@@ -1,10 +1,4 @@
-import {
-  adminCsp,
-  isHttpsSite,
-  PERMISSIONS_POLICY,
-  publicCsp,
-  securityHeaders,
-} from './headers';
+import { adminCsp, isHttpsSite, PERMISSIONS_POLICY, publicCsp, securityHeaders } from './headers';
 
 const prod = { dev: false, https: true };
 const directive = (csp: string, name: string) =>
@@ -13,9 +7,8 @@ const directive = (csp: string, name: string) =>
 describe('publicCsp', () => {
   it('is the strict static policy in production', () => {
     const csp = publicCsp(prod);
-    expect(directive(csp, 'script-src')).toBe(
-      "script-src 'self' 'unsafe-inline'",
-    );
+
+    expect(directive(csp, 'script-src')).toBe("script-src 'self' 'unsafe-inline'");
     expect(directive(csp, 'style-src')).toBe("style-src 'self'");
     expect(directive(csp, 'object-src')).toBe("object-src 'none'");
     expect(directive(csp, 'base-uri')).toBe("base-uri 'none'");
@@ -26,6 +19,7 @@ describe('publicCsp', () => {
 
   it('allows eval only in development and skips the upgrade on http', () => {
     const csp = publicCsp({ dev: true, https: false });
+
     expect(directive(csp, 'script-src')).toContain("'unsafe-eval'");
     expect(directive(csp, 'upgrade-insecure-requests')).toBeUndefined();
   });
@@ -34,9 +28,8 @@ describe('publicCsp', () => {
 describe('adminCsp', () => {
   it('uses the nonce with strict-dynamic and no inline allowance', () => {
     const csp = adminCsp('abc', prod);
-    expect(directive(csp, 'script-src')).toBe(
-      "script-src 'self' 'nonce-abc' 'strict-dynamic'",
-    );
+
+    expect(directive(csp, 'script-src')).toBe("script-src 'self' 'nonce-abc' 'strict-dynamic'");
     expect(directive(csp, 'style-src')).toBe("style-src 'self' 'nonce-abc'");
   });
 });
@@ -44,9 +37,9 @@ describe('adminCsp', () => {
 describe('securityHeaders', () => {
   it('sends HSTS without preload on https only', () => {
     const hsts = (https: boolean) =>
-      securityHeaders({ dev: false, https }).find(
-        (h) => h.key === 'Strict-Transport-Security',
-      )?.value;
+      securityHeaders({ dev: false, https }).find((h) => h.key === 'Strict-Transport-Security')
+        ?.value;
+
     expect(hsts(true)).toBe('max-age=63072000; includeSubDomains');
     expect(hsts(false)).toBeUndefined();
   });

@@ -8,11 +8,10 @@ export type AnalyticsEvent =
   | 'resume_open'
   | 'terminal_open';
 
-/** Low-cardinality properties only: never put user input in here. */
-export function track(
-  event: AnalyticsEvent,
-  properties?: Record<string, string>,
-) {
+/**
+ * Low-cardinality properties only: never put user input in here.
+ */
+export function track(event: AnalyticsEvent, properties?: Record<string, string>) {
   try {
     vaTrack(event, properties);
   } catch {

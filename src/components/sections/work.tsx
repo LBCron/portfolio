@@ -6,7 +6,7 @@ import { techNameLookup } from '@/components/portfolio/tech-names';
 import { ButtonLink } from '@/components/ui/button';
 import { Reveal } from '@/components/ui/reveal';
 import { SectionHeader } from '@/components/ui/section-header';
-import type { ProjectSummary, Technology } from '@/lib/content';
+import { type ProjectSummary, type Technology } from '@/lib/content';
 
 export async function Work({
   projects,
@@ -40,10 +40,7 @@ export async function Work({
           {projects.map((project, index) => (
             <li key={project.id}>
               <Reveal index={index % 3} className="h-full">
-                <ProjectCard
-                  project={project}
-                  techNames={namesFor(project.techIds)}
-                />
+                <ProjectCard project={project} techNames={namesFor(project.techIds)} />
               </Reveal>
             </li>
           ))}

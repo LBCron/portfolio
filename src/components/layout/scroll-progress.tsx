@@ -2,13 +2,17 @@
 
 import { useEffect, useRef } from 'react';
 
-/** 2px gradient bar at the very top; transform is written in rAF. */
+/**
+ * 2px gradient bar at the very top; transform is written in rAF.
+ */
 export function ScrollProgress() {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const bar = ref.current;
+
     if (!bar) return;
+
     let frame = 0;
     const update = () => {
       frame = 0;
@@ -19,9 +23,11 @@ export function ScrollProgress() {
     const schedule = () => {
       if (!frame) frame = requestAnimationFrame(update);
     };
+
     update();
     window.addEventListener('scroll', schedule, { passive: true });
     window.addEventListener('resize', schedule);
+
     return () => {
       window.removeEventListener('scroll', schedule);
       window.removeEventListener('resize', schedule);

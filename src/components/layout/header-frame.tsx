@@ -16,11 +16,14 @@ export function HeaderFrame({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const header = ref.current;
+
     if (!header) return;
+
     let frame = 0;
     const update = () => {
       frame = 0;
       const scrolled = window.scrollY > SCROLL_THRESHOLD;
+
       if ((header.dataset.scrolled === 'true') !== scrolled) {
         header.dataset.scrolled = String(scrolled);
       }
@@ -28,8 +31,10 @@ export function HeaderFrame({ children }: { children: ReactNode }) {
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(update);
     };
+
     update();
     window.addEventListener('scroll', onScroll, { passive: true });
+
     return () => {
       window.removeEventListener('scroll', onScroll);
       cancelAnimationFrame(frame);
@@ -40,16 +45,19 @@ export function HeaderFrame({ children }: { children: ReactNode }) {
   // on screen (CSS reads `data-hero`). The header outlives route changes.
   useEffect(() => {
     const header = ref.current;
+
     if (!header) return;
+
     const hero = document.getElementById('top');
+
     if (!hero) {
       header.dataset.hero = 'false';
+
       return;
     }
+
     const offset = parseFloat(
-      getComputedStyle(document.documentElement).getPropertyValue(
-        '--header-height',
-      ),
+      getComputedStyle(document.documentElement).getPropertyValue('--header-height'),
     );
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -57,7 +65,9 @@ export function HeaderFrame({ children }: { children: ReactNode }) {
       },
       { rootMargin: `-${offset || 0}px 0px 0px 0px`, threshold: 0 },
     );
+
     observer.observe(hero);
+
     return () => observer.disconnect();
   }, [pathname]);
 

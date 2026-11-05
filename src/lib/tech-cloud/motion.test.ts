@@ -1,15 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  FRAME_MS,
-  MAX_FRAME_MS,
-  decay,
-  ease,
-  frameScale,
-  stepDrag,
-} from './motion';
+import { decay, ease, FRAME_MS, frameScale, MAX_FRAME_MS, stepDrag } from './motion';
 
-/** Integrates `step` over one second at the given refresh rate. */
+/**
+ * Integrates `step` over one second at the given refresh rate.
+ */
 function simulate(hz: number, step: (k: number, gapMs: number) => void) {
   const gap = 1000 / hz;
   for (let i = 0; i < hz; i += 1) step(frameScale(gap), gap);
@@ -31,11 +26,14 @@ describe('refresh-rate independence', () => {
   it('auto-spin covers the same angle per second at 60 and 144 Hz', () => {
     const total = (hz: number) => {
       let angle = 0;
+
       simulate(hz, (k) => {
         angle += 0.004 * k;
       });
+
       return angle;
     };
+
     expect(total(144)).toBeCloseTo(total(60), 6);
     expect(total(90)).toBeCloseTo(total(60), 6);
   });
@@ -43,11 +41,14 @@ describe('refresh-rate independence', () => {
   it('hover easing settles to the same value at any rate', () => {
     const settle = (hz: number) => {
       let value = 1;
+
       simulate(hz, (k) => {
         value += (0.05 - value) * ease(0.08, k);
       });
+
       return value;
     };
+
     expect(settle(144)).toBeCloseTo(settle(60), 6);
     expect(settle(120)).toBeCloseTo(settle(60), 6);
   });
@@ -55,11 +56,14 @@ describe('refresh-rate independence', () => {
   it('friction decays equally over one second', () => {
     const rate = (hz: number) => {
       let v = 1;
+
       simulate(hz, (k) => {
         v *= decay(0.95, k);
       });
+
       return v;
     };
+
     expect(rate(144)).toBeCloseTo(rate(60), 6);
   });
 
@@ -67,13 +71,16 @@ describe('refresh-rate independence', () => {
     const travel = (hz: number) => {
       let velocity = 0.02;
       let total = 0;
+
       simulate(hz, (_k, gapMs) => {
         const out = stepDrag({ velocity, pending: 0, dragging: false, gapMs });
         velocity = out.velocity;
         total += out.rotation;
       });
+
       return total;
     };
+
     // Discrete sums of the same decay curve: equal within the step size.
     expect(travel(144) / travel(60)).toBeGreaterThan(0.95);
     expect(travel(144) / travel(60)).toBeLessThan(1.05);
@@ -97,6 +104,7 @@ describe('stepDrag', () => {
       dragging: true,
       gapMs: FRAME_MS,
     });
+
     expect(many.rotation).toBeCloseTo(one.rotation, 10);
   });
 
@@ -130,6 +138,7 @@ describe('stepDrag', () => {
       dragging: false,
       gapMs: 400,
     });
+
     expect(Math.abs(stalled.velocity)).toBeLessThan(Math.abs(normal.velocity));
   });
 
@@ -140,6 +149,7 @@ describe('stepDrag', () => {
       dragging: false,
       gapMs: FRAME_MS,
     });
+
     expect(out.velocity).toBeGreaterThan(0);
     expect(out.rotation).toBeGreaterThan(0.05);
   });

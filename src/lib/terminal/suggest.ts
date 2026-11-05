@@ -11,20 +11,22 @@ export function levenshtein(a: string, b: string): number {
     }
     previous = row;
   }
+
   return previous[b.length] as number;
 }
 
-/** The closest candidate within distance 2, or `null`. */
-export function didYouMean(
-  input: string,
-  candidates: readonly string[],
-): string | null {
-  let best: { name: string; distance: number } | null = null;
+/**
+ * The closest candidate within distance 2, or `null`.
+ */
+export function didYouMean(input: string, candidates: readonly string[]): null | string {
+  let best: { distance: number; name: string } | null = null;
   for (const name of candidates) {
     const distance = levenshtein(input.toLowerCase(), name);
+
     if (distance <= 2 && (!best || distance < best.distance)) {
       best = { name, distance };
     }
   }
+
   return best?.name ?? null;
 }

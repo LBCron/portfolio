@@ -9,17 +9,14 @@ export const size = ogSize;
 export const contentType = ogContentType;
 export const revalidate = 86400;
 
-export default async function Image({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
+export default async function Image({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const resolved = isAppLocale(locale) ? locale : routing.defaultLocale;
   const t = await getTranslations({
     locale: resolved,
     namespace: 'accessibility',
   });
+
   return renderOgImage({
     title: t('title'),
     subtitle: t('intro'),

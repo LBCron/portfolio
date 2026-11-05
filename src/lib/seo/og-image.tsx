@@ -1,38 +1,38 @@
+import { ImageResponse } from 'next/og';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
-import { ImageResponse } from 'next/og';
-
 import { owner, THEME_COLOR } from '@/config/site';
+
 import { absoluteUrl } from './urls';
 
 export const ogSize = { width: 1200, height: 630 };
 export const ogContentType = 'image/png';
 
 const geistSemiBold = await readFile(
-  join(
-    process.cwd(),
-    'node_modules/geist/dist/fonts/geist-sans/Geist-SemiBold.ttf',
-  ),
+  join(process.cwd(), 'node_modules/geist/dist/fonts/geist-sans/Geist-SemiBold.ttf'),
 );
 const geistRegular = await readFile(
-  join(
-    process.cwd(),
-    'node_modules/geist/dist/fonts/geist-sans/Geist-Regular.ttf',
-  ),
+  join(process.cwd(), 'node_modules/geist/dist/fonts/geist-sans/Geist-Regular.ttf'),
 );
 
 async function asDataUrl(url?: string) {
   if (!url) return undefined;
+
   try {
     if (url.startsWith('/')) {
       const file = await readFile(join(process.cwd(), 'public', url));
+
       return `data:image/webp;base64,${file.toString('base64')}`;
     }
+
     const response = await fetch(absoluteUrl(url));
+
     if (!response.ok) return undefined;
+
     const buffer = Buffer.from(await response.arrayBuffer());
     const type = response.headers.get('content-type') ?? 'image/jpeg';
+
     return `data:${type};base64,${buffer.toString('base64')}`;
   } catch {
     return undefined;
@@ -40,17 +40,13 @@ async function asDataUrl(url?: string) {
 }
 
 export interface OgImageInput {
-  title: string;
-  subtitle: string;
   alt: string;
   photoUrl?: string;
+  subtitle: string;
+  title: string;
 }
 
-export async function renderOgImage({
-  title,
-  subtitle,
-  photoUrl,
-}: OgImageInput) {
+export async function renderOgImage({ title, subtitle, photoUrl }: OgImageInput) {
   const photo = await asDataUrl(photoUrl);
 
   return new ImageResponse(

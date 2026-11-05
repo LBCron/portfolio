@@ -1,16 +1,20 @@
-import type { CSSProperties } from 'react';
+import { type CSSProperties } from 'react';
 
 const COLUMNS = 32;
 const GLYPHS = '0123456789ABCDEF<>/{}[]=+#$%&*';
 const LENGTH = 22;
 
-/** xorshift32: the same rain every time, no Math.random in render. */
+/**
+ * Xorshift32: the same rain every time, no Math.random in render.
+ */
 function seeded(seed: number) {
   let state = seed;
+
   return () => {
     state ^= state << 13;
     state ^= state >>> 17;
     state ^= state << 5;
+
     return (state >>> 0) / 0x1_0000_0000;
   };
 }
@@ -27,11 +31,11 @@ const COLUMN_DATA = Array.from({ length: COLUMNS }, () => ({
 }));
 
 /**
- * Green rain over the terminal body for `matrix` (§10.4). Pure CSS: each
- * column falls with a transform animation (no per-frame React work, no
- * glyph swapping, so nothing flashes). Decorative and click-through; it is
- * never mounted with reduced motion, and the global reduced-motion rule
- * stops it if Pause animations is switched on mid-way.
+ * Green rain over the terminal body for `matrix` (§10.4). Pure CSS: each column
+ * falls with a transform animation (no per-frame React work, no glyph swapping,
+ * so nothing flashes). Decorative and click-through; it is never mounted with
+ * reduced motion, and the global reduced-motion rule stops it if Pause
+ * animations is switched on mid-way.
  */
 export function MatrixRain() {
   return (
@@ -46,8 +50,8 @@ export function MatrixRain() {
           className="matrix-column"
           style={
             {
-              left: `${(index / COLUMNS) * 100}%`,
-              opacity: column.opacity,
+              'left': `${(index / COLUMNS) * 100}%`,
+              'opacity': column.opacity,
               '--fall': `${column.duration.toFixed(2)}s`,
               '--wait': `${column.delay.toFixed(2)}s`,
             } as CSSProperties

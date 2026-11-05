@@ -6,42 +6,38 @@ import { DashboardActions } from '@/components/admin/dashboard-actions';
 import { requireAdmin } from '@/lib/auth/session';
 import { getAdminStore } from '@/lib/content/admin';
 import { findAttention } from '@/lib/content/admin/attention';
-import type { AdminDoc } from '@/lib/content/admin/types';
-import type { DocumentType } from '@/lib/content/schema';
+import { type AdminDoc } from '@/lib/content/admin/types';
+import { type DocumentType } from '@/lib/content/schema';
 
 export default async function Dashboard() {
   await requireAdmin();
+
   const store = getAdminStore();
   const lists = await Promise.all(AREAS.map((area) => store.list(area.type)));
-  const docs = Object.fromEntries(
-    AREAS.map((area, index) => [area.type, lists[index]]),
-  ) as Partial<Record<DocumentType, AdminDoc[]>>;
-  const areaOf = (type: DocumentType) =>
-    AREAS.find((area) => area.type === type);
+  const docs = Object.fromEntries(AREAS.map((area, index) => [area.type, lists[index]])) as Partial<
+    Record<DocumentType, AdminDoc[]>
+  >;
+  const areaOf = (type: DocumentType) => AREAS.find((area) => area.type === type);
   const hrefFor = (type: DocumentType, id: string) => {
     const area = areaOf(type);
+
     if (!area) return '/admin';
+
     return area.singleton || !id
       ? `/admin/${area.slug}`
       : `/admin/${area.slug}/${idToSegment(type, id)}`;
   };
 
   const attention = findAttention(docs);
-  const recent = AREAS.flatMap((area, index) =>
-    (lists[index] ?? []).map((doc) => ({ area, doc })),
-  )
+  const recent = AREAS.flatMap((area, index) => (lists[index] ?? []).map((doc) => ({ area, doc })))
     .filter(({ doc }) => typeof doc.updatedAt === 'string')
-    .sort((a, b) =>
-      String(b.doc.updatedAt).localeCompare(String(a.doc.updatedAt)),
-    )
+    .sort((a, b) => String(b.doc.updatedAt).localeCompare(String(a.doc.updatedAt)))
     .slice(0, 8);
 
   return (
     <div className="mx-auto max-w-5xl">
       <h1 className="text-h2">Dashboard</h1>
-      <p className="mt-2 text-text-2">
-        What is on the site, and what needs a look.
-      </p>
+      <p className="mt-2 text-text-2">What is on the site, and what needs a look.</p>
 
       <div className="mt-6">
         <DashboardActions />
@@ -52,6 +48,7 @@ export default async function Dashboard() {
         {AREAS.map((area, index) => {
           const list = lists[index] ?? [];
           const hidden = list.filter((doc) => doc['visible'] === false).length;
+
           return (
             <li key={area.slug}>
               <Link
@@ -59,19 +56,11 @@ export default async function Dashboard() {
                 prefetch={false}
                 className="block rounded-xl border border-line bg-surface-1 p-4 hover-fine:border-line-strong"
               >
-                <span className="block text-small text-text-3">
-                  {area.label}
-                </span>
+                <span className="block text-small text-text-3">{area.label}</span>
                 <span className="mt-1 block text-h3 text-text-1">
-                  {area.singleton
-                    ? list.length > 0
-                      ? 'Set'
-                      : 'Missing'
-                    : list.length}
+                  {area.singleton ? (list.length > 0 ? 'Set' : 'Missing') : list.length}
                   {hidden > 0 ? (
-                    <span className="ml-2 text-small text-text-3">
-                      {hidden} hidden
-                    </span>
+                    <span className="ml-2 text-small text-text-3">{hidden} hidden</span>
                   ) : null}
                 </span>
               </Link>
@@ -88,6 +77,7 @@ export default async function Dashboard() {
           {attention.slice(0, 30).map((item, index) => {
             const doc = docs[item.type]?.find((entry) => entry.id === item.id);
             const config = AREA_CONFIG[areaOf(item.type)?.slug ?? ''];
+
             return (
               <li key={`${item.id}-${index}`} className="text-small">
                 <Link
@@ -117,8 +107,7 @@ export default async function Dashboard() {
             </Link>
             <span className="text-text-2">
               {' '}
-              · {area.label} ·{' '}
-              {new Date(String(doc.updatedAt)).toLocaleString('en')}
+              · {area.label} · {new Date(String(doc.updatedAt)).toLocaleString('en')}
             </span>
           </li>
         ))}

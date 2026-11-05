@@ -1,25 +1,20 @@
-import type { ReactNode } from 'react';
+import { type ReactNode } from 'react';
 
 import { cn } from '@/lib/cn';
 
 interface SectionHeaderProps {
+  className?: string;
+  eyebrow: string;
   id: string;
   index: number;
-  eyebrow: string;
-  title: ReactNode;
   lead?: ReactNode;
-  className?: string;
+  title: ReactNode;
 }
 
-/** Mono eyebrow with number ("01 — About"), h2 and optional lead. */
-export function SectionHeader({
-  id,
-  index,
-  eyebrow,
-  title,
-  lead,
-  className,
-}: SectionHeaderProps) {
+/**
+ * Mono eyebrow with number ("01 — About"), h2 and optional lead.
+ */
+export function SectionHeader({ id, index, eyebrow, title, lead, className }: SectionHeaderProps) {
   return (
     <header className={cn('mb-12 max-w-3xl md:mb-16', className)}>
       <p className="mb-4 flex items-center gap-3 font-label text-text-3">

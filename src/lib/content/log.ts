@@ -1,4 +1,4 @@
-type Details = Record<string, string | number | boolean | undefined>;
+type Details = Record<string, boolean | number | string | undefined>;
 
 export interface ContentLogger {
   warn(event: string, details: Details): void;

@@ -1,8 +1,8 @@
-import type { ComponentType } from 'react';
+import { type ComponentType } from 'react';
 
-import type { AdminDoc } from '@/lib/content/admin';
+import { type AdminDoc } from '@/lib/content/admin';
 
-import { type Option, EducationForm, ExperienceForm } from './forms/career';
+import { EducationForm, ExperienceForm, type Option } from './forms/career';
 import { ContactForm, ProfileForm, ResumeForm } from './forms/identity';
 import { LinkForm, RecommendedForm } from './forms/people';
 import { ProjectForm } from './forms/project';
@@ -11,22 +11,30 @@ import { PracticeForm, TechnologyForm } from './forms/stack';
 type Values = Record<string, unknown>;
 
 export interface AreaConfig {
-  /** List columns; the first one links to the editor. */
-  columns: string[];
-  filterColumns?: number[];
-  hasFeatured?: boolean;
   cells(doc: AdminDoc): string[];
-  /** Text to type before deleting, and the editor title. */
-  name(doc: AdminDoc): string;
-  /** A new document's starting values. */
+  /**
+   * List columns; the first one links to the editor.
+   */
+  columns: string[];
+  /**
+   * A new document's starting values.
+   */
   defaults(): Values;
+  filterColumns?: number[];
   Form: ComponentType<{ techOptions: Option[] }>;
+  hasFeatured?: boolean;
+  /**
+   * Text to type before deleting, and the editor title.
+   */
+  name(doc: AdminDoc): string;
   needsTechnologies?: boolean;
 }
 
 const blank = () => ({ en: '', pt: '' });
 
-/** Reads `value.en` from a localized field of an unvalidated document. */
+/**
+ * Reads `value.en` from a localized field of an unvalidated document.
+ */
 const en = (doc: AdminDoc, field: string) =>
   String((doc[field] as { en?: string } | undefined)?.en ?? '');
 const str = (doc: AdminDoc, field: string) => String(doc[field] ?? '');
@@ -87,12 +95,7 @@ export const AREA_CONFIG: Record<string, AreaConfig> = {
     columns: ['Title', 'Kind', 'Status', 'Year'],
     filterColumns: [1, 2],
     hasFeatured: true,
-    cells: (doc) => [
-      en(doc, 'title'),
-      str(doc, 'kind'),
-      str(doc, 'status'),
-      str(doc, 'year'),
-    ],
+    cells: (doc) => [en(doc, 'title'), str(doc, 'kind'), str(doc, 'status'), str(doc, 'year')],
     name: (doc) => str(doc, 'slug') || en(doc, 'title'),
     defaults: () => ({
       title: blank(),
@@ -118,9 +121,9 @@ export const AREA_CONFIG: Record<string, AreaConfig> = {
     columns: ['Company', 'Latest role', 'Since'],
     cells: (doc) => {
       const first = (
-        doc['roles'] as
-          { title?: { en?: string }; start?: string }[] | undefined
+        doc['roles'] as Array<{ start?: string; title?: { en?: string } }> | undefined
       )?.[0];
+
       return [str(doc, 'company'), first?.title?.en ?? '', first?.start ?? ''];
     },
     name: (doc) => str(doc, 'company'),
@@ -138,11 +141,7 @@ export const AREA_CONFIG: Record<string, AreaConfig> = {
   education: {
     columns: ['Title', 'Kind', 'Institution'],
     filterColumns: [1],
-    cells: (doc) => [
-      en(doc, 'title'),
-      str(doc, 'kind'),
-      str(doc, 'institution'),
-    ],
+    cells: (doc) => [en(doc, 'title'), str(doc, 'kind'), str(doc, 'institution')],
     name: (doc) => en(doc, 'title'),
     defaults: () => ({ kind: 'degree', title: blank(), visible: true }),
     Form: EducationForm,
@@ -151,11 +150,7 @@ export const AREA_CONFIG: Record<string, AreaConfig> = {
   technologies: {
     columns: ['Name', 'Category', 'Prominence'],
     filterColumns: [1],
-    cells: (doc) => [
-      str(doc, 'name'),
-      str(doc, 'category'),
-      str(doc, 'priority'),
-    ],
+    cells: (doc) => [str(doc, 'name'), str(doc, 'category'), str(doc, 'priority')],
     name: (doc) => str(doc, 'name'),
     defaults: () => ({
       category: 'frontend',

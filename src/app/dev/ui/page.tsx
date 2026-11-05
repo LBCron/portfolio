@@ -15,7 +15,7 @@ import { SectionHeader } from '@/components/ui/section-header';
 import { Tooltip } from '@/components/ui/tooltip';
 import { toast } from '@/stores/toast-store';
 
-function Demo({ title, children }: { title: string; children: ReactNode }) {
+function Demo({ title, children }: { children: ReactNode; title: string }) {
   return (
     <section className="border-t border-line py-10">
       <h2 className="mb-6 font-label text-text-3">{title}</h2>
@@ -70,11 +70,7 @@ export default function DevUiPage() {
 
       <Demo title="Tooltip and Toast">
         <Tooltip content="Ctrl + / toggles the terminal">
-          <Button
-            variant="secondary"
-            size="icon"
-            aria-label="Open the terminal"
-          >
+          <Button variant="secondary" size="icon" aria-label="Open the terminal">
             <Terminal aria-hidden="true" />
           </Button>
         </Tooltip>
@@ -111,9 +107,7 @@ export default function DevUiPage() {
             <Reveal key={index} index={index}>
               <Card className="p-6">
                 <h3 className="text-h3">Card {index + 1}</h3>
-                <p className="mt-2 text-small">
-                  Spotlight border follows a fine pointer.
-                </p>
+                <p className="mt-2 text-small">Spotlight border follows a fine pointer.</p>
               </Card>
             </Reveal>
           ))}

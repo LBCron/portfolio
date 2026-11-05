@@ -23,14 +23,17 @@ export function DesktopNav() {
   useLayoutEffect(() => {
     const list = listRef.current;
     const indicator = indicatorRef.current;
+
     if (!list || !indicator) return;
-    const link = active
-      ? list.querySelector<HTMLElement>(`[data-section="${active}"]`)
-      : null;
+
+    const link = active ? list.querySelector<HTMLElement>(`[data-section="${active}"]`) : null;
+
     if (!link) {
       indicator.style.opacity = '0';
+
       return;
     }
+
     indicator.style.opacity = '1';
     indicator.style.width = `${link.offsetWidth}px`;
     indicator.style.transform = `translateX(${link.offsetLeft}px)`;
@@ -63,9 +66,7 @@ export function DesktopNav() {
               aria-current={active === section ? 'location' : undefined}
               className={cn(
                 'relative inline-flex min-h-11 items-center rounded-full px-3.5 text-small transition-colors duration-200',
-                active === section
-                  ? 'text-text-1'
-                  : 'text-text-2 hover-fine:text-text-1',
+                active === section ? 'text-text-1' : 'text-text-2 hover-fine:text-text-1',
               )}
             >
               {t(`nav.${section}`)}

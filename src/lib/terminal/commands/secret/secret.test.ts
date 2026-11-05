@@ -8,6 +8,7 @@ const actions = vi.hoisted(() => ({
   getSessionStatus: vi.fn(),
   logout: vi.fn(),
 }));
+
 vi.mock('@/lib/auth/actions', () => actions);
 
 const loadSecret = () => import('.');
@@ -26,9 +27,11 @@ describe('su', () => {
       redirectTo: '/admin',
       expiresAt: session.expiresAt,
     });
+
     const readSecret = vi.fn().mockResolvedValue('hunter2');
     const harness = await createHarness('en', { loadSecret, readSecret });
     const output = flatten(await harness.run('su julio'));
+
     expect(readSecret).toHaveBeenCalledWith('Password:', expect.anything());
     expect(actions.authenticate).toHaveBeenCalledWith('hunter2');
     expect(output).toBe('Authenticated.');
@@ -37,14 +40,13 @@ describe('su', () => {
 
   it('fails the same way for a wrong password, any target and no target', async () => {
     actions.authenticate.mockResolvedValue({ ok: false });
+
     const harness = await createHarness('en', {
       loadSecret,
       readSecret: async () => 'nope',
     });
     for (const line of ['su julio', 'su root', 'su']) {
-      expect(flatten(await harness.run(line))).toBe(
-        'su: Authentication failure',
-      );
+      expect(flatten(await harness.run(line))).toBe('su: Authentication failure');
     }
     expect(harness.calls).toEqual([]);
   });
@@ -54,6 +56,7 @@ describe('su', () => {
       loadSecret,
       readSecret: async () => null,
     });
+
     expect(await harness.run('su julio')).toEqual([]);
     expect(actions.authenticate).not.toHaveBeenCalled();
   });
@@ -64,10 +67,8 @@ describe('admin and logout', () => {
     const harness = await createHarness('en', { loadSecret });
     for (const name of ['admin', 'logout']) {
       const secret = flatten(await harness.run(name));
-      const unknown = flatten(await harness.run('qwzxv')).replace(
-        'qwzxv',
-        name,
-      );
+      const unknown = flatten(await harness.run('qwzxv')).replace('qwzxv', name);
+
       expect(secret).toBe(unknown);
     }
     expect(actions.getSessionStatus).not.toHaveBeenCalled();
@@ -76,8 +77,10 @@ describe('admin and logout', () => {
 
   it('admin lists the areas and opens one', async () => {
     actions.getSessionStatus.mockResolvedValue({ isAdmin: true, ...session });
+
     const harness = await createHarness('en', { loadSecret, session });
     const listed = await harness.run('admin');
+
     expect(listed[1]).toMatchObject({ type: 'command' });
     expect(JSON.stringify(listed)).toContain('"command":"admin projects"');
     await harness.run('admin projects');
@@ -87,13 +90,16 @@ describe('admin and logout', () => {
 
   it('admin ends the session when the server says it is over', async () => {
     actions.getSessionStatus.mockResolvedValue({ isAdmin: false });
+
     const harness = await createHarness('en', { loadSecret, session });
+
     expect(flatten(await harness.run('admin'))).toBe('session expired');
     expect(harness.calls).toEqual(['session:off']);
   });
 
   it('logout clears the session', async () => {
     const harness = await createHarness('en', { loadSecret, session });
+
     expect(flatten(await harness.run('logout'))).toBe('Signed out.');
     expect(actions.logout).toHaveBeenCalled();
     expect(harness.calls).toEqual(['session:off']);
@@ -103,16 +109,20 @@ describe('admin and logout', () => {
 describe('expiry', () => {
   it('prints "session expired" on the next command and reverts', async () => {
     actions.getSessionStatus.mockResolvedValue({ isAdmin: false });
+
     const old = { expiresAt: Date.now() - 1000, base: '/admin' };
     const harness = await createHarness('en', { loadSecret, session: old });
+
     expect(flatten(await harness.run('pwd'))).toBe('session expired\n~');
     expect(harness.calls).toEqual(['session:off']);
   });
 
   it('keeps the session when the server renewed it elsewhere', async () => {
     actions.getSessionStatus.mockResolvedValue({ isAdmin: true, ...session });
+
     const old = { expiresAt: Date.now() - 1000, base: '/admin' };
     const harness = await createHarness('en', { loadSecret, session: old });
+
     expect(flatten(await harness.run('pwd'))).toBe('~');
     expect(harness.calls).toEqual(['session:on']);
   });
@@ -134,12 +144,12 @@ describe('invisibility', () => {
 
   it('do not answer --help', async () => {
     actions.authenticate.mockResolvedValue({ ok: false });
+
     const harness = await createHarness('en', {
       loadSecret,
       readSecret: async () => '',
     });
-    expect(flatten(await harness.run('su --help'))).toBe(
-      'su: Authentication failure',
-    );
+
+    expect(flatten(await harness.run('su --help'))).toBe('su: Authentication failure');
   });
 });

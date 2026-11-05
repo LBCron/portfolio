@@ -1,15 +1,19 @@
-import type { DocumentType } from '@/lib/content/schema';
+import { type DocumentType } from '@/lib/content/schema';
 
 export interface AreaMeta {
-  slug: string;
   label: string;
-  /** Singular noun for buttons and titles. */
-  singular: string;
-  type: DocumentType;
   singleton?: boolean;
+  /**
+   * Singular noun for buttons and titles.
+   */
+  singular: string;
+  slug: string;
+  type: DocumentType;
 }
 
-/** The admin areas, in sidebar order (after the dashboard). */
+/**
+ * The admin areas, in sidebar order (after the dashboard).
+ */
 export const AREAS: AreaMeta[] = [
   {
     slug: 'profile',
@@ -66,8 +70,7 @@ export const AREAS: AreaMeta[] = [
   },
 ];
 
-export const findArea = (slug: string) =>
-  AREAS.find((area) => area.slug === slug);
+export const findArea = (slug: string) => AREAS.find((area) => area.slug === slug);
 
 export const ADMIN_NAV = [
   { label: 'Dashboard', href: '/admin' },

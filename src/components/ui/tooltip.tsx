@@ -13,33 +13,32 @@ import {
 import { cn } from '@/lib/cn';
 
 interface TooltipProps {
-  content: ReactNode;
-  /** A single focusable element (button or link). */
+  /**
+   * A single focusable element (button or link).
+   */
   children: ReactElement<{ 'aria-describedby'?: string }>;
-  side?: 'top' | 'bottom';
   className?: string;
+  content: ReactNode;
+  side?: 'bottom' | 'top';
 }
 
 const HIDE_DELAY_MS = 120;
 
 /**
- * Supplementary description shown on hover and focus (WCAG 1.4.13):
- * dismissible with Esc, hoverable, and persistent while hovered or focused.
- * The trigger keeps its own accessible name; the tooltip only describes it.
+ * Supplementary description shown on hover and focus (WCAG 1.4.13): dismissible
+ * with Esc, hoverable, and persistent while hovered or focused. The trigger
+ * keeps its own accessible name; the tooltip only describes it.
  */
-export function Tooltip({
-  content,
-  children,
-  side = 'bottom',
-  className,
-}: TooltipProps) {
+export function Tooltip({ content, children, side = 'bottom', className }: TooltipProps) {
   const id = useId();
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     const wrapper = wrapperRef.current;
+
     if (!wrapper) return;
+
     let timer: number | undefined;
 
     const show = () => {
@@ -64,6 +63,7 @@ export function Tooltip({
     wrapper.addEventListener('focusin', show);
     wrapper.addEventListener('focusout', hide);
     document.addEventListener('keydown', onKeyDown);
+
     return () => {
       window.clearTimeout(timer);
       wrapper.removeEventListener('pointerenter', onPointerEnter);
@@ -84,9 +84,7 @@ export function Tooltip({
           'absolute left-1/2 z-(--z-floating) w-max max-w-64 -translate-x-1/2 rounded-sm border border-line-strong bg-surface-2 px-2.5 py-1.5',
           'text-small text-text-1 shadow-lg transition-[opacity,translate] duration-150 ease-out-expo',
           side === 'bottom' ? 'top-full mt-2' : 'bottom-full mb-2',
-          open
-            ? 'visible translate-y-0 opacity-100'
-            : 'invisible -translate-y-0.5 opacity-0',
+          open ? 'visible translate-y-0 opacity-100' : 'invisible -translate-y-0.5 opacity-0',
           className,
         )}
       >

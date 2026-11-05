@@ -1,8 +1,8 @@
-import type { DocumentInput } from '../../schema';
+import { type DocumentInput } from '../../schema';
 import { L, meta } from '../helpers';
 import { techId } from '../ids';
 
-export const experience: DocumentInput<'experience'>[] = [
+export const experience: Array<DocumentInput<'experience'>> = [
   {
     ...meta('experience', 'lumen-works'),
     company: 'Lumen Works',
@@ -32,15 +32,9 @@ export const experience: DocumentInput<'experience'>[] = [
         ],
       },
     ],
-    techIds: [
-      'TypeScript',
-      'React',
-      'Next.js',
-      'Node.js',
-      'PostgreSQL',
-      'AWS',
-      'Docker',
-    ].map(techId),
+    techIds: ['TypeScript', 'React', 'Next.js', 'Node.js', 'PostgreSQL', 'AWS', 'Docker'].map(
+      techId,
+    ),
     collapsedByDefault: false,
     order: 10,
     visible: true,
@@ -71,9 +65,7 @@ export const experience: DocumentInput<'experience'>[] = [
         ],
       },
     ],
-    techIds: ['TypeScript', 'Vue.js', 'Nuxt', 'GraphQL', 'Google Cloud'].map(
-      techId,
-    ),
+    techIds: ['TypeScript', 'Vue.js', 'Nuxt', 'GraphQL', 'Google Cloud'].map(techId),
     collapsedByDefault: false,
     order: 20,
     visible: true,
@@ -111,14 +103,11 @@ export const experience: DocumentInput<'experience'>[] = [
   },
 ];
 
-export const education: DocumentInput<'education'>[] = [
+export const education: Array<DocumentInput<'education'>> = [
   {
     ...meta('education', 'bsc-computer-science'),
     kind: 'degree',
-    title: L(
-      'B.Sc. in Computer Science',
-      'Bacharelado em Ciência da Computação',
-    ),
+    title: L('B.Sc. in Computer Science', 'Bacharelado em Ciência da Computação'),
     institution: 'Example University',
     start: '2012',
     end: '2016',
@@ -129,10 +118,7 @@ export const education: DocumentInput<'education'>[] = [
   {
     ...meta('education', 'applied-software-architecture'),
     kind: 'certification',
-    title: L(
-      'Applied Software Architecture',
-      'Arquitetura de Software Aplicada',
-    ),
+    title: L('Applied Software Architecture', 'Arquitetura de Software Aplicada'),
     institution: 'Example Academy',
     end: '2021',
     url: 'https://example.com/academy/architecture',
@@ -142,10 +128,7 @@ export const education: DocumentInput<'education'>[] = [
   {
     ...meta('education', 'accessible-interfaces'),
     kind: 'certification',
-    title: L(
-      'Accessible Interface Engineering',
-      'Engenharia de Interfaces Acessíveis',
-    ),
+    title: L('Accessible Interface Engineering', 'Engenharia de Interfaces Acessíveis'),
     institution: 'Example Academy',
     end: '2022',
     url: 'https://example.com/academy/accessibility',

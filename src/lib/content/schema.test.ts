@@ -1,3 +1,4 @@
+import { createFixtureDataset } from './fixtures/dataset';
 import {
   featuredLinkSchema,
   hasNoRawHtml,
@@ -7,7 +8,6 @@ import {
   slugSchema,
   technologySchema,
 } from './schema';
-import { createFixtureDataset } from './fixtures/dataset';
 
 const dataset = createFixtureDataset();
 const project = dataset.project[0];
@@ -40,10 +40,10 @@ describe('content schema', () => {
 
   it('validates the profile title font and lead length', () => {
     expect(profileSchema.safeParse(profile).success).toBe(true);
-    expect(
-      profileSchema.safeParse({ ...profile, titleFont: 'comic-sans' }).success,
-    ).toBe(false);
+    expect(profileSchema.safeParse({ ...profile, titleFont: 'comic-sans' }).success).toBe(false);
+
     const long = 'x'.repeat(121);
+
     expect(
       profileSchema.safeParse({
         ...profile,
@@ -53,12 +53,8 @@ describe('content schema', () => {
   });
 
   it('rejects the retired hero link placement', () => {
-    expect(
-      featuredLinkSchema.safeParse({ ...link, placements: ['hero'] }).success,
-    ).toBe(false);
-    expect(
-      featuredLinkSchema.safeParse({ ...link, placements: ['header'] }).success,
-    ).toBe(true);
+    expect(featuredLinkSchema.safeParse({ ...link, placements: ['hero'] }).success).toBe(false);
+    expect(featuredLinkSchema.safeParse({ ...link, placements: ['header'] }).success).toBe(true);
   });
 
   it('accepts mailto only where allowed', () => {
@@ -69,10 +65,9 @@ describe('content schema', () => {
         isOwnProfile: false,
       }).success,
     ).toBe(true);
-    expect(
-      featuredLinkSchema.safeParse({ ...link, url: 'mailto:hello@example.com' })
-        .success,
-    ).toBe(false);
+    expect(featuredLinkSchema.safeParse({ ...link, url: 'mailto:hello@example.com' }).success).toBe(
+      false,
+    );
     expect(
       projectSchema.safeParse({
         ...project,
@@ -82,9 +77,7 @@ describe('content schema', () => {
   });
 
   it('rejects raw HTML in Markdown but allows it in code', () => {
-    expect(
-      hasNoRawHtml('Use `<div>` sparingly.\n\n```html\n<p>x</p>\n```'),
-    ).toBe(true);
+    expect(hasNoRawHtml('Use `<div>` sparingly.\n\n```html\n<p>x</p>\n```')).toBe(true);
     expect(hasNoRawHtml('Hello <script>alert(1)</script>')).toBe(false);
     expect(hasNoRawHtml('<img src=x onerror=alert(1)>')).toBe(false);
     expect(hasNoRawHtml('a <!-- comment -->')).toBe(false);
@@ -92,10 +85,7 @@ describe('content schema', () => {
   });
 
   it('requires both locales and enforces length caps', () => {
-    expect(
-      projectSchema.safeParse({ ...project, title: { en: 'X', pt: '' } })
-        .success,
-    ).toBe(false);
+    expect(projectSchema.safeParse({ ...project, title: { en: 'X', pt: '' } }).success).toBe(false);
     expect(
       projectSchema.safeParse({
         ...project,
@@ -106,6 +96,7 @@ describe('content schema', () => {
 
   it('requires alt text on every image', () => {
     const gallery = project?.gallery ?? [];
+
     expect(
       projectSchema.safeParse({
         ...project,
@@ -115,10 +106,9 @@ describe('content schema', () => {
   });
 
   it('rejects a previous slug equal to the current one', () => {
-    expect(
-      projectSchema.safeParse({ ...project, previousSlugs: [project?.slug] })
-        .success,
-    ).toBe(false);
+    expect(projectSchema.safeParse({ ...project, previousSlugs: [project?.slug] }).success).toBe(
+      false,
+    );
   });
 
   it('needs an icon slug for package icon sources', () => {
@@ -129,8 +119,6 @@ describe('content schema', () => {
         iconSlug: undefined,
       }).success,
     ).toBe(false);
-    expect(
-      technologySchema.safeParse({ ...tech, iconSource: 'custom-svg' }).success,
-    ).toBe(false);
+    expect(technologySchema.safeParse({ ...tech, iconSource: 'custom-svg' }).success).toBe(false);
   });
 });

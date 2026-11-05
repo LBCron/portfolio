@@ -1,5 +1,5 @@
 import { cva, type VariantProps } from 'class-variance-authority';
-import type { ComponentProps } from 'react';
+import { type ComponentProps } from 'react';
 
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/cn';
@@ -39,39 +39,34 @@ export function Button({
   size,
   type = 'button',
   ...props
-}: ComponentProps<'button'> & ButtonVariantProps) {
+}: ButtonVariantProps & ComponentProps<'button'>) {
   return (
-    <button
-      type={type}
-      className={cn(buttonVariants({ variant, size }), className)}
-      {...props}
-    />
+    <button type={type} className={cn(buttonVariants({ variant, size }), className)} {...props} />
   );
 }
 
-/** Internal, locale-aware link styled as a button. */
+/**
+ * Internal, locale-aware link styled as a button.
+ */
 export function ButtonLink({
   className,
   variant,
   size,
   ...props
-}: ComponentProps<typeof Link> & ButtonVariantProps) {
-  return (
-    <Link
-      className={cn(buttonVariants({ variant, size }), className)}
-      {...props}
-    />
-  );
+}: ButtonVariantProps & ComponentProps<typeof Link>) {
+  return <Link className={cn(buttonVariants({ variant, size }), className)} {...props} />;
 }
 
-/** Plain anchor styled as a button (hash links, external URLs, files). */
+/**
+ * Plain anchor styled as a button (hash links, external URLs, files).
+ */
 export function ButtonAnchor({
   className,
   variant,
   size,
   children,
   ...props
-}: ComponentProps<'a'> & ButtonVariantProps) {
+}: ButtonVariantProps & ComponentProps<'a'>) {
   return (
     <a className={cn(buttonVariants({ variant, size }), className)} {...props}>
       {children}

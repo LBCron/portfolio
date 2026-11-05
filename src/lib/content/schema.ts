@@ -4,10 +4,10 @@ import { techCategories, titleFonts } from './taxonomy';
 
 export {
   techCategories,
-  titleFontLabels,
-  titleFonts,
   type TechCategory,
   type TitleFont,
+  titleFontLabels,
+  titleFonts,
 } from './taxonomy';
 
 /**
@@ -28,18 +28,17 @@ const FENCED_CODE = /```[\s\S]*?```|~~~[\s\S]*?~~~/g;
 const INLINE_CODE = /`[^`\n]*`/g;
 const RAW_HTML = /<\/?[a-z][a-z0-9-]*(?:\s[^>]*)?\/?>|<!--/i;
 
-/** True when Markdown has no raw HTML outside code spans and code blocks. */
+/**
+ * True when Markdown has no raw HTML outside code spans and code blocks.
+ */
 export function hasNoRawHtml(markdown: string): boolean {
-  return !RAW_HTML.test(
-    markdown.replace(FENCED_CODE, '').replace(INLINE_CODE, ''),
-  );
+  return !RAW_HTML.test(markdown.replace(FENCED_CODE, '').replace(INLINE_CODE, ''));
 }
 
 const markdown = (max: number) =>
   text(max).refine(hasNoRawHtml, { message: 'Raw HTML is not allowed' });
 
-export const localized = (max: number) =>
-  z.object({ en: text(max), pt: text(max) });
+export const localized = (max: number) => z.object({ en: text(max), pt: text(max) });
 
 export const localizedMarkdown = (max: number) =>
   z.object({ en: markdown(max), pt: markdown(max) });
@@ -51,18 +50,18 @@ export const slugSchema = z
   .max(80)
   .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, { message: 'Invalid slug' });
 
-export const httpsUrlSchema = z
-  .url({ protocol: /^https$/, hostname: z.regexes.domain })
-  .max(2048);
+export const httpsUrlSchema = z.url({ protocol: /^https$/, hostname: z.regexes.domain }).max(2048);
 
 export const mailtoUrlSchema = z
   .string()
   .max(320)
-  .regex(/^mailto:[^\s@/?#]+@[^\s@/?#]+\.[^\s@/?#]+$/, {
+  .regex(/^mailto:[^\s@/?#]+@[^\s#/?@][^\s#./?@]*\.[^\s#/?@]+$/, {
     message: 'Invalid mailto URL',
   });
 
-/** Sanity CDN URLs, or files the fixtures adapter serves from `public/`. */
+/**
+ * Sanity CDN URLs, or files the fixtures adapter serves from `public/`.
+ */
 export const assetUrlSchema = z.union([
   httpsUrlSchema,
   z
@@ -71,26 +70,26 @@ export const assetUrlSchema = z.union([
     .refine((path) => !path.includes('..'), { message: 'Invalid path' }),
 ]);
 
-export const hexColorSchema = z
-  .string()
-  .regex(/^#[0-9a-f]{6}$/i, { message: 'Expected #rrggbb' });
+export const hexColorSchema = z.string().regex(/^#[0-9a-f]{6}$/i, { message: 'Expected #rrggbb' });
 
-/** `YYYY-MM`. */
+/**
+ * `YYYY-MM`.
+ */
 export const yearMonthSchema = z
   .string()
   .regex(/^\d{4}-(?:0[1-9]|1[0-2])$/, { message: 'Expected YYYY-MM' });
 
-/** `YYYY` or `YYYY-MM`. */
-export const partialDateSchema = z
-  .string()
-  .regex(/^\d{4}(?:-(?:0[1-9]|1[0-2]))?$/, {
-    message: 'Expected YYYY or YYYY-MM',
-  });
+/**
+ * `YYYY` or `YYYY-MM`.
+ */
+export const partialDateSchema = z.string().regex(/^\d{4}(?:-(?:0[1-9]|1[0-2]))?$/, {
+  message: 'Expected YYYY or YYYY-MM',
+});
 
 export const documentIdSchema = z
   .string()
   .max(128)
-  .regex(/^[a-zA-Z0-9][a-zA-Z0-9._-]*$/, { message: 'Invalid document id' });
+  .regex(/^[a-z0-9][\w.-]*$/i, { message: 'Invalid document id' });
 
 const orderSchema = z.number().int().min(0).max(1_000_000);
 const visibleSchema = z.boolean().default(true);
@@ -126,7 +125,9 @@ export const imageSchema = z.object({
   focal: focalPointSchema.optional(),
 });
 
-/** Avatars derive their alt text from the person's name. */
+/**
+ * Avatars derive their alt text from the person's name.
+ */
 export const avatarSchema = z.object({
   asset: imageAssetSchema,
   focal: focalPointSchema.optional(),
@@ -138,18 +139,18 @@ export const fileAssetSchema = z.object({
   mimeType: z.literal('application/pdf'),
 });
 
-/** Geometry for inline SVG: one `viewBox` and plain `d` attributes. */
+/**
+ * Geometry for inline SVG: one `viewBox` and plain `d` attributes.
+ */
 export const svgDataSchema = z.object({
-  viewBox: z
-    .string()
-    .regex(/^-?\d+(?:\.\d+)? -?\d+(?:\.\d+)? \d+(?:\.\d+)? \d+(?:\.\d+)?$/),
+  viewBox: z.string().regex(/^-?\d+(?:\.\d+)? -?\d+(?:\.\d+)? \d+(?:\.\d+)? \d+(?:\.\d+)?$/),
   paths: z
     .array(
       z
         .string()
         .min(1)
         .max(60_000)
-        .regex(/^[MmZzLlHhVvCcSsQqTtAaEe0-9.,\s+-]+$/),
+        .regex(/^[MZLHVCSQTAE0-9.,\s+-]+$/i),
     )
     .min(1)
     .max(64),
@@ -173,10 +174,14 @@ export const profileSchema = z.object({
   displayName: text(80),
   jobTitle: localized(80),
   heroLead: localized(120),
-  /** Font of the hero title; unset is the site font. */
+  /**
+   * Font of the hero title; unset is the site font.
+   */
   titleFont: z.enum(titleFonts).optional(),
   photo: imageSchema.optional(),
-  /** Side-by-side hero art (lg+); falls back to `photo` when absent. */
+  /**
+   * Side-by-side hero art (lg+); falls back to `photo` when absent.
+   */
   photoLg: imageSchema.optional(),
   bio: localizedMarkdown(1500),
   location: localized(80),
@@ -215,7 +220,9 @@ export const resumeSchema = z.object({
 export const linkKinds = ['social', 'site', 'other'] as const;
 export const linkPlacements = ['header', 'contact', 'footer'] as const;
 
-/** `simple-icons:<slug>`, `lucide:<name>` or the generic `link`. */
+/**
+ * `simple-icons:<slug>`, `lucide:<name>` or the generic `link`.
+ */
 export const linkIconSchema = z.union([
   z.literal('link'),
   z.string().regex(/^simple-icons:[a-z0-9]+$/),
@@ -254,12 +261,7 @@ export const recommendedProfileSchema = z.object({
   visible: visibleSchema,
 });
 
-export const iconSources = [
-  'simple-icons',
-  'devicon',
-  'custom-svg',
-  'monogram',
-] as const;
+export const iconSources = ['simple-icons', 'devicon', 'custom-svg', 'monogram'] as const;
 
 export const technologySchema = z
   .object({
@@ -273,7 +275,9 @@ export const technologySchema = z
       .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
       .optional(),
     customSvg: svgDataSchema.optional(),
-    /** Overrides the generated monogram (1–3 letters or digits). */
+    /**
+     * Overrides the generated monogram (1–3 letters or digits).
+     */
     monogram: z
       .string()
       .regex(/^[A-Z0-9]{1,3}$/)
@@ -285,8 +289,8 @@ export const technologySchema = z
     visible: visibleSchema,
   })
   .superRefine((tech, ctx) => {
-    const needsSlug =
-      tech.iconSource === 'simple-icons' || tech.iconSource === 'devicon';
+    const needsSlug = tech.iconSource === 'simple-icons' || tech.iconSource === 'devicon';
+
     if (needsSlug && !tech.iconSlug) {
       ctx.addIssue({
         code: 'custom',
@@ -294,6 +298,7 @@ export const technologySchema = z
         message: `Required for ${tech.iconSource}`,
       });
     }
+
     if (tech.iconSource === 'custom-svg' && !tech.customSvg) {
       ctx.addIssue({
         code: 'custom',
@@ -320,12 +325,7 @@ export const projectKinds = [
 ] as const;
 export type ProjectKind = (typeof projectKinds)[number];
 
-export const projectStatuses = [
-  'live',
-  'in-progress',
-  'archived',
-  'private',
-] as const;
+export const projectStatuses = ['live', 'in-progress', 'archived', 'private'] as const;
 export type ProjectStatus = (typeof projectStatuses)[number];
 
 export const galleryItemSchema = imageSchema.extend({
@@ -370,10 +370,8 @@ export const projectSchema = z
         message: 'Duplicate technology',
       });
     }
-    if (
-      project.previousSlugs.includes(project.slug) ||
-      !isUnique(project.previousSlugs)
-    ) {
+
+    if (project.previousSlugs.includes(project.slug) || !isUnique(project.previousSlugs)) {
       ctx.addIssue({
         code: 'custom',
         path: ['previousSlugs'],
@@ -448,13 +446,11 @@ export const documentSchemas = {
 export type DocumentType = keyof typeof documentSchemas;
 export const documentTypes = Object.keys(documentSchemas) as DocumentType[];
 
-export type DocumentOf<T extends DocumentType> = z.infer<
-  (typeof documentSchemas)[T]
->;
-/** Authoring shape (defaults optional), used by fixtures and the seed. */
-export type DocumentInput<T extends DocumentType> = z.input<
-  (typeof documentSchemas)[T]
->;
+export type DocumentOf<T extends DocumentType> = z.infer<(typeof documentSchemas)[T]>;
+/**
+ * Authoring shape (defaults optional), used by fixtures and the seed.
+ */
+export type DocumentInput<T extends DocumentType> = z.input<(typeof documentSchemas)[T]>;
 
 export type ProfileDocument = DocumentOf<'profile'>;
 export type ContactDocument = DocumentOf<'contact'>;

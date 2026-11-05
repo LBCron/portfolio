@@ -1,9 +1,9 @@
-import type { Metadata } from 'next';
+import { type Metadata } from 'next';
 import { getFormatter, getTranslations } from 'next-intl/server';
 
 import { Breadcrumb } from '@/components/seo/breadcrumb';
-import { Link } from '@/i18n/navigation';
 import { currentLocale } from '@/i18n/locale';
+import { Link } from '@/i18n/navigation';
 import { pageMetadata } from '@/lib/seo/metadata';
 import { pickDescription } from '@/lib/seo/text';
 
@@ -11,18 +11,13 @@ export const revalidate = 86400;
 
 const REVIEWED = '2026-10-13';
 
-const MEASURES = [
-  'keyboard',
-  'semantics',
-  'motion',
-  'contrast',
-  'noScript',
-] as const;
+const MEASURES = ['keyboard', 'semantics', 'motion', 'contrast', 'noScript'] as const;
 const LIMITS = ['decorative', 'thirdParty'] as const;
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await currentLocale();
   const t = await getTranslations('accessibility');
+
   return pageMetadata({
     locale,
     path: '/accessibility',
@@ -88,9 +83,7 @@ export default async function AccessibilityPage() {
           </p>
         </section>
 
-        <p className="mt-12 text-small text-text-3">
-          {t('lastReviewed', { date: reviewed })}
-        </p>
+        <p className="mt-12 text-small text-text-3">{t('lastReviewed', { date: reviewed })}</p>
       </div>
     </article>
   );

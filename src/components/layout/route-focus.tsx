@@ -15,12 +15,18 @@ export function RouteFocus() {
 
   useEffect(() => {
     if (previous.current === pathname) return;
+
     previous.current = pathname;
+
     if (window.location.hash) return;
+
     const heading = document.querySelector<HTMLElement>('main h1');
     const target = heading ?? document.getElementById('main');
+
     if (!target) return;
+
     if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
+
     target.focus({ preventScroll: true });
   }, [pathname]);
 

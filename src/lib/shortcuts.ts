@@ -9,16 +9,15 @@ export const TERMINAL_SHORTCUT = {
 
 export function isTerminalShortcut(event: KeyboardEvent) {
   return (
-    event.key === TERMINAL_SHORTCUT.key &&
-    (event.metaKey || event.ctrlKey) &&
-    !event.altKey &&
-    !event.shiftKey
+    event.key === TERMINAL_SHORTCUT.key
+    && (event.metaKey || event.ctrlKey)
+    && !event.altKey
+    && !event.shiftKey
   );
 }
 
 export function isApplePlatform() {
   if (typeof navigator === 'undefined') return false;
-  return /mac|iphone|ipad|ipod/i.test(
-    navigator.platform || navigator.userAgent,
-  );
+
+  return /mac|iphone|ipad|ipod/i.test(navigator.platform || navigator.userAgent);
 }

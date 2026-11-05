@@ -1,11 +1,11 @@
 'use client';
 
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
-import Image from 'next/image';
 import { useTranslations } from 'next-intl';
+import Image from 'next/image';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 
-import type { GalleryImage } from '@/lib/content';
+import { type GalleryImage } from '@/lib/content';
 
 interface GalleryProps {
   images: readonly GalleryImage[];
@@ -15,8 +15,8 @@ export function Gallery({ images }: GalleryProps) {
   const t = useTranslations('project');
   const titleId = useId();
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const touchStart = useRef<number | null>(null);
-  const [index, setIndex] = useState<number | null>(null);
+  const touchStart = useRef<null | number>(null);
+  const [index, setIndex] = useState<null | number>(null);
   const current = index === null ? undefined : images[index];
 
   const close = useCallback(() => setIndex(null), []);
@@ -27,28 +27,39 @@ export function Gallery({ images }: GalleryProps) {
 
   useEffect(() => {
     const dialog = dialogRef.current;
+
     if (!dialog) return;
+
     if (index !== null && !dialog.open) dialog.showModal();
+
     if (index === null && dialog.open) dialog.close();
   }, [index]);
 
   useEffect(() => {
     const dialog = dialogRef.current;
+
     if (!dialog) return;
+
     const onClick = (event: MouseEvent) => {
       if (event.target === dialog) close();
     };
+
     dialog.addEventListener('click', onClick);
+
     return () => dialog.removeEventListener('click', onClick);
   }, [close]);
 
   useEffect(() => {
     if (index === null) return;
+
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'ArrowRight') show(index + 1);
+
       if (event.key === 'ArrowLeft') show(index - 1);
     };
+
     window.addEventListener('keydown', onKey);
+
     return () => window.removeEventListener('keydown', onKey);
   }, [index, show]);
 
@@ -66,9 +77,7 @@ export function Gallery({ images }: GalleryProps) {
                 index: imageIndex + 1,
                 total: images.length,
                 // The visible caption must be part of the name (WCAG 2.5.3).
-                alt: image.caption
-                  ? `${image.alt}. ${image.caption}`
-                  : image.alt,
+                alt: image.caption ? `${image.alt}. ${image.caption}` : image.alt,
               })}
               className="group relative block w-full overflow-hidden rounded-md border border-line text-left"
             >
@@ -107,9 +116,13 @@ export function Gallery({ images }: GalleryProps) {
           const start = touchStart.current;
           const end = event.changedTouches[0]?.clientX;
           touchStart.current = null;
+
           if (start === null || end === undefined || index === null) return;
+
           const delta = end - start;
+
           if (delta > 40) show(index - 1);
+
           if (delta < -40) show(index + 1);
         }}
         className="m-auto max-h-[min(92dvh,56rem)] w-[min(64rem,calc(100%-1.5rem))] rounded-xl border border-line-strong bg-bg-0 p-0 text-text-1 shadow-(--shadow-window) backdrop:bg-black/80"

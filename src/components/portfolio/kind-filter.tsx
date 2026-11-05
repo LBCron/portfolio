@@ -3,18 +3,20 @@ import { getTranslations } from 'next-intl/server';
 import { RovingRadiogroup } from '@/components/ui/roving-radiogroup';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/cn';
-import type { ProjectKind } from '@/lib/content';
+import { type ProjectKind } from '@/lib/content';
 import { projectsLink } from '@/lib/projects';
 
 interface KindFilterProps {
-  kinds: readonly { kind: ProjectKind; count: number }[];
   active?: ProjectKind;
+  kinds: ReadonlyArray<{ count: number; kind: ProjectKind }>;
 }
 
-/** Crawlable single-select. Hidden by the caller when only one kind exists. */
+/**
+ * Crawlable single-select. Hidden by the caller when only one kind exists.
+ */
 export async function KindFilter({ kinds, active }: KindFilterProps) {
   const t = await getTranslations('projects');
-  const options: { kind?: ProjectKind; label: string; count?: number }[] = [
+  const options: Array<{ count?: number; kind?: ProjectKind; label: string }> = [
     { label: t('all') },
     ...kinds.map((entry) => ({
       kind: entry.kind,
@@ -24,12 +26,10 @@ export async function KindFilter({ kinds, active }: KindFilterProps) {
   ];
 
   return (
-    <RovingRadiogroup
-      aria-label={t('filterLabel')}
-      className="flex flex-wrap gap-2"
-    >
+    <RovingRadiogroup aria-label={t('filterLabel')} className="flex flex-wrap gap-2">
       {options.map((option) => {
         const selected = option.kind === active;
+
         return (
           <Link
             key={option.kind ?? 'all'}

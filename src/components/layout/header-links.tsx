@@ -1,5 +1,5 @@
-import { locale as rootLocale } from 'next/root-params';
 import { getTranslations } from 'next-intl/server';
+import { locale as rootLocale } from 'next/root-params';
 
 import { LinkIcon } from '@/components/content/link-icon';
 import { externalRel } from '@/components/sections/links';
@@ -9,19 +9,20 @@ import { getContent } from '@/lib/content';
 
 const MAX_HEADER_LINKS = 3;
 
-/** Profile icons for the header bar and the mobile menu, rendered on the server. */
+/**
+ * Profile icons for the header bar and the mobile menu, rendered on the server.
+ */
 export async function HeaderLinks() {
   const locale = await rootLocale();
   const [t, tA11y, links] = await Promise.all([
     getTranslations('header'),
     getTranslations('a11y'),
-    isAppLocale(locale)
-      ? getContent().getFeaturedLinks(locale)
-      : Promise.resolve([]),
+    isAppLocale(locale) ? getContent().getFeaturedLinks(locale) : Promise.resolve([]),
   ]);
   const headerLinks = links
     .filter((link) => link.placements.includes('header'))
     .slice(0, MAX_HEADER_LINKS);
+
   if (headerLinks.length === 0) return null;
 
   return (

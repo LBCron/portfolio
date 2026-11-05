@@ -1,14 +1,14 @@
 import '@/styles/globals.css';
 
-import type { Metadata, Viewport } from 'next';
-import { notFound } from 'next/navigation';
-import { locale as rootLocale } from 'next/root-params';
+import { type Metadata, type Viewport } from 'next';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations } from 'next-intl/server';
+import { notFound } from 'next/navigation';
+import { locale as rootLocale } from 'next/root-params';
 
+import { ClickTracker } from '@/components/layout/click-tracker';
 import { Footer } from '@/components/layout/footer';
 import { Header } from '@/components/layout/header';
-import { ClickTracker } from '@/components/layout/click-tracker';
 import { LanguageAnnouncer } from '@/components/layout/language-announcer';
 import { MotionInit } from '@/components/layout/motion-init';
 import { MotionProvider } from '@/components/layout/motion-provider';
@@ -23,15 +23,10 @@ import { siteMetadata } from '@/lib/seo/metadata';
 import { fontVariables } from '@/styles/fonts';
 import { titleFontVariables } from '@/styles/title-fonts';
 
-/** Namespaces needed by client components; the rest stays on the server. */
-const CLIENT_NAMESPACES = [
-  'a11y',
-  'header',
-  'errors',
-  'project',
-  'stack',
-  'window',
-] as const;
+/**
+ * Namespaces needed by client components; the rest stays on the server.
+ */
+const CLIENT_NAMESPACES = ['a11y', 'header', 'errors', 'project', 'stack', 'window'] as const;
 
 export const revalidate = 86400;
 
@@ -49,6 +44,7 @@ export const viewport: Viewport = {
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('meta');
+
   return siteMetadata(
     t('siteDescription', {
       name: owner.name,
@@ -58,10 +54,9 @@ export async function generateMetadata(): Promise<Metadata> {
   );
 }
 
-export default async function LocaleLayout({
-  children,
-}: LayoutProps<'/[locale]'>) {
+export default async function LocaleLayout({ children }: LayoutProps<'/[locale]'>) {
   const locale = await rootLocale();
+
   if (!isAppLocale(locale)) notFound();
 
   const messages = await getMessages();

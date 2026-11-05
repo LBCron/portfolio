@@ -9,8 +9,8 @@ import {
   previewTechIconAction,
   searchIconsAction,
 } from '@/lib/admin/actions';
-import type { IconHit, IconSearchSource } from '@/lib/admin/icons';
-import type { LinkIcon as LinkIconData, TechIcon } from '@/lib/content';
+import { type IconHit, type IconSearchSource } from '@/lib/admin/icons';
+import { type LinkIcon as LinkIconData, type TechIcon } from '@/lib/content';
 
 import { SelectField, TextField } from './fields';
 import { useForm } from './form';
@@ -28,12 +28,7 @@ function TechIconPreview({ icon }: { icon: TechIcon }) {
           {icon.monogram}
         </span>
       ) : (
-        <svg
-          viewBox={icon.viewBox}
-          aria-hidden="true"
-          fill="currentColor"
-          className="size-8"
-        >
+        <svg viewBox={icon.viewBox} aria-hidden="true" fill="currentColor" className="size-8">
           {icon.paths.map((d) => (
             <path key={d} d={d} />
           ))}
@@ -43,42 +38,41 @@ function TechIconPreview({ icon }: { icon: TechIcon }) {
   );
 }
 
-/** Debounced server-side search; `onPick` receives the chosen slug. */
+/**
+ * Debounced server-side search; `onPick` receives the chosen slug.
+ */
 function IconSearch({
   source,
   query,
   onPick,
 }: {
-  source: IconSearchSource;
-  query: string;
   onPick: (slug: string) => void;
+  query: string;
+  source: IconSearchSource;
 }) {
   const [hits, setHits] = useState<IconHit[]>([]);
+
   useEffect(() => {
     let live = true;
     const timer = window.setTimeout(async () => {
-      const result = query.trim()
-        ? await searchIconsAction(source, query).catch(() => [])
-        : [];
+      const result = query.trim() ? await searchIconsAction(source, query).catch(() => []) : [];
+
       if (live) setHits(result);
     }, 220);
+
     return () => {
       live = false;
       window.clearTimeout(timer);
     };
   }, [source, query]);
 
-  if (hits.length === 0 || hits.some((hit) => hit.slug === query.trim()))
-    return null;
+  if (hits.length === 0 || hits.some((hit) => hit.slug === query.trim())) return null;
+
   return (
     <ul aria-label="Matching icons" className="flex flex-wrap gap-2">
       {hits.map((hit) => (
         <li key={hit.slug}>
-          <button
-            type="button"
-            onClick={() => onPick(hit.slug)}
-            className={smallButton}
-          >
+          <button type="button" onClick={() => onPick(hit.slug)} className={smallButton}>
             {hit.slug}
           </button>
         </li>
@@ -94,18 +88,19 @@ const SOURCES = [
   { value: 'monogram', label: 'Monogram (letters)' },
 ];
 
-/** Icon source, search, custom SVG and a live preview for a technology. */
+/**
+ * Icon source, search, custom SVG and a live preview for a technology.
+ */
 export function TechIconFields() {
   const form = useForm();
   const source = String(form.get('iconSource') ?? 'monogram');
   const slug = String(form.get('iconSlug') ?? '');
-  const customSvg = form.get('customSvg') as
-    { viewBox: string; paths: string[] } | undefined;
+  const customSvg = form.get('customSvg') as { paths: string[]; viewBox: string } | undefined;
   const monogram = String(form.get('monogram') ?? '');
   const name = String(form.get('name') ?? '');
   const [preview, setPreview] = useState<{
-    icon: TechIcon;
     brandColor?: string;
+    icon: TechIcon;
   } | null>(null);
   const [svgText, setSvgText] = useState('');
   const [svgError, setSvgError] = useState('');
@@ -120,8 +115,10 @@ export function TechIconFields() {
         ...(customSvg ? { customSvg } : {}),
         ...(monogram ? { monogram } : {}),
       }).catch(() => null);
+
       if (live) setPreview(result);
     }, 250);
+
     return () => {
       live = false;
       window.clearTimeout(timer);
@@ -130,6 +127,7 @@ export function TechIconFields() {
 
   async function applySvg(text: string) {
     const result = await parseSvgAction(text);
+
     if (result.ok) {
       form.set('customSvg', result.svg);
       setSvgError('');
@@ -142,11 +140,7 @@ export function TechIconFields() {
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-end gap-4">
         <div className="min-w-60 flex-1">
-          <SelectField
-            path="iconSource"
-            label="Icon source"
-            options={SOURCES}
-          />
+          <SelectField path="iconSource" label="Icon source" options={SOURCES} />
         </div>
         {preview ? <TechIconPreview icon={preview.icon} /> : null}
       </div>
@@ -159,11 +153,7 @@ export function TechIconFields() {
             mono
             hint="Type to search; pick a match below."
           />
-          <IconSearch
-            source={source}
-            query={slug}
-            onPick={(pick) => form.set('iconSlug', pick)}
-          />
+          <IconSearch source={source} query={slug} onPick={(pick) => form.set('iconSlug', pick)} />
           {preview?.brandColor ? (
             <div>
               <button
@@ -211,8 +201,10 @@ export function TechIconFields() {
                 onChange={async (event) => {
                   const file = event.target.files?.[0];
                   event.target.value = '';
+
                   if (file) {
                     const text = await file.text();
+
                     setSvgText(text);
                     await applySvg(text);
                   }
@@ -221,8 +213,8 @@ export function TechIconFields() {
             </label>
           </div>
           <p className={hintClass}>
-            Only filled paths and basic shapes are kept (max 20 KB). Scripts,
-            styles, strokes and transforms are not supported.
+            Only filled paths and basic shapes are kept (max 20 KB). Scripts, styles, strokes and
+            transforms are not supported.
           </p>
           {svgError ? (
             <p role="alert" className="text-small text-danger">
@@ -256,7 +248,9 @@ const LINK_MODES = [
   { value: 'lucide', label: 'Lucide icon' },
 ];
 
-/** `link`, `simple-icons:<slug>` or `lucide:<name>`, with search and preview. */
+/**
+ * `link`, `simple-icons:<slug>` or `lucide:<name>`, with search and preview.
+ */
 export function LinkIconField({ path }: { path: string }) {
   const form = useForm();
   const value = String(form.get(path) ?? 'link');
@@ -268,8 +262,10 @@ export function LinkIconField({ path }: { path: string }) {
     let live = true;
     const timer = window.setTimeout(async () => {
       const result = await previewLinkIconAction(value).catch(() => null);
+
       if (live) setPreview(result);
     }, 250);
+
     return () => {
       live = false;
       window.clearTimeout(timer);
@@ -289,12 +285,7 @@ export function LinkIconField({ path }: { path: string }) {
               value={mode}
               disabled={form.disabled}
               onChange={(event) =>
-                form.set(
-                  path,
-                  event.target.value === 'link'
-                    ? 'link'
-                    : `${event.target.value}:`,
-                )
+                form.set(path, event.target.value === 'link' ? 'link' : `${event.target.value}:`)
               }
               className={inputClass}
             >
@@ -327,14 +318,10 @@ export function LinkIconField({ path }: { path: string }) {
               value={name}
               disabled={form.disabled}
               autoComplete="off"
-              onChange={(event) =>
-                form.set(path, `${mode}:${event.target.value}`)
-              }
+              onChange={(event) => form.set(path, `${mode}:${event.target.value}`)}
               className={`${inputClass} font-mono`}
             />
-            {form.error(path) ? (
-              <p className="text-small text-danger">{form.error(path)}</p>
-            ) : null}
+            {form.error(path) ? <p className="text-small text-danger">{form.error(path)}</p> : null}
           </div>
           <IconSearch
             source={mode as IconSearchSource}

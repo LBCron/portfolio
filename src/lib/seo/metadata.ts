@@ -1,46 +1,57 @@
 import 'server-only';
 
-import type { Metadata } from 'next';
+import { type Metadata } from 'next';
 
 import { owner } from '@/config/site';
 import { env, isIndexable } from '@/env';
 import { type AppLocale, ogLocales, routing } from '@/i18n/routing';
 
-import { truncate, TITLE_MAX } from './text';
+import { TITLE_MAX, truncate } from './text';
 import { absoluteUrl, languageAlternates, localizedPath } from './urls';
 
 interface PageMetadataInput {
-  locale: AppLocale;
-  /** Locale-independent path, e.g. `/projects/orbit-dashboard`. */
-  path: string;
-  /** Combined with the `%s | name` template unless `absoluteTitle` is set. */
-  title?: string;
   absoluteTitle?: string;
-  description: string;
-  type?: 'website' | 'profile' | 'article';
-  /** Canonical override (filtered listings point at the unfiltered page). */
+  /**
+   * Canonical override (filtered listings point at the unfiltered page).
+   */
   canonicalPath?: string;
-  /** `noindex, follow` (filtered listings). */
-  noindex?: boolean;
+  description: string;
+  locale: AppLocale;
   modifiedTime?: string;
+  /**
+   * `noindex, follow` (filtered listings).
+   */
+  noindex?: boolean;
+  /**
+   * Locale-independent path, e.g. `/projects/orbit-dashboard`.
+   */
+  path: string;
+  /**
+   * Combined with the `%s | name` template unless `absoluteTitle` is set.
+   */
+  title?: string;
+  type?: 'article' | 'profile' | 'website';
 }
 
 const TEMPLATE_SUFFIX = ` | ${owner.name}`;
 
 function fitTitle(title: string, withTemplate: boolean) {
   const budget = TITLE_MAX - (withTemplate ? TEMPLATE_SUFFIX.length : 0);
+
   return truncate(title, budget);
 }
 
 export function robotsFor(noindex = false): Metadata['robots'] {
   if (!isIndexable) return { index: false, follow: false };
+
   if (noindex) return { index: false, follow: true };
+
   return {
     index: true,
     follow: true,
     googleBot: {
-      index: true,
-      follow: true,
+      'index': true,
+      'follow': true,
       'max-image-preview': 'large',
       'max-snippet': -1,
       'max-video-preview': -1,
@@ -48,7 +59,9 @@ export function robotsFor(noindex = false): Metadata['robots'] {
   };
 }
 
-/** Site-wide defaults, set once by the locale layout. */
+/**
+ * Site-wide defaults, set once by the locale layout.
+ */
 export function siteMetadata(description: string): Metadata {
   return {
     metadataBase: new URL(absoluteUrl('/')),
@@ -84,9 +97,7 @@ export function pageMetadata({
   const resolvedTitle = absoluteTitle
     ? fitTitle(absoluteTitle, false)
     : fitTitle(title ?? owner.name, true);
-  const fullTitle = absoluteTitle
-    ? resolvedTitle
-    : resolvedTitle + TEMPLATE_SUFFIX;
+  const fullTitle = absoluteTitle ? resolvedTitle : resolvedTitle + TEMPLATE_SUFFIX;
   const canonical = absoluteUrl(localizedPath(locale, canonicalPath ?? path));
   const alternateLocale = routing.locales
     .filter((other) => other !== locale)
@@ -109,9 +120,7 @@ export function pageMetadata({
       locale: ogLocales[locale],
       alternateLocale,
       ...(type === 'article' && modifiedTime ? { modifiedTime } : {}),
-      ...(type === 'profile'
-        ? { firstName: owner.givenName, lastName: owner.familyName }
-        : {}),
+      ...(type === 'profile' ? { firstName: owner.givenName, lastName: owner.familyName } : {}),
     },
     twitter: {
       card: 'summary_large_image',

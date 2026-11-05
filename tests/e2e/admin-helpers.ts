@@ -4,12 +4,9 @@ import { ADMIN_PASSWORD } from './auth-constants';
 import { openWithShortcut } from './hydration';
 
 export const windowOf = (page: Page) => page.locator('[data-window=terminal]');
-export const inputOf = (page: Page) =>
-  page.getByRole('textbox', { name: /Command input/ });
-export const passwordOf = (page: Page) =>
-  page.getByLabel('Password', { exact: true });
-export const logOf = (page: Page) =>
-  page.getByRole('log', { name: 'Terminal output' });
+export const inputOf = (page: Page) => page.getByRole('textbox', { name: /Command input/ });
+export const passwordOf = (page: Page) => page.getByLabel('Password', { exact: true });
+export const logOf = (page: Page) => page.getByRole('log', { name: 'Terminal output' });
 
 export async function openTerminal(page: Page, path = '/en') {
   await page.goto(path, { waitUntil: 'domcontentloaded' });
@@ -28,7 +25,9 @@ export async function submitPassword(page: Page, password: string) {
   await passwordOf(page).press('Enter');
 }
 
-/** Signs in through the terminal and lands on the dashboard. */
+/**
+ * Signs in through the terminal and lands on the dashboard.
+ */
 export async function signIn(page: Page) {
   await openTerminal(page);
   await run(page, 'su julio');
@@ -37,7 +36,9 @@ export async function signIn(page: Page) {
   await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
 }
 
-/** Gives each test its own client key, so the login rate limiter is not shared. */
+/**
+ * Gives each test its own client key, so the login rate limiter is not shared.
+ */
 export async function isolateClient(page: Page) {
   await page.context().setExtraHTTPHeaders({
     'x-forwarded-for': `10.${Math.floor(Math.random() * 250)}.${Math.floor(Math.random() * 250)}.${Math.floor(Math.random() * 250)}`,

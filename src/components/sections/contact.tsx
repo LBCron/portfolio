@@ -4,43 +4,31 @@ import { getTranslations } from 'next-intl/server';
 import { LinkIcon } from '@/components/content/link-icon';
 import { SectionHeader } from '@/components/ui/section-header';
 import { type AppLocale, localeTags, routing } from '@/i18n/routing';
-import type {
-  Contact as ContactData,
-  FeaturedLink,
-  Resume,
-} from '@/lib/content';
+import { type Contact as ContactData, type FeaturedLink, type Resume } from '@/lib/content';
 
 import { EmailActions } from './email-actions';
 import { externalRel } from './links';
 
 interface ContactProps {
-  locale: AppLocale;
   contact: ContactData | null;
   links: FeaturedLink[];
-  resume: Resume | null;
+  locale: AppLocale;
+  resume: null | Resume;
 }
 
 const linkClass =
   'inline-flex min-h-11 items-center gap-2 rounded-full border border-line px-4 text-small text-text-1 transition-colors hover-fine:border-line-strong hover-fine:bg-surface-1';
 
-export async function Contact({
-  locale,
-  contact,
-  links,
-  resume,
-}: ContactProps) {
+export async function Contact({ locale, contact, links, resume }: ContactProps) {
   const [t, tA11y, tHeader] = await Promise.all([
     getTranslations('contact'),
     getTranslations('a11y'),
     getTranslations('header'),
   ]);
-  const contactLinks = links.filter((link) =>
-    link.placements.includes('contact'),
+  const contactLinks = links.filter((link) => link.placements.includes('contact'));
+  const resumeLocales = [locale, ...routing.locales.filter((other) => other !== locale)].filter(
+    (candidate) => resume?.files[candidate],
   );
-  const resumeLocales = [
-    locale,
-    ...routing.locales.filter((other) => other !== locale),
-  ].filter((candidate) => resume?.files[candidate]);
   const [user = '', domain = ''] = contact?.email.split('@') ?? [];
   const obfuscated = `${user} [${t('emailAt')}] ${domain.replaceAll('.', ` [${t('emailDot')}] `)}`;
 
@@ -94,9 +82,7 @@ export async function Contact({
                     <span>
                       {t.rich('resumeOther', {
                         language: tHeader(`languageNames.${fileLocale}`),
-                        lang: (chunks) => (
-                          <span lang={localeTags[fileLocale]}>{chunks}</span>
-                        ),
+                        lang: (chunks) => <span lang={localeTags[fileLocale]}>{chunks}</span>,
                       })}
                     </span>
                   )}
@@ -133,28 +119,21 @@ export async function Contact({
               <ul className="mt-4 flex flex-wrap gap-2">
                 {contactLinks.map((link) => {
                   const external = !link.url.startsWith('mailto:');
+
                   return (
                     <li key={link.id}>
                       <a
                         href={link.url}
                         target={external ? '_blank' : undefined}
-                        rel={
-                          external ? externalRel(link.isOwnProfile) : undefined
-                        }
+                        rel={external ? externalRel(link.isOwnProfile) : undefined}
                         className={linkClass}
                       >
                         <LinkIcon icon={link.icon} />
                         {link.label}
                         {external ? (
                           <>
-                            <ArrowUpRight
-                              aria-hidden="true"
-                              className="size-3.5 text-text-3"
-                            />
-                            <span className="sr-only">
-                              {' '}
-                              {tA11y('opensInNewTab')}
-                            </span>
+                            <ArrowUpRight aria-hidden="true" className="size-3.5 text-text-3" />
+                            <span className="sr-only"> {tA11y('opensInNewTab')}</span>
                           </>
                         ) : null}
                       </a>

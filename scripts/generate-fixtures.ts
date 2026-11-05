@@ -3,45 +3,42 @@
  * `public/fixtures/` and writes their manifest. Deterministic: the same specs
  * always produce the same files. Run after changing `image-specs.ts`:
  *
- *   bun run fixtures:generate
+ * Bun run fixtures:generate.
  */
 import { createHash } from 'node:crypto';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-
 import sharp from 'sharp';
 
 import { owner } from '@/config/site';
 import {
+  type FixtureImageSpec,
   fixtureImageSpecs,
   fixturePdfKeys,
-  type FixtureImageSpec,
 } from '@/lib/content/fixtures/image-specs';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const PUBLIC_DIR = path.join(ROOT, 'public', 'fixtures');
-const MANIFEST = path.join(
-  ROOT,
-  'src/lib/content/fixtures/assets.generated.ts',
-);
+const MANIFEST = path.join(ROOT, 'src/lib/content/fixtures/assets.generated.ts');
 
 const PALETTE = ['#8b7cff', '#4cc9f0', '#4ade80', '#fbbf24', '#f472b6'];
 
 function random(seed: string): () => number {
-  let state = Number.parseInt(
-    createHash('sha256').update(seed).digest('hex').slice(0, 8),
-    16,
-  );
+  let state = Number.parseInt(createHash('sha256').update(seed).digest('hex').slice(0, 8), 16);
+
   return () => {
     state = (state + 0x6d2b79f5) | 0;
     let t = Math.imul(state ^ (state >>> 15), 1 | state);
+
     t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }
 
 function pickColors(rand: () => number, count: number): string[] {
   const start = Math.floor(rand() * PALETTE.length);
+
   return Array.from(
     { length: count },
     (_, index) => PALETTE[(start + index * 2) % PALETTE.length] ?? '#8b7cff',
@@ -60,6 +57,7 @@ function coverSvg(spec: FixtureImageSpec, rand: () => number): string {
       const cx = round(w * (0.15 + rand() * 0.7));
       const cy = round(h * (0.15 + rand() * 0.7));
       const r = round(Math.min(w, h) * (0.35 + rand() * 0.25));
+
       return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${color}" opacity="${0.55 - index * 0.1}"/>`;
     })
     .join('');
@@ -76,9 +74,11 @@ function coverSvg(spec: FixtureImageSpec, rand: () => number): string {
     const ph = Math.round(((0.16 + rand() * 0.2) * h) / step) * step;
     const px = Math.round((rand() * (w - pw)) / step) * step;
     const py = Math.round((rand() * (h - ph)) / step) * step;
+
     return `<rect x="${px}" y="${py}" width="${pw}" height="${ph}" rx="18" fill="#11141b" fill-opacity="0.55" stroke="#ffffff" stroke-opacity="0.14"/>`;
   }).join('');
   const orbit = `<circle cx="${round(w * (0.3 + rand() * 0.4))}" cy="${round(h * (0.3 + rand() * 0.4))}" r="${round(h * 0.36)}" fill="none" stroke="#ffffff" stroke-opacity="0.12" stroke-width="2"/>`;
+
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
 <defs><filter id="b" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="${round(Math.min(w, h) * 0.12)}"/></filter></defs>
 <rect width="${w}" height="${h}" fill="#0c0e13"/>
@@ -94,9 +94,11 @@ function roundSvg(spec: FixtureImageSpec, rand: () => number): string {
   const angle = Math.round(rand() * 360);
   const rings = Array.from({ length: 4 }, (_, index) => {
     const r = round((w / 2) * (0.35 + index * 0.17));
+
     return `<circle cx="${w / 2}" cy="${h / 2}" r="${r}" fill="none" stroke="#ffffff" stroke-opacity="${0.18 - index * 0.035}" stroke-width="${round(w / 128)}"/>`;
   }).join('');
   const glow = `<circle cx="${round(w * (0.3 + rand() * 0.4))}" cy="${round(h * (0.3 + rand() * 0.4))}" r="${round(w * 0.32)}" fill="${a}" opacity="0.7"/>`;
+
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
 <defs>
 <linearGradient id="g" gradientTransform="rotate(${angle} 0.5 0.5)"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient>
@@ -111,9 +113,11 @@ ${rings}
 
 async function encodeAuthored(spec: FixtureImageSpec) {
   const authored = spec.authored;
+
   if (!authored) {
     throw new Error(`Fixture "${spec.key}" has no authored source`);
   }
+
   const sourcePath = path.join(PUBLIC_DIR, 'images', authored.source);
   const resized = sharp(sourcePath).resize(spec.width, spec.height, {
     fit: authored.fit,
@@ -121,12 +125,8 @@ async function encodeAuthored(spec: FixtureImageSpec) {
     withoutEnlargement: true,
   });
   const webp = authored.alpha
-    ? await resized
-        .webp({ quality: 82, alphaQuality: 90, effort: 6 })
-        .toBuffer()
-    : await resized
-        .webp({ quality: 82, effort: 6, smartSubsample: true })
-        .toBuffer();
+    ? await resized.webp({ quality: 82, alphaQuality: 90, effort: 6 }).toBuffer()
+    : await resized.webp({ quality: 82, effort: 6, smartSubsample: true }).toBuffer();
   const meta = await sharp(webp).metadata();
   const lqip = await sharp(webp)
     .flatten({ background: '#11141b' })
@@ -134,7 +134,9 @@ async function encodeAuthored(spec: FixtureImageSpec) {
     .jpeg({ quality: 50 })
     .toBuffer();
   const file = `images/${spec.key}.webp`;
+
   await writeFile(path.join(PUBLIC_DIR, file), webp);
+
   return {
     key: spec.key,
     asset: {
@@ -151,8 +153,7 @@ async function renderImage(spec: FixtureImageSpec) {
   if (spec.authored) return encodeAuthored(spec);
 
   const rand = random(spec.key);
-  const svg =
-    spec.style === 'cover' ? coverSvg(spec, rand) : roundSvg(spec, rand);
+  const svg = spec.style === 'cover' ? coverSvg(spec, rand) : roundSvg(spec, rand);
   const image = sharp(Buffer.from(svg));
   const webp = await image
     .clone()
@@ -160,7 +161,9 @@ async function renderImage(spec: FixtureImageSpec) {
     .toBuffer();
   const lqip = await image.clone().resize(20).jpeg({ quality: 50 }).toBuffer();
   const file = `images/${spec.key}.webp`;
+
   await writeFile(path.join(PUBLIC_DIR, file), webp);
+
   return {
     key: spec.key,
     asset: {
@@ -190,23 +193,26 @@ function pdfString(value: string): string {
   let out = '';
   for (const char of value) {
     const code = WIN_ANSI[char] ?? char.codePointAt(0) ?? 0x3f;
+
     if (code > 0xff) throw new Error(`Unsupported PDF character: ${char}`);
+
     if (char === '\\' || char === '(' || char === ')') out += `\\${char}`;
     else if (code < 0x20 || code > 0x7e) {
       out += `\\${code.toString(8).padStart(3, '0')}`;
     } else out += char;
   }
+
   return `(${out})`;
 }
 
 interface PdfLine {
-  text: string;
-  size: number;
   bold?: boolean;
   gap?: number;
+  size: number;
+  text: string;
 }
 
-const RESUME_LINES: Record<'en' | 'pt', { title: string; lines: PdfLine[] }> = {
+const RESUME_LINES: Record<'en' | 'pt', { lines: PdfLine[]; title: string }> = {
   en: {
     title: 'Sample résumé (fictional)',
     lines: [
@@ -291,6 +297,7 @@ function buildPdf(locale: 'en' | 'pt'): Buffer {
   const content = lines
     .map((line) => {
       y -= line.gap ?? 0;
+
       return `BT /${line.bold ? 'F2' : 'F1'} ${line.size} Tf 56 ${y} Td ${pdfString(line.text)} Tj ET`;
     })
     .join('\n');
@@ -307,16 +314,17 @@ function buildPdf(locale: 'en' | 'pt'): Buffer {
 
   let body = '%PDF-1.4\n%\xe2\xe3\xcf\xd3\n';
   const offsets: number[] = [];
+
   objects.forEach((object, index) => {
     offsets.push(Buffer.byteLength(body, 'latin1'));
     body += `${index + 1} 0 obj\n${object}\nendobj\n`;
   });
+
   const xref = Buffer.byteLength(body, 'latin1');
   body += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
-  body += offsets
-    .map((offset) => `${String(offset).padStart(10, '0')} 00000 n \n`)
-    .join('');
+  body += offsets.map((offset) => `${String(offset).padStart(10, '0')} 00000 n \n`).join('');
   body += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R /Info 7 0 R >>\nstartxref\n${xref}\n%%EOF\n`;
+
   return Buffer.from(body, 'latin1');
 }
 
@@ -332,7 +340,9 @@ async function main() {
       const locale = key === 'resume-pt' ? 'pt' : 'en';
       const pdf = buildPdf(locale);
       const file = `pdf/${key}.pdf`;
+
       await writeFile(path.join(PUBLIC_DIR, file), pdf);
+
       return {
         key,
         asset: {
@@ -360,9 +370,11 @@ export const fixtureFileAssets: Record<FixturePdfKey, FileAsset> = ${JSON.string
     2,
   )};
 `;
+
   await writeFile(MANIFEST, manifest);
 
   const total = images.reduce((sum, image) => sum + image.bytes, 0);
+
   console.log(
     `Generated ${images.length} images (${Math.round(total / 1024)} KB) and ${files.length} PDFs.`,
   );

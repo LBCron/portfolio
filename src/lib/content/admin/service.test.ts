@@ -17,13 +17,13 @@ function setup(writable = true) {
     audit: (event) => audits.push(`${event.type}:${event.action}`),
     now: () => new Date('2026-10-27T12:00:00Z'),
   });
+
   return { store, service, revalidated, audits };
 }
 
 async function firstProject(store: ReturnType<typeof setup>['store']) {
-  const [project] = (await store.list('project')).filter(
-    (doc) => doc['visible'] !== false,
-  );
+  const [project] = (await store.list('project')).filter((doc) => doc['visible'] !== false);
+
   return (await store.get('project', project!.id))!;
 }
 
@@ -37,8 +37,11 @@ describe('save', () => {
       { ...before, displayName: 'Julio Edited' },
       before.rev,
     );
+
     expect(result).toMatchObject({ ok: true, id: 'profile' });
+
     const after = (await store.get('profile', 'profile'))!;
+
     expect(after['displayName']).toBe('Julio Edited');
     expect(after.rev).not.toBe(before.rev);
     expect(after.updatedAt).toBe('2026-10-27T12:00:00.000Z');
@@ -54,10 +57,11 @@ describe('save', () => {
       jobTitle: { en: 'Engineer', pt: '' },
       displayName: '',
     });
+
     expect(result).toMatchObject({
       ok: false,
       kind: 'invalid',
-      fieldErrors: { 'jobTitle.pt': 'Required', displayName: 'Required' },
+      fieldErrors: { 'jobTitle.pt': 'Required', 'displayName': 'Required' },
     });
     expect((await store.get('profile', 'profile'))!.rev).toBe(before.rev);
     expect(revalidated).toEqual([]);
@@ -66,19 +70,23 @@ describe('save', () => {
   it('detects a stale revision', async () => {
     const { store, service } = setup();
     const before = (await store.get('profile', 'profile'))!;
+
     await service.save('profile', null, before, before.rev);
+
     const stale = await service.save(
       'profile',
       null,
       { ...before, displayName: 'Late' },
       before.rev,
     );
+
     expect(stale).toEqual({ ok: false, kind: 'conflict' });
   });
 
   it('refuses every write when the store is read-only', async () => {
     const { store, service } = setup(false);
     const before = (await store.get('profile', 'profile'))!;
+
     expect(await service.save('profile', null, before)).toEqual({
       ok: false,
       kind: 'readonly',
@@ -103,15 +111,18 @@ describe('save', () => {
       slug: 'brand-new',
       title: { en: 'Brand new', pt: 'Novinho' },
     });
+
     expect(result).toMatchObject({ ok: true, slug: 'brand-new' });
+
     const projects = await store.list('project');
+
     expect(projects).toHaveLength(before + 1);
+
     const created = projects.find((doc) => doc['slug'] === 'brand-new')!;
+
     expect(created.id).toMatch(/^project\./);
     expect(created['order']).toBe(
-      Math.max(
-        ...projects.filter((p) => p !== created).map((p) => Number(p['order'])),
-      ) + 10,
+      Math.max(...projects.filter((p) => p !== created).map((p) => Number(p['order']))) + 10,
     );
   });
 
@@ -120,12 +131,8 @@ describe('save', () => {
     const projects = await store.list('project');
     const a = (await store.get('project', projects[0]!.id))!;
     const b = projects[1]!;
-    const taken = await service.save(
-      'project',
-      a.id,
-      { ...a, slug: b['slug'] },
-      a.rev,
-    );
+    const taken = await service.save('project', a.id, { ...a, slug: b['slug'] }, a.rev);
+
     expect(taken).toMatchObject({
       ok: false,
       fieldErrors: { slug: expect.stringContaining('already') },
@@ -142,22 +149,22 @@ describe('save', () => {
       { ...project, slug: 'renamed-slug' },
       project.rev,
     );
+
     expect(result).toMatchObject({ ok: true });
+
     const after = (await store.get('project', project.id))!;
+
     expect(after['slug']).toBe('renamed-slug');
     expect(after['previousSlugs']).toContain(oldSlug);
     expect(revalidated.at(-1)).toBe(`project:renamed-slug,${oldSlug}`);
-    const back = await service.save(
-      'project',
-      project.id,
-      { ...after, slug: oldSlug },
-      after.rev,
-    );
+
+    const back = await service.save('project', project.id, { ...after, slug: oldSlug }, after.rev);
+
     expect(back).toMatchObject({ ok: true });
+
     const restored = (await store.get('project', project.id))!;
-    expect(restored['previousSlugs']).toEqual(
-      expect.not.arrayContaining([oldSlug]),
-    );
+
+    expect(restored['previousSlugs']).toEqual(expect.not.arrayContaining([oldSlug]));
   });
 
   it('rejects unknown technologies and raw HTML', async () => {
@@ -173,16 +180,19 @@ describe('save', () => {
       },
       project.rev,
     );
+
     expect(bad).toMatchObject({
       ok: false,
       fieldErrors: { 'body.en': 'Raw HTML is not allowed' },
     });
+
     const unknown = await service.save(
       'project',
       project.id,
       { ...project, techIds: ['technology.nope'] },
       project.rev,
     );
+
     expect(unknown).toMatchObject({
       ok: false,
       fieldErrors: { 'techIds.0': 'Unknown technology' },
@@ -199,7 +209,9 @@ describe('save', () => {
       { ...full, placements: ['header'] },
       full.rev,
     );
+
     expect(result).toMatchObject({ ok: true });
+
     const contact = (await store.get('contact', 'contact'))!;
     const cleared = await service.save(
       'contact',
@@ -207,8 +219,11 @@ describe('save', () => {
       { ...contact, phone: '', bookingUrl: '   ' },
       contact.rev,
     );
+
     expect(cleared).toMatchObject({ ok: true });
+
     const after = (await store.get('contact', 'contact'))!;
+
     expect(after).not.toHaveProperty('phone');
     expect(after).not.toHaveProperty('bookingUrl');
   });
@@ -220,7 +235,9 @@ describe('remove, flags and order', () => {
     const project = await firstProject(store);
     const techId = (project['techIds'] as string[])[0]!;
     const result = await service.remove('technology', techId);
+
     expect(result).toMatchObject({ ok: false, kind: 'in-use' });
+
     if (!result.ok && result.kind === 'in-use') {
       expect(result.references.map((ref) => ref.id)).toContain(project.id);
     }
@@ -229,9 +246,8 @@ describe('remove, flags and order', () => {
   it('deletes an unused document and refuses singletons', async () => {
     const { store, service, audits } = setup();
     const practice = (await store.list('practice'))[0]!;
-    expect(await service.remove('practice', practice.id, practice.rev)).toEqual(
-      { ok: true },
-    );
+
+    expect(await service.remove('practice', practice.id, practice.rev)).toEqual({ ok: true });
     expect(await store.get('practice', practice.id)).toBeNull();
     expect(audits.at(-1)).toBe('practice:delete');
     expect(await service.remove('profile', 'profile')).toEqual({
@@ -243,15 +259,13 @@ describe('remove, flags and order', () => {
   it('toggles flags without validating the rest, even on a broken document', async () => {
     const { store, service } = setup();
     const link = (await store.list('featuredLink'))[0]!;
+
     await store.patch('featuredLink', link.id, {
       label: { en: 'only english' },
     });
-    const hidden = await service.setFlag(
-      'featuredLink',
-      link.id,
-      'visible',
-      false,
-    );
+
+    const hidden = await service.setFlag('featuredLink', link.id, 'visible', false);
+
     expect(hidden).toMatchObject({ ok: true });
     expect((await store.get('featuredLink', link.id))!['visible']).toBe(false);
   });
@@ -260,10 +274,13 @@ describe('remove, flags and order', () => {
     const { store, service } = setup();
     const ids = (await store.list('practice')).map((doc) => doc.id);
     const reversed = [...ids].reverse();
+
     expect(await service.reorder('practice', reversed)).toMatchObject({
       ok: true,
     });
+
     const after = await store.list('practice');
+
     expect(after.map((doc) => doc['order'])).toEqual(
       after.map((_, index) => (reversed.indexOf(after[index]!.id) + 1) * 10),
     );

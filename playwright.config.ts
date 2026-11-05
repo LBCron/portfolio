@@ -1,10 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 
-import {
-  ADMIN_PASSWORD,
-  SESSION_SECRET,
-  WEBHOOK_SECRET,
-} from './tests/e2e/auth-constants';
+import { ADMIN_PASSWORD, SESSION_SECRET, WEBHOOK_SECRET } from './tests/e2e/auth-constants';
 
 const PORT = Number(process.env.E2E_PORT ?? 3100);
 const baseURL = `http://localhost:${PORT}`;
@@ -12,8 +8,7 @@ const baseURL = `http://localhost:${PORT}`;
 export default defineConfig({
   testDir: './tests/e2e',
   // Baselines are committed for Linux, the CI platform (D61).
-  snapshotPathTemplate:
-    '{testDir}/__screenshots__/{testFilePath}/{arg}-{projectName}{ext}',
+  snapshotPathTemplate: '{testDir}/__screenshots__/{testFilePath}/{arg}-{projectName}{ext}',
   expect: {
     timeout: 10_000,
     toHaveScreenshot: { maxDiffPixelRatio: 0.01, animations: 'disabled' },

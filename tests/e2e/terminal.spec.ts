@@ -10,10 +10,8 @@ test.beforeEach(async ({ page }) => {
 });
 
 const windowOf = (page: Page) => page.locator('[data-window=terminal]');
-const inputOf = (page: Page) =>
-  page.getByRole('textbox', { name: /Command input/ });
-const logOf = (page: Page) =>
-  page.getByRole('log', { name: 'Terminal output' });
+const inputOf = (page: Page) => page.getByRole('textbox', { name: /Command input/ });
+const logOf = (page: Page) => page.getByRole('log', { name: 'Terminal output' });
 
 async function openTerminal(page: Page, path = '/en') {
   await page.goto(path, { waitUntil: 'domcontentloaded' });
@@ -27,9 +25,7 @@ async function run(page: Page, line: string) {
 }
 
 test.describe('entry points', () => {
-  test('the dock chip and header toggle open the terminal', async ({
-    page,
-  }) => {
+  test('the dock chip and header toggle open the terminal', async ({ page }) => {
     await page.goto('/en', { waitUntil: 'domcontentloaded' });
     await page.getByRole('button', { name: 'terminal', exact: true }).click();
     await expect(windowOf(page)).toHaveAttribute('data-status', 'open');
@@ -46,9 +42,7 @@ test.describe('entry points', () => {
     await expect(page.locator('footer kbd')).toBeVisible();
   });
 
-  test('the dock hint appears once per session without motion preference', async ({
-    page,
-  }) => {
+  test('the dock hint appears once per session without motion preference', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await page.goto('/en', { waitUntil: 'domcontentloaded' });
     await expect(page.getByText('Try the terminal: type help')).toBeVisible({
@@ -83,9 +77,7 @@ test.describe('shell', () => {
     for (const group of ['Navigate', 'Explore', 'Site', 'Fun']) {
       await expect(logOf(page)).toContainText(group);
     }
-    await logOf(page)
-      .getByRole('button', { name: 'about', exact: true })
-      .click();
+    await logOf(page).getByRole('button', { name: 'about', exact: true }).click();
     await expect(logOf(page)).toContainText('visitor@julio-muller:~$ about');
   });
 
@@ -99,9 +91,7 @@ test.describe('shell', () => {
     await expect(logOf(page)).not.toContainText('scratch-pad');
   });
 
-  test('unknown commands suggest and unsupported syntax explains', async ({
-    page,
-  }) => {
+  test('unknown commands suggest and unsupported syntax explains', async ({ page }) => {
     await openTerminal(page);
     await run(page, 'hepl');
     await expect(logOf(page)).toContainText('command not found: hepl');
@@ -110,30 +100,26 @@ test.describe('shell', () => {
     await expect(logOf(page)).toContainText('Chaining commands');
   });
 
-  test('names reserved for later are plain unknown commands', async ({
-    page,
-  }) => {
+  test('names reserved for later are plain unknown commands', async ({ page }) => {
     await openTerminal(page);
     await run(page, 'admin');
     await expect(logOf(page)).toContainText('command not found: admin');
   });
 
-  test('navigates the virtual file system and follows the title', async ({
-    page,
-  }) => {
+  test('navigates the virtual file system and follows the title', async ({ page }) => {
     await openTerminal(page);
     await run(page, 'cd projects');
-    await expect(
-      page.getByRole('toolbar', { name: 'Window controls' }),
-    ).toContainText('visitor@julio-muller: ~/projects');
+    await expect(page.getByRole('toolbar', { name: 'Window controls' })).toContainText(
+      'visitor@julio-muller: ~/projects',
+    );
     await run(page, 'ls');
     await expect(logOf(page)).toContainText('pay-bridge.md');
     await run(page, 'cat pay-bridge.md');
     await expect(logOf(page)).toContainText('Pay');
     await run(page, 'cd ..');
-    await expect(
-      page.getByRole('toolbar', { name: 'Window controls' }),
-    ).toContainText('visitor@julio-muller: ~');
+    await expect(page.getByRole('toolbar', { name: 'Window controls' })).toContainText(
+      'visitor@julio-muller: ~',
+    );
   });
 
   test('Tab completes, lists candidates on a second Tab, and leaves when idle', async ({
@@ -141,7 +127,9 @@ test.describe('shell', () => {
     browserName,
   }) => {
     await openTerminal(page);
+
     const input = inputOf(page);
+
     await input.fill('cd pro');
     await input.press('Tab');
     await expect(input).toHaveValue('cd projects/');
@@ -156,9 +144,7 @@ test.describe('shell', () => {
     await page.evaluate(() => {
       window.addEventListener('keydown', (event) => {
         if (event.key === 'Tab') {
-          document.body.dataset['tabPrevented'] = String(
-            event.defaultPrevented,
-          );
+          document.body.dataset['tabPrevented'] = String(event.defaultPrevented);
         }
       });
     });
@@ -166,10 +152,8 @@ test.describe('shell', () => {
     // Idle Tab is left to the browser. The input is the last tab stop, and
     // headless Firefox has no browser UI to move focus to, so check the
     // default action rather than where focus went there.
-    await expect(page.locator('body')).toHaveAttribute(
-      'data-tab-prevented',
-      'false',
-    );
+    await expect(page.locator('body')).toHaveAttribute('data-tab-prevented', 'false');
+
     if (browserName !== 'firefox') await expect(input).not.toBeFocused();
   });
 
@@ -177,7 +161,9 @@ test.describe('shell', () => {
     await openTerminal(page);
     await run(page, 'pwd');
     await run(page, 'whoami');
+
     const input = inputOf(page);
+
     await input.press('ArrowUp');
     await expect(input).toHaveValue('whoami');
     await input.press('ArrowUp');
@@ -205,17 +191,12 @@ test.describe('shell', () => {
     await expect(logOf(page)).not.toContainText('whoami');
   });
 
-  test('a multi-line paste runs only the first line', async ({
-    page,
-    browserName,
-  }) => {
-    test.skip(
-      browserName === 'firefox',
-      'Firefox empties clipboardData on synthetic paste events',
-    );
+  test('a multi-line paste runs only the first line', async ({ page, browserName }) => {
+    test.skip(browserName === 'firefox', 'Firefox empties clipboardData on synthetic paste events');
     await openTerminal(page);
     await inputOf(page).evaluate((element) => {
       const data = new DataTransfer();
+
       data.setData('text', 'echo first\nwhoami');
       element.dispatchEvent(
         new ClipboardEvent('paste', {
@@ -258,9 +239,11 @@ test.describe('shell', () => {
     await run(page, 'lang pt');
     await expect(page).toHaveURL(/\/pt/);
     await expect(windowOf(page)).toHaveAttribute('data-status', 'open');
+
     // The log and the input names are localized too.
     const log = page.getByRole('log', { name: 'Saída do terminal' });
     const input = page.getByRole('textbox', { name: /Entrada de comando/ });
+
     await expect(log).toContainText('Language switched to Português.');
     await input.fill('help');
     await input.press('Enter');
@@ -270,19 +253,17 @@ test.describe('shell', () => {
     await expect(log).toContainText('comando não encontrado: hepl');
   });
 
-  test('resume --download opens the PDF route in a new tab', async ({
-    page,
-  }) => {
+  test('resume --download opens the PDF route in a new tab', async ({ page }) => {
     await openTerminal(page);
+
     const popup = page.waitForEvent('popup');
+
     await run(page, 'resume --download');
     await popup;
     await expect(logOf(page)).toContainText('Downloading the résumé');
   });
 
-  test('git log, neofetch and skills show only snapshot data', async ({
-    page,
-  }) => {
+  test('git log, neofetch and skills show only snapshot data', async ({ page }) => {
     await openTerminal(page);
     await run(page, 'git log --oneline');
     await expect(logOf(page)).toContainText('(HEAD -> main)');
@@ -292,9 +273,7 @@ test.describe('shell', () => {
     await expect(logOf(page)).toContainText('React');
   });
 
-  test('persists across reload; closing ends the log but keeps history', async ({
-    page,
-  }) => {
+  test('persists across reload; closing ends the log but keeps history', async ({ page }) => {
     await openTerminal(page);
     await run(page, 'echo remembered');
     await page.reload({ waitUntil: 'domcontentloaded' });
@@ -309,17 +288,14 @@ test.describe('shell', () => {
     await expect(inputOf(page)).toHaveValue('echo remembered');
   });
 
-  test('exit closes, minimize and maximize drive the window', async ({
-    page,
-    isMobile,
-  }) => {
+  test('exit closes, minimize and maximize drive the window', async ({ page, isMobile }) => {
     await openTerminal(page);
+
     if (!isMobile) {
       await run(page, 'maximize');
-      await expect(
-        page.getByRole('button', { name: 'Restore terminal' }),
-      ).toBeVisible();
+      await expect(page.getByRole('button', { name: 'Restore terminal' })).toBeVisible();
     }
+
     await run(page, 'minimize');
     await expect(windowOf(page)).toHaveAttribute('data-status', 'minimized');
     await page.getByRole('button', { name: 'terminal (minimized)' }).click();
@@ -332,9 +308,7 @@ test.describe('easter eggs', () => {
   test('sudo, rm and the editors stay harmless', async ({ page }) => {
     await openTerminal(page);
     await run(page, 'sudo rm -rf /');
-    await expect(logOf(page)).toContainText(
-      'visitor is not in the sudoers file.',
-    );
+    await expect(logOf(page)).toContainText('visitor is not in the sudoers file.');
     await run(page, 'rm -rf /');
     await expect(logOf(page)).toContainText('rm: refusing to remove that.');
     await run(page, 'nano about.md');
@@ -344,25 +318,23 @@ test.describe('easter eggs', () => {
     await expect(logOf(page)).toContainText('fortune');
   });
 
-  test('cowsay is labelled art and fortune prints a maxim', async ({
-    page,
-  }) => {
+  test('cowsay is labelled art and fortune prints a maxim', async ({ page }) => {
     await openTerminal(page);
     await run(page, 'cowsay make it kind');
-    await expect(
-      page.getByRole('img', { name: 'A cow says: make it kind' }),
-    ).toContainText('< make it kind >');
-    await run(page, 'fortune');
-    await expect(logOf(page).locator('[data-block=text]').last()).toHaveText(
-      /\.$/,
+    await expect(page.getByRole('img', { name: 'A cow says: make it kind' })).toContainText(
+      '< make it kind >',
     );
+    await run(page, 'fortune');
+    await expect(logOf(page).locator('[data-block=text]').last()).toHaveText(/\.$/);
   });
 
   test('matrix rains for about four seconds, then stops', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await openTerminal(page);
     await run(page, 'matrix');
+
     const rain = windowOf(page).locator('[data-effect=matrix]');
+
     await expect(rain).toBeVisible();
     await expect(rain).toHaveAttribute('aria-hidden', 'true');
     await expect(rain).toHaveCount(0, { timeout: 8_000 });
@@ -373,7 +345,9 @@ test.describe('easter eggs', () => {
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await openTerminal(page);
     await run(page, 'matrix');
+
     const rain = windowOf(page).locator('[data-effect=matrix]');
+
     await expect(rain).toBeVisible();
     await inputOf(page).press('Control+c');
     await expect(rain).toHaveCount(0);
@@ -388,16 +362,15 @@ test.describe('easter eggs', () => {
 });
 
 test.describe('snapshot endpoint', () => {
-  test('is public, noindex and free of hidden or private data', async ({
-    request,
-  }) => {
+  test('is public, noindex and free of hidden or private data', async ({ request }) => {
     for (const locale of ['en', 'pt']) {
-      const response = await request.get(
-        `/api/terminal-content?locale=${locale}`,
-      );
+      const response = await request.get(`/api/terminal-content?locale=${locale}`);
+
       expect(response.status()).toBe(200);
       expect(response.headers()['x-robots-tag']).toContain('noindex');
+
       const body = await response.text();
+
       expect(body).not.toContain('scratch-pad');
       expect(body).not.toContain('Sofia Demo');
       expect(body).not.toContain('phone');
@@ -406,9 +379,7 @@ test.describe('snapshot endpoint', () => {
   });
 
   test('rejects unknown locales', async ({ request }) => {
-    expect(
-      (await request.get('/api/terminal-content?locale=xx')).status(),
-    ).toBe(404);
+    expect((await request.get('/api/terminal-content?locale=xx')).status()).toBe(404);
     expect((await request.get('/api/terminal-content')).status()).toBe(404);
   });
 });
@@ -418,9 +389,7 @@ test.describe('mobile', () => {
     test.skip(!isMobile, 'covered by the desktop projects');
   });
 
-  test('uses 16px input text and quick actions in the sheet', async ({
-    page,
-  }) => {
+  test('uses 16px input text and quick actions in the sheet', async ({ page }) => {
     await openTerminal(page);
     await expect(inputOf(page)).toHaveCSS('font-size', '16px');
     await page
@@ -432,10 +401,7 @@ test.describe('mobile', () => {
 });
 
 test.describe('accessibility', () => {
-  test('has no axe violations with output on screen', async ({
-    page,
-    browserName,
-  }) => {
+  test('has no axe violations with output on screen', async ({ page, browserName }) => {
     test.skip(browserName === 'webkit', 'axe runs on Chromium projects (D23)');
     await openTerminal(page);
     await run(page, 'help');
@@ -443,16 +409,14 @@ test.describe('accessibility', () => {
     await run(page, 'tree');
     await expect(logOf(page)).toContainText('orbit-dashboard');
     await windowOf(page).evaluate((element) =>
-      Promise.all(
-        element
-          .getAnimations({ subtree: true })
-          .map((animation) => animation.finished),
-      ),
+      Promise.all(element.getAnimations({ subtree: true }).map((animation) => animation.finished)),
     );
+
     const results = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
       .exclude('[data-reveal=pending]')
       .analyze();
+
     expect(results.violations).toEqual([]);
   });
 });

@@ -2,7 +2,7 @@ import { localeTags, routing } from '@/i18n/routing';
 
 import { type OutputNode, text } from '../../output';
 import { errorText, usageOf } from '../helpers';
-import type { Command, CommandGroup } from '../types';
+import { type Command, type CommandGroup } from '../types';
 
 const GROUPS: CommandGroup[] = ['navigate', 'explore', 'site', 'fun'];
 
@@ -21,18 +21,23 @@ const help: Command = {
   async run(ctx, args) {
     const commands = ctx.commands();
     const requested = args.positionals[0];
+
     if (requested) {
       const command = commands.find(
         (item) => item.name === requested || item.aliases?.includes(requested),
       );
+
       return command
         ? usageOf(ctx, command)
         : [errorText(ctx.t('terminal.notFound', { name: requested }))];
     }
+
     const output: OutputNode[] = [];
     for (const group of GROUPS) {
       const items = commands.filter((command) => command.group === group);
+
       if (items.length === 0) continue;
+
       output.push(text(ctx.t(`terminal.groups.${group}`), 'bold'), {
         type: 'kv',
         items: items.map((command) => ({
@@ -42,12 +47,8 @@ const help: Command = {
         })),
       });
     }
-    output.push(
-      text(
-        ctx.t('terminal.help.footer', { shortcut: ctx.shortcutLabel }),
-        'dim',
-      ),
-    );
+    output.push(text(ctx.t('terminal.help.footer', { shortcut: ctx.shortcutLabel }), 'dim'));
+
     return output;
   },
 };
@@ -60,6 +61,7 @@ const clear: Command = {
   visibility: 'public',
   async run(ctx) {
     ctx.actions.clear();
+
     return [];
   },
 };
@@ -85,7 +87,9 @@ const history: Command = {
     if (ctx.history.length === 0) {
       return [text(ctx.t('terminal.history.empty'), 'dim')];
     }
+
     const width = String(ctx.history.length).length;
+
     return [
       text(
         ctx.history
@@ -153,32 +157,29 @@ const lang: Command = {
   async *run(ctx, args) {
     const target = args.positionals[0]?.toLowerCase();
     const name = (locale: string) => ctx.t(`header.languageNames.${locale}`);
+
     if (!target) {
-      yield text(
-        ctx.t('terminal.lang.current', { language: name(ctx.locale) }),
-      );
-      yield text(
-        ctx.t('terminal.lang.available', { list: routing.locales.join(', ') }),
-        'dim',
-      );
+      yield text(ctx.t('terminal.lang.current', { language: name(ctx.locale) }));
+      yield text(ctx.t('terminal.lang.available', { list: routing.locales.join(', ') }), 'dim');
+
       return;
     }
+
     const locale = routing.locales.find((item) => item === target);
+
     if (!locale) {
       yield errorText(ctx.t('terminal.lang.unknown', { language: target }));
+
       return;
     }
+
     if (locale === ctx.locale) {
-      yield text(
-        ctx.t('terminal.lang.already', { language: name(locale) }),
-        'warn',
-      );
+      yield text(ctx.t('terminal.lang.already', { language: name(locale) }), 'warn');
+
       return;
     }
-    yield text(
-      ctx.t('terminal.lang.switched', { language: name(locale) }),
-      'success',
-    );
+
+    yield text(ctx.t('terminal.lang.switched', { language: name(locale) }), 'success');
     // Runs after the consumer stored the confirmation, so it survives the reload.
     ctx.actions.setLocale(locale);
   },
@@ -192,6 +193,7 @@ const exit: Command = {
   visibility: 'public',
   async run(ctx) {
     ctx.actions.window.close();
+
     return [];
   },
 };
@@ -204,6 +206,7 @@ const minimize: Command = {
   visibility: 'public',
   async run(ctx) {
     ctx.actions.window.minimize();
+
     return [];
   },
 };
@@ -216,6 +219,7 @@ const maximize: Command = {
   visibility: 'public',
   async run(ctx) {
     ctx.actions.window.maximize();
+
     return [];
   },
 };

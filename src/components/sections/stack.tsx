@@ -1,12 +1,14 @@
 import { getTranslations } from 'next-intl/server';
 
 import { TechCloudShell } from '@/components/tech-cloud/tech-cloud-shell';
+import { type StackTech } from '@/components/tech-cloud/types';
 import { SectionHeader } from '@/components/ui/section-header';
-import type { StackTech } from '@/components/tech-cloud/types';
-import type { Practice, Technology } from '@/lib/content';
+import { type Practice, type Technology } from '@/lib/content';
 import { toPublicIcon } from '@/lib/content/icon-src';
 
-/** Only what the client needs: icon URLs, never paths (D59). */
+/**
+ * Only what the client needs: icon URLs, never paths (D59).
+ */
 function toStackTech(tech: Technology): StackTech {
   return {
     id: tech.id,
@@ -20,15 +22,15 @@ function toStackTech(tech: Technology): StackTech {
 }
 
 /**
- * Stack section: List is the SSR / reduced-motion baseline; the geoid cloud
- * is a client enhancement (D37).
+ * Stack section: List is the SSR / reduced-motion baseline; the geoid cloud is
+ * a client enhancement (D37).
  */
 export async function Stack({
   technologies,
   practices,
 }: {
-  technologies: Technology[];
   practices: Practice[];
+  technologies: Technology[];
 }) {
   const t = await getTranslations('stack');
 
@@ -47,10 +49,7 @@ export async function Stack({
           lead={t('lead')}
         />
       </div>
-      <TechCloudShell
-        technologies={technologies.map(toStackTech)}
-        practices={practices}
-      />
+      <TechCloudShell technologies={technologies.map(toStackTech)} practices={practices} />
     </section>
   );
 }

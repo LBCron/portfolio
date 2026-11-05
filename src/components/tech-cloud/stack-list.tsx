@@ -2,9 +2,9 @@ import { TechIcon } from '@/components/content/tech-icon';
 import { Chip } from '@/components/ui/chip';
 import { Reveal } from '@/components/ui/reveal';
 import { techCategories } from '@/lib/content/taxonomy';
-import type { Practice } from '@/lib/content/types';
+import { type Practice } from '@/lib/content/types';
 
-import type { StackTech } from './types';
+import { type StackTech } from './types';
 
 export function StackList({
   technologies,
@@ -12,10 +12,10 @@ export function StackList({
   categoryLabels,
   practicesTitle,
 }: {
-  technologies: StackTech[];
-  practices: Practice[];
   categoryLabels: Record<(typeof techCategories)[number], string>;
+  practices: Practice[];
   practicesTitle: string;
+  technologies: StackTech[];
 }) {
   const groups = techCategories
     .map((category) => ({
@@ -59,15 +59,10 @@ export function StackList({
           <h3 id="stack-practices" className="font-label text-text-3">
             {practicesTitle}
           </h3>
-          <ul
-            aria-labelledby="stack-practices"
-            className="mt-4 flex flex-wrap gap-2"
-          >
+          <ul aria-labelledby="stack-practices" className="mt-4 flex flex-wrap gap-2">
             {practices.map((practice) => (
               <li key={practice.id}>
-                <Chip className="px-3 py-1.5 text-[0.8125rem]">
-                  {practice.label}
-                </Chip>
+                <Chip className="px-3 py-1.5 text-[0.8125rem]">{practice.label}</Chip>
               </li>
             ))}
           </ul>

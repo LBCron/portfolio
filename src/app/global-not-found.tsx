@@ -1,6 +1,6 @@
 import '@/styles/globals.css';
 
-import type { Metadata, Viewport } from 'next';
+import { type Metadata, type Viewport } from 'next';
 import { createTranslator } from 'next-intl';
 
 import { NotFoundView } from '@/components/layout/not-found-view';

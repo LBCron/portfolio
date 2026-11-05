@@ -4,9 +4,12 @@ import { isAppLocale } from '@/i18n/routing';
 import { getContent } from '@/lib/content';
 import { buildSnapshot } from '@/lib/terminal/snapshot';
 
-/** Public, read-only snapshot for the terminal; hidden items never appear. */
+/**
+ * Public, read-only snapshot for the terminal; hidden items never appear.
+ */
 export async function GET(request: Request) {
   const locale = new URL(request.url).searchParams.get('locale');
+
   if (!isAppLocale(locale)) {
     return new NextResponse(null, { status: 404 });
   }

@@ -1,14 +1,10 @@
 'use client';
 
-import {
-  type PointerEvent as ReactPointerEvent,
-  useEffect,
-  useRef,
-} from 'react';
+import { type PointerEvent as ReactPointerEvent, useEffect, useRef } from 'react';
 
 import { cn } from '@/lib/cn';
-import type { TechCategory } from '@/lib/content/taxonomy';
-import type { PublicTechIcon } from '@/lib/content/icon-src';
+import { type PublicTechIcon } from '@/lib/content/icon-src';
+import { type TechCategory } from '@/lib/content/taxonomy';
 import { fibonacciGeoid } from '@/lib/tech-cloud/geoid';
 import { ease, frameScale, stepDrag } from '@/lib/tech-cloud/motion';
 
@@ -16,54 +12,61 @@ import { CloudMark } from './cloud-mark';
 import { geoidStageClassName } from './stage';
 
 export interface CloudTech {
-  id: string;
-  name: string;
+  brandColor?: string;
   category: TechCategory;
   icon: PublicTechIcon;
-  brandColor?: string;
-  url?: string;
+  id: string;
+  name: string;
   priority: 1 | 2 | 3;
+  url?: string;
 }
 
 interface GeoidSphereProps {
-  technologies: CloudTech[];
-  /** Active category filter; null = all. */
-  activeCategory: TechCategory | null;
-  paused: boolean;
-  onSelect: (tech: CloudTech | null) => void;
-  selectedId: string | null;
+  /**
+   * Active category filter; null = all.
+   */
+  activeCategory: null | TechCategory;
   className?: string;
-}
-
-/** Depth opacity multiplier for icons outside the active category filter. */
-const CATEGORY_DIM = 0.08;
-/** Per-60Hz-frame lerp toward `CATEGORY_DIM` / 1 (~250ms at any refresh rate, D66). */
-const CATEGORY_DIM_LERP = 0.12;
-
-interface ItemRuntime {
-  tech: CloudTech;
-  el: HTMLElement;
-  sinPhi: number;
-  cosPhi: number;
-  theta: number;
-  radiusMultiplier: number;
-  rotationSpeed: number;
-  floatOffset: number;
-  floatSpeed: number;
-  isHovered: boolean;
-  speedMultiplier: number;
-  dimMultiplier: number;
-  lastTx: string;
-  lastTy: string;
-  lastScale: string;
-  lastOpacity: string;
-  lastZIndex: number;
-  lastPointerEvents: string;
+  onSelect: (tech: CloudTech | null) => void;
+  paused: boolean;
+  selectedId: null | string;
+  technologies: CloudTech[];
 }
 
 /**
- * DOM geoid: Fibonacci layout, latitude spin, yaw drag, per-icon hover slowdown.
- * Writes styles through refs — no React state per frame (D37 / §7).
+ * Depth opacity multiplier for icons outside the active category filter.
+ */
+const CATEGORY_DIM = 0.08;
+/**
+ * Per-60Hz-frame lerp toward `CATEGORY_DIM` / 1 (~250ms at any refresh rate,
+ * D66).
+ */
+const CATEGORY_DIM_LERP = 0.12;
+
+interface ItemRuntime {
+  cosPhi: number;
+  dimMultiplier: number;
+  el: HTMLElement;
+  floatOffset: number;
+  floatSpeed: number;
+  isHovered: boolean;
+  lastOpacity: string;
+  lastPointerEvents: string;
+  lastScale: string;
+  lastTx: string;
+  lastTy: string;
+  lastZIndex: number;
+  radiusMultiplier: number;
+  rotationSpeed: number;
+  sinPhi: number;
+  speedMultiplier: number;
+  tech: CloudTech;
+  theta: number;
+}
+
+/**
+ * DOM geoid: Fibonacci layout, latitude spin, yaw drag, per-icon hover
+ * slowdown. Writes styles through refs — no React state per frame (D37 / §7).
  */
 export function GeoidSphere({
   technologies,
@@ -78,18 +81,26 @@ export function GeoidSphere({
   const dragRef = useRef({
     active: false,
     previousX: 0,
-    /** Pointer travel (rad) since the last frame; consumed once per frame. */
+    /**
+     * Pointer travel (rad) since the last frame; consumed once per frame.
+     */
     pending: 0,
-    /** Coast velocity (rad per 60 Hz frame). */
+    /**
+     * Coast velocity (rad per 60 Hz frame).
+     */
     velocity: 0,
     pointerId: -1,
   });
-  /** Stage size, measured by the ResizeObserver so pointer moves never read layout. */
+  /**
+   * Stage size, measured by the ResizeObserver so pointer moves never read
+   * layout.
+   */
   const sizeRef = useRef({ width: 0, height: 0 });
   const pausedRef = useRef(paused);
   const categoryRef = useRef(activeCategory);
   const selectedRef = useRef(selectedId);
   const onSelectRef = useRef(onSelect);
+
   useEffect(() => {
     pausedRef.current = paused;
     categoryRef.current = activeCategory;
@@ -99,13 +110,13 @@ export function GeoidSphere({
 
   useEffect(() => {
     const stage = stageRef.current;
+
     if (!stage) return;
 
     const seeds = fibonacciGeoid(technologies.length);
-    const nodes = Array.from(
-      stage.querySelectorAll<HTMLElement>('[data-cloud-item]'),
-    );
+    const nodes = Array.from(stage.querySelectorAll<HTMLElement>('[data-cloud-item]'));
     const hoverAbort = new AbortController();
+
     itemsRef.current = technologies.map((tech, index) => {
       const seed = seeds[index]!;
       const el = nodes[index]!;
@@ -129,6 +140,7 @@ export function GeoidSphere({
         lastZIndex: Number.NaN,
         lastPointerEvents: '',
       };
+
       el.addEventListener(
         'mouseenter',
         () => {
@@ -143,6 +155,7 @@ export function GeoidSphere({
         },
         { signal: hoverAbort.signal },
       );
+
       return item;
     });
 
@@ -154,14 +167,15 @@ export function GeoidSphere({
     let height = stage.clientHeight;
     sizeRef.current = { width, height };
     let reduced =
-      document.documentElement.dataset.motion === 'reduced' ||
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      document.documentElement.dataset.motion === 'reduced'
+      || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     const canRun = () => inView && visible && width > 0 && height > 0;
     // The loop stops itself when the stage is hidden or off-screen and is
     // restarted here, so an idle cloud costs no frames at all.
     const start = () => {
       if (frame !== 0 || !canRun()) return;
+
       lastTime = 0;
       frame = requestAnimationFrame(tick);
     };
@@ -172,6 +186,7 @@ export function GeoidSphere({
       sizeRef.current = { width, height };
       start();
     });
+
     resize.observe(stage);
 
     const observer = new IntersectionObserver(
@@ -181,6 +196,7 @@ export function GeoidSphere({
       },
       { rootMargin: '300px' },
     );
+
     observer.observe(stage);
 
     const onVisibility = () => {
@@ -189,13 +205,18 @@ export function GeoidSphere({
     };
     const onMotion = () => {
       reduced =
-        document.documentElement.dataset.motion === 'reduced' ||
-        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        document.documentElement.dataset.motion === 'reduced'
+        || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     };
+
     document.addEventListener('visibilitychange', onVisibility);
+
     const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+
     motionQuery.addEventListener('change', onMotion);
+
     const motionAttr = new MutationObserver(onMotion);
+
     motionAttr.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ['data-motion'],
@@ -205,8 +226,10 @@ export function GeoidSphere({
     function tick(time: number) {
       if (!canRun()) {
         frame = 0;
+
         return;
       }
+
       frame = requestAnimationFrame(tick);
 
       // Everything below is scaled by real frame time (D66): the same speed at
@@ -238,8 +261,8 @@ export function GeoidSphere({
 
       for (const item of itemsRef.current) {
         const targetMultiplier = item.isHovered || freeze ? 0.05 : 1;
-        item.speedMultiplier +=
-          (targetMultiplier - item.speedMultiplier) * ease(0.08, k);
+
+        item.speedMultiplier += (targetMultiplier - item.speedMultiplier) * ease(0.08, k);
 
         item.theta += freeze
           ? step.rotation
@@ -252,70 +275,68 @@ export function GeoidSphere({
         const inFront = z > 0;
         const interactive = inFront && matching;
         const dimTarget = matching ? 1 : CATEGORY_DIM;
+
         if (freeze) {
           item.dimMultiplier = dimTarget;
         } else {
-          item.dimMultiplier +=
-            (dimTarget - item.dimMultiplier) * ease(CATEGORY_DIM_LERP, k);
+          item.dimMultiplier += (dimTarget - item.dimMultiplier) * ease(CATEGORY_DIM_LERP, k);
         }
+
         if (!matching) item.isHovered = false;
+
         if (!inFront) {
           item.isHovered = false;
+
           if (item.lastPointerEvents !== 'none') {
             item.lastPointerEvents = 'none';
             item.el.style.pointerEvents = 'none';
             item.el.removeAttribute('data-interactive');
           }
+
           if (skipBack) {
             const zNormalized = (z + maxRadiusZ) / depthSpan;
-            const opacity = (
-              (0.15 + zNormalized * 0.85) *
-              item.dimMultiplier
-            ).toFixed(2);
+            const opacity = ((0.15 + zNormalized * 0.85) * item.dimMultiplier).toFixed(2);
+
             if (item.lastOpacity !== opacity) {
               item.lastOpacity = opacity;
               item.el.style.opacity = opacity;
             }
+
             continue;
           }
         }
 
-        const floatY = freeze
-          ? 0
-          : Math.sin(time * item.floatSpeed + item.floatOffset) * 6;
+        const floatY = freeze ? 0 : Math.sin(time * item.floatSpeed + item.floatOffset) * 6;
         const y = ryScale * mul * item.cosPhi + floatY;
         const zNormalized = (z + maxRadiusZ) / depthSpan;
         const selectedBoost = matching && selected === item.tech.id ? 1.15 : 1;
         const tx = x.toFixed(1);
         const ty = y.toFixed(1);
         const scale = ((0.25 + zNormalized * 1.35) * selectedBoost).toFixed(3);
-        if (
-          item.lastTx !== tx ||
-          item.lastTy !== ty ||
-          item.lastScale !== scale
-        ) {
+
+        if (item.lastTx !== tx || item.lastTy !== ty || item.lastScale !== scale) {
           item.lastTx = tx;
           item.lastTy = ty;
           item.lastScale = scale;
           item.el.style.transform = `translate3d(-50%,-50%,0) translate3d(${tx}px,${ty}px,0) scale(${scale})`;
         }
 
-        const opacity = (
-          (0.15 + zNormalized * 0.85) *
-          item.dimMultiplier
-        ).toFixed(2);
+        const opacity = ((0.15 + zNormalized * 0.85) * item.dimMultiplier).toFixed(2);
+
         if (item.lastOpacity !== opacity) {
           item.lastOpacity = opacity;
           item.el.style.opacity = opacity;
         }
 
         const zIndex = Math.round(z);
+
         if (item.lastZIndex !== zIndex) {
           item.lastZIndex = zIndex;
           item.el.style.zIndex = String(zIndex);
         }
 
         const pointerEvents = interactive ? 'auto' : 'none';
+
         if (item.lastPointerEvents !== pointerEvents) {
           item.lastPointerEvents = pointerEvents;
           item.el.style.pointerEvents = pointerEvents;
@@ -341,10 +362,14 @@ export function GeoidSphere({
   function onPointerDown(event: ReactPointerEvent<HTMLDivElement>) {
     // Touch has its own path below (it must keep vertical page scroll).
     if (event.pointerType === 'touch') return;
+
     if (event.pointerType === 'mouse' && event.button !== 0) return;
+
     const drag = dragRef.current;
+
     // A second pointer must not hijack a drag in progress.
     if (drag.active) return;
+
     drag.active = true;
     drag.previousX = event.clientX;
     drag.pointerId = event.pointerId;
@@ -355,7 +380,9 @@ export function GeoidSphere({
 
   function onPointerMove(event: ReactPointerEvent<HTMLDivElement>) {
     const drag = dragRef.current;
+
     if (!drag.active || event.pointerId !== drag.pointerId) return;
+
     const deltaX = event.clientX - drag.previousX;
     drag.previousX = event.clientX;
     // Travel accumulates and is consumed once per frame, so the same drag turns
@@ -365,7 +392,9 @@ export function GeoidSphere({
 
   function onPointerUp(event: ReactPointerEvent<HTMLDivElement>) {
     const drag = dragRef.current;
+
     if (event.pointerId !== drag.pointerId) return;
+
     drag.active = false;
     drag.pointerId = -1;
   }
@@ -373,7 +402,9 @@ export function GeoidSphere({
   // Touch: yaw only, keep vertical page scroll (touch-action: pan-y).
   useEffect(() => {
     const stage = stageRef.current;
+
     if (!stage) return;
+
     let tracking = false;
     let startX = 0;
     let startY = 0;
@@ -382,6 +413,7 @@ export function GeoidSphere({
 
     const onStart = (event: TouchEvent) => {
       if (event.touches.length !== 1) return;
+
       const touch = event.touches[0]!;
       tracking = true;
       moved = false;
@@ -394,55 +426,67 @@ export function GeoidSphere({
     };
     const onMove = (event: TouchEvent) => {
       if (!tracking || event.touches.length !== 1) return;
+
       const touch = event.touches[0]!;
       const dx = touch.clientX - startX;
       const dy = touch.clientY - startY;
+
       if (!moved && Math.hypot(dx, dy) > 6) moved = true;
+
       if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 4) {
         event.preventDefault();
         dragRef.current.active = true;
         dragRef.current.pending +=
-          -(
-            (touch.clientX - dragRef.current.previousX) /
-            (sizeRef.current.width || 1)
-          ) * 2.5;
+          -((touch.clientX - dragRef.current.previousX) / (sizeRef.current.width || 1)) * 2.5;
         dragRef.current.previousX = touch.clientX;
       }
     };
     const onEnd = (event: TouchEvent) => {
       if (!tracking) return;
+
       tracking = false;
       // Release: the queued travel seeds the coast (D66).
       dragRef.current.active = false;
       const duration = performance.now() - startTime;
+
       if (!moved && duration < 250) {
-        const target = (event.target as Element | null)?.closest(
-          '[data-cloud-item]',
-        );
+        const target = (event.target as Element | null)?.closest('[data-cloud-item]');
         const id = target?.getAttribute('data-cloud-item');
+
         if (!id) {
           onSelectRef.current(null);
+
           return;
         }
+
         event.preventDefault();
+
         const tech = itemsRef.current.find((item) => item.tech.id === id)?.tech;
+
         if (!tech) return;
+
         const category = categoryRef.current;
+
         if (category && tech.category !== category) return;
+
         onSelectRef.current(selectedRef.current === tech.id ? null : tech);
       }
     };
+
     stage.addEventListener('touchstart', onStart, { passive: true });
     stage.addEventListener('touchmove', onMove, { passive: false });
     stage.addEventListener('touchend', onEnd, { passive: false });
     stage.addEventListener('touchcancel', onEnd);
+
     // Losing focus mid-drag must not leave the gesture latched.
     const release = () => {
       tracking = false;
       dragRef.current.active = false;
       dragRef.current.pointerId = -1;
     };
+
     window.addEventListener('blur', release);
+
     return () => {
       window.removeEventListener('blur', release);
       stage.removeEventListener('touchstart', onStart);
@@ -468,17 +512,21 @@ export function GeoidSphere({
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerUp}
       onClick={(event) => {
-        const node = (event.target as Element | null)?.closest(
-          '[data-cloud-item]',
-        );
+        const node = (event.target as Element | null)?.closest('[data-cloud-item]');
         const id = node?.getAttribute('data-cloud-item');
+
         if (!id) {
           onSelect(null);
+
           return;
         }
+
         const tech = technologies.find((item) => item.id === id);
+
         if (!tech) return;
+
         if (activeCategory && tech.category !== activeCategory) return;
+
         onSelect(selectedId === tech.id ? null : tech);
       }}
     >

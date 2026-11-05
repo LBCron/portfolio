@@ -5,21 +5,17 @@ import {
 import { createRepository } from '../create-repository';
 import { createFixtureDataset } from '../fixtures/dataset';
 import { createFixtureSource } from '../fixtures/source';
+import { type ContentRepository } from '../repository';
 import { describeRepositoryContract } from '../repository.contract';
-import type { ContentRepository } from '../repository';
 import { contentLocales } from '../schema';
 import { contentTags } from '../tags';
 import { createSanitySource } from './source';
 
-describeRepositoryContract(
-  'sanity (GROQ over an in-memory dataset)',
-  (dataset, logger) =>
-    createRepository(
-      createSanitySource(
-        createMemoryGroqFetch(createSanityMemoryDataset(dataset)),
-      ),
-      logger,
-    ),
+describeRepositoryContract('sanity (GROQ over an in-memory dataset)', (dataset, logger) =>
+  createRepository(
+    createSanitySource(createMemoryGroqFetch(createSanityMemoryDataset(dataset))),
+    logger,
+  ),
 );
 
 describe('sanity adapter', () => {
@@ -27,9 +23,7 @@ describe('sanity adapter', () => {
     const dataset = createFixtureDataset();
     const fixtures = createRepository(createFixtureSource(dataset));
     const sanity = createRepository(
-      createSanitySource(
-        createMemoryGroqFetch(createSanityMemoryDataset(dataset)),
-      ),
+      createSanitySource(createMemoryGroqFetch(createSanityMemoryDataset(dataset))),
     );
 
     const read = async (repository: ContentRepository) => {
@@ -52,6 +46,7 @@ describe('sanity adapter', () => {
           await repository.getPractices(locale),
         );
       }
+
       return results;
     };
 
@@ -59,23 +54,19 @@ describe('sanity adapter', () => {
   });
 
   it('tags every read for revalidation', async () => {
-    const seen: (readonly string[])[] = [];
+    const seen: Array<readonly string[]> = [];
     const repository = createRepository(
       createSanitySource(
-        createMemoryGroqFetch(
-          createSanityMemoryDataset(createFixtureDataset()),
-          (_query, tags) => seen.push(tags),
+        createMemoryGroqFetch(createSanityMemoryDataset(createFixtureDataset()), (_query, tags) =>
+          seen.push(tags),
         ),
       ),
     );
+
     await repository.getProject('en', 'orbit-dashboard');
     await repository.getExperience('en');
     expect(seen).toEqual([
-      [
-        contentTags.projects,
-        'content:project:orbit-dashboard',
-        contentTags.technologies,
-      ],
+      [contentTags.projects, 'content:project:orbit-dashboard', contentTags.technologies],
       [contentTags.experience, contentTags.technologies],
     ]);
   });

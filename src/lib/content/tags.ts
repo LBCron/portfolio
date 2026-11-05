@@ -1,4 +1,6 @@
-/** Fallback lifetime for cached content, in case a revalidation is missed. */
+/**
+ * Fallback lifetime for cached content, in case a revalidation is missed.
+ */
 export const CONTENT_REVALIDATE_SECONDS = 86_400;
 
 export const contentTags = {
@@ -23,26 +25,26 @@ export type ContentTag = `content:${string}`;
  */
 export function tagsForDocument(type: string, slugs: string[] = []): string[] {
   switch (type) {
-    case 'profile':
-      return [contentTags.profile];
     case 'contact':
       return [contentTags.contact];
-    case 'resume':
-      return [contentTags.resume];
-    case 'featuredLink':
-      return [contentTags.links];
-    case 'recommendedProfile':
-      return [contentTags.recommended];
-    case 'project':
-      return [contentTags.projects, ...slugs.map(contentTags.project)];
-    case 'experience':
-      return [contentTags.experience];
     case 'education':
       return [contentTags.education];
-    case 'technology':
-      return [contentTags.technologies];
+    case 'experience':
+      return [contentTags.experience];
+    case 'featuredLink':
+      return [contentTags.links];
     case 'practice':
       return [contentTags.practices];
+    case 'profile':
+      return [contentTags.profile];
+    case 'project':
+      return [contentTags.projects, ...slugs.map(contentTags.project)];
+    case 'recommendedProfile':
+      return [contentTags.recommended];
+    case 'resume':
+      return [contentTags.resume];
+    case 'technology':
+      return [contentTags.technologies];
     default:
       return [];
   }

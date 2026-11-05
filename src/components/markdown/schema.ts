@@ -1,8 +1,8 @@
-import type { Options as SanitizeSchema } from 'rehype-sanitize';
+import { type Options as SanitizeSchema } from 'rehype-sanitize';
 
 /**
- * Strict allowlist for Markdown output (§12.8). No raw HTML reaches this
- * point (`skipHtml`), but the schema still guards everything remark emits.
+ * Strict allowlist for Markdown output (§12.8). No raw HTML reaches this point
+ * (`skipHtml`), but the schema still guards everything remark emits.
  */
 export const markdownSchema: SanitizeSchema = {
   strip: ['script', 'style'],

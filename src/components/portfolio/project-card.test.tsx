@@ -1,18 +1,21 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { vi } from 'vitest';
 
-import type { ProjectSummary } from '@/lib/content';
+import { type ProjectSummary } from '@/lib/content';
+
+import { ProjectCard } from './project-card';
 
 const t = (key: string, values?: Record<string, string>) => {
   const table: Record<string, string> = {
-    visitApp: 'Visit app',
-    visitAppLabel: `Visit app: ${values?.title ?? ''} (opens in a new tab)`,
-    viewDetails: 'View details',
-    viewDetailsLabel: `View details about ${values?.title ?? ''}`,
-    moreTechnologies: 'more',
+    'visitApp': 'Visit app',
+    'visitAppLabel': `Visit app: ${values?.title ?? ''} (opens in a new tab)`,
+    'viewDetails': 'View details',
+    'viewDetailsLabel': `View details about ${values?.title ?? ''}`,
+    'moreTechnologies': 'more',
     'kinds.web': 'Web',
     'statuses.live': 'Live',
   };
+
   return table[key] ?? key;
 };
 
@@ -26,13 +29,10 @@ vi.mock('@/i18n/navigation', () => ({
     children,
     ...props
   }: {
-    href: string | { pathname?: string };
     children?: unknown;
+    href: { pathname?: string } | string;
   }) => (
-    <a
-      href={typeof href === 'string' ? href : (href.pathname ?? '/')}
-      {...props}
-    >
+    <a href={typeof href === 'string' ? href : (href.pathname ?? '/')} {...props}>
       {children as never}
     </a>
   ),
@@ -45,8 +45,6 @@ vi.mock('next/image', () => ({
     <img alt="" {...props} />
   ),
 }));
-
-import { ProjectCard } from './project-card';
 
 const base: ProjectSummary = {
   id: 'project.test',
@@ -71,9 +69,7 @@ const base: ProjectSummary = {
 };
 
 async function markup(project: ProjectSummary) {
-  return renderToStaticMarkup(
-    await ProjectCard({ project, techNames: ['React'] }),
-  );
+  return renderToStaticMarkup(await ProjectCard({ project, techNames: ['React'] }));
 }
 
 describe('ProjectCard CTAs', () => {
@@ -82,6 +78,7 @@ describe('ProjectCard CTAs', () => {
       ...base,
       links: { live: 'https://example.com/app' },
     });
+
     expect(html).toContain('Visit app: Test App (opens in a new tab)');
     expect(html).toContain('View details about Test App');
     expect(html).toContain('https://example.com/app');
@@ -91,6 +88,7 @@ describe('ProjectCard CTAs', () => {
 
   it('makes View details the only CTA when there is no live URL', async () => {
     const html = await markup(base);
+
     expect(html).not.toContain('Visit app');
     expect(html).toContain('View details about Test App');
     expect(html).toContain('bg-text-1');

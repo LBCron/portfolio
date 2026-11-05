@@ -1,6 +1,6 @@
-import type { AppLocale } from '@/i18n/routing';
 import { saveLocalePreference } from '@/i18n/locale-cookie';
-import type { useRouter } from '@/i18n/navigation';
+import { type useRouter } from '@/i18n/navigation';
+import { type AppLocale } from '@/i18n/routing';
 import { track } from '@/lib/analytics';
 
 export const LANGUAGE_SWITCH_KEY = 'jm.language-switch';
@@ -16,7 +16,9 @@ export function switchLocale(
 ) {
   saveLocalePreference(target);
   track('language_switch', { to: target });
+
   const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+
   try {
     sessionStorage.setItem(
       LANGUAGE_SWITCH_KEY,
@@ -28,8 +30,9 @@ export function switchLocale(
   } catch {
     // Without storage the switch still works; scroll is simply not kept.
   }
-  router.replace(
-    `${pathname}${window.location.search}${window.location.hash}`,
-    { locale: target, scroll: false },
-  );
+
+  router.replace(`${pathname}${window.location.search}${window.location.hash}`, {
+    locale: target,
+    scroll: false,
+  });
 }

@@ -3,17 +3,18 @@ import { getTranslations } from 'next-intl/server';
 
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/cn';
-import type { ProjectKind } from '@/lib/content';
+import { type ProjectKind } from '@/lib/content';
 import { projectsLink } from '@/lib/projects';
 
 interface PaginationProps {
+  kind?: ProjectKind;
   page: number;
   totalPages: number;
-  kind?: ProjectKind;
 }
 
 export async function Pagination({ page, totalPages, kind }: PaginationProps) {
   if (totalPages <= 1) return null;
+
   const t = await getTranslations('projects');
   const pages = Array.from({ length: totalPages }, (_, index) => index + 1);
 
@@ -22,10 +23,7 @@ export async function Pagination({ page, totalPages, kind }: PaginationProps) {
       <ul className="flex flex-wrap items-center gap-2">
         <li>
           {page > 1 ? (
-            <Link
-              href={projectsLink({ kind, page: page - 1 })}
-              className={pageLink()}
-            >
+            <Link href={projectsLink({ kind, page: page - 1 })} className={pageLink()}>
               <ArrowLeft aria-hidden="true" className="size-4" />
               {t('previousPage')}
             </Link>
@@ -52,10 +50,7 @@ export async function Pagination({ page, totalPages, kind }: PaginationProps) {
         ))}
         <li>
           {page < totalPages ? (
-            <Link
-              href={projectsLink({ kind, page: page + 1 })}
-              className={pageLink()}
-            >
+            <Link href={projectsLink({ kind, page: page + 1 })} className={pageLink()}>
               {t('nextPage')}
               <ArrowRight aria-hidden="true" className="size-4" />
             </Link>

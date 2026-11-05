@@ -1,10 +1,15 @@
 import { type AppLocale, localeTags } from '@/i18n/routing';
 
-/** `2023-03` → "Mar 2023" / "mar. de 2023"; `2016` → "2016". */
+/**
+ * `2023-03` → "Mar 2023" / "mar. de 2023"; `2016` → "2016".
+ */
 export function formatPartialDate(locale: AppLocale, value: string) {
   const [year, month] = value.split('-').map(Number);
+
   if (!year) return value;
+
   if (!month) return String(year);
+
   return new Intl.DateTimeFormat(localeTags[locale], {
     month: 'short',
     year: 'numeric',

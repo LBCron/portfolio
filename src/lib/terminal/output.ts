@@ -1,5 +1,4 @@
-export type Tone =
-  'default' | 'dim' | 'bold' | 'accent' | 'success' | 'warn' | 'error' | 'link';
+export type Tone = 'accent' | 'bold' | 'default' | 'dim' | 'error' | 'link' | 'success' | 'warn';
 
 export interface Span {
   text: string;
@@ -7,17 +6,21 @@ export interface Span {
 }
 
 export interface KvItem {
+  /**
+   * Renders the key as a chip that runs this command.
+   */
+  command?: string;
   key: string;
   value: string;
-  /** Renders the key as a chip that runs this command. */
-  command?: string;
 }
 
 export interface LinkItem {
-  label: string;
-  /** Internal paths have no locale prefix (`/projects/x`). */
-  href: string;
   external?: boolean;
+  /**
+   * Internal paths have no locale prefix (`/projects/x`).
+   */
+  href: string;
+  label: string;
   note?: string;
 }
 
@@ -26,23 +29,27 @@ export interface LinkItem {
  * serializable for sessionStorage.
  */
 export type OutputNode =
-  | { type: 'text'; spans: Span[]; typed?: boolean }
-  | { type: 'link'; items: LinkItem[] }
-  | { type: 'command'; items: { command: string; label?: string }[] }
-  | { type: 'table'; head?: string[]; rows: string[][] }
-  | { type: 'tree'; lines: string[] }
-  | { type: 'kv'; items: KvItem[] }
   | {
-      type: 'ascii';
-      lines: string[];
       fallback?: string;
-      /** Meaningful art: read as an image with this name, shown when narrow. */
+      /**
+       * Meaningful art: read as an image with this name, shown when narrow.
+       */
       label?: string;
+      lines: string[];
+      type: 'ascii';
     }
-  | { type: 'spinner'; label: string }
+  | { head?: string[]; rows: string[][]; type: 'table' }
+  | { items: Array<{ command: string; label?: string }>; type: 'command' }
+  | { items: KvItem[]; type: 'kv' }
+  | { items: LinkItem[]; type: 'link' }
+  | { label: string; type: 'spinner' }
+  | { lines: string[]; type: 'tree' }
+  | { spans: Span[]; type: 'text'; typed?: boolean }
   | { type: 'blank' };
 
-/** A rendered node with a stable id; `volatile` blocks are never persisted. */
+/**
+ * A rendered node with a stable id; `volatile` blocks are never persisted.
+ */
 export interface Block {
   id: number;
   node: OutputNode;

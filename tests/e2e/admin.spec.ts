@@ -1,7 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
-import { SESSION_SECRET } from './auth-constants';
 import {
   inputOf,
   logOf,
@@ -12,6 +11,7 @@ import {
   submitPassword,
   windowOf,
 } from './admin-helpers';
+import { SESSION_SECRET } from './auth-constants';
 
 const SHORTCUT = 'Control+/';
 const FAILURE = 'su: Authentication failure';
@@ -34,53 +34,41 @@ const ANONYMOUS_PATHS = [
 ];
 
 test.describe('anonymous access', () => {
-  test('every admin path is the same real 404 as an unknown path', async ({
-    request,
-  }) => {
+  test('every admin path is the same real 404 as an unknown path', async ({ request }) => {
     const reference = await request.get('/zz-no-such-page');
+
     expect(reference.status()).toBe(404);
+
     const referenceBody = await reference.text();
 
     for (const path of ANONYMOUS_PATHS) {
       const response = await request.get(path);
+
       expect(response.status(), path).toBe(404);
       expect(await response.text(), path).toBe(referenceBody);
-      for (const header of [
-        'content-type',
-        'cache-control',
-        'x-robots-tag',
-        'referrer-policy',
-      ]) {
-        expect(response.headers()[header], `${path} ${header}`).toBe(
-          reference.headers()[header],
-        );
+      for (const header of ['content-type', 'cache-control', 'x-robots-tag', 'referrer-policy']) {
+        expect(response.headers()[header], `${path} ${header}`).toBe(reference.headers()[header]);
       }
     }
   });
 
-  test('writes and action posts are 404 too, never 401 or a redirect', async ({
-    request,
-  }) => {
+  test('writes and action posts are 404 too, never 401 or a redirect', async ({ request }) => {
     for (const method of ['post', 'put', 'delete'] as const) {
       for (const action of [false, true]) {
-        const headers: Record<string, string> = action
-          ? { 'next-action': 'abc' }
-          : {};
-        const send = (path: string) =>
-          request[method](path, { maxRedirects: 0, headers });
+        const headers: Record<string, string> = action ? { 'next-action': 'abc' } : {};
+        const send = (path: string) => request[method](path, { maxRedirects: 0, headers });
         const unknown = await send('/zz-no-such-page');
         const admin = await send('/admin');
+
         expect(admin.status(), method).toBe(unknown.status());
         expect(await admin.text(), method).toBe(await unknown.text());
+
         if (!action) expect(admin.status(), method).toBe(404);
       }
     }
   });
 
-  test('garbage, forged and expired cookies are not sessions', async ({
-    request,
-    context,
-  }) => {
+  test('garbage, forged and expired cookies are not sessions', async ({ request, context }) => {
     const { SignJWT } = await import('jose');
     const forge = (secret: string, exp: number) =>
       new SignJWT({ ses: Math.floor(Date.now() / 1000) })
@@ -96,9 +84,7 @@ test.describe('anonymous access', () => {
       await forge(SESSION_SECRET, Math.floor(Date.now() / 1000) - 600),
     ];
     for (const value of cookies) {
-      await context.addCookies([
-        { name: 'jm_session', value, url: 'http://localhost:3100' },
-      ]);
+      await context.addCookies([{ name: 'jm_session', value, url: 'http://localhost:3100' }]);
       expect((await request.get('/admin')).status()).toBe(404);
     }
   });
@@ -114,18 +100,20 @@ test.describe('anonymous access', () => {
       '/api/terminal-content?locale=pt',
     ]) {
       const body = await (await request.get(path)).text();
+
       expect(body, path).not.toContain('/admin');
     }
   });
 
-  test('public scripts hold no secret strings; the lazy module has them', async ({
-    page,
-  }) => {
+  test('public scripts hold no secret strings; the lazy module has them', async ({ page }) => {
     const scripts = new Map<string, string>();
+
     page.on('response', async (response) => {
       if (response.request().resourceType() !== 'script') return;
+
       scripts.set(response.url(), await response.text().catch(() => ''));
     });
+
     const forbidden = ['Authentication failure', '/admin'];
 
     await openTerminal(page);
@@ -144,18 +132,15 @@ test.describe('anonymous access', () => {
     await expect
       .poll(
         () =>
-          [...scripts.values()].filter((source) =>
-            source.includes('Authentication failure'),
-          ).length,
+          [...scripts.values()].filter((source) => source.includes('Authentication failure'))
+            .length,
       )
       .toBe(1);
   });
 });
 
 test.describe('terminal login', () => {
-  test('a wrong password shows the generic failure and leaves no trace', async ({
-    page,
-  }) => {
+  test('a wrong password shows the generic failure and leaves no trace', async ({ page }) => {
     await openTerminal(page);
     await run(page, 'su julio');
     await expect(logOf(page)).toContainText('Password:');
@@ -163,14 +148,17 @@ test.describe('terminal login', () => {
     await expect(passwordOf(page)).toHaveAttribute('autocomplete', 'off');
 
     const started = Date.now();
+
     await submitPassword(page, 'wrong-secret-value');
     await expect(logOf(page)).toContainText(FAILURE);
     expect(Date.now() - started).toBeGreaterThanOrEqual(750);
 
     await expect(logOf(page)).not.toContainText('wrong-secret-value');
+
     const stored = await page.evaluate(() =>
       JSON.stringify({ ...sessionStorage, ...localStorage }),
     );
+
     expect(stored).not.toContain('wrong-secret-value');
     expect(stored).not.toContain('su julio');
     expect(await page.evaluate(() => document.cookie)).not.toContain('session');
@@ -202,9 +190,7 @@ test.describe('terminal login', () => {
     await expect(logOf(page)).toContainText('~');
   });
 
-  test('admin and logout look like unknown commands without a session', async ({
-    page,
-  }) => {
+  test('admin and logout look like unknown commands without a session', async ({ page }) => {
     await openTerminal(page);
     // The first secret name loads a lazy chunk; input is ignored while it runs.
     await run(page, 'admin');
@@ -212,12 +198,8 @@ test.describe('terminal login', () => {
     await run(page, 'logout');
     await expect(logOf(page)).toContainText('command not found: logout');
     await run(page, 'help');
-    await expect(
-      logOf(page).getByRole('button', { name: 'logout' }),
-    ).toHaveCount(0);
-    await expect(
-      logOf(page).getByRole('button', { name: 'help' }).first(),
-    ).toBeVisible();
+    await expect(logOf(page).getByRole('button', { name: 'logout' })).toHaveCount(0);
+    await expect(logOf(page).getByRole('button', { name: 'help' }).first()).toBeVisible();
   });
 
   test('signing in opens the dashboard; the terminal shows the session; logout ends it', async ({
@@ -226,9 +208,8 @@ test.describe('terminal login', () => {
   }) => {
     await signIn(page);
 
-    const cookie = (await context.cookies()).find(
-      (item) => item.name === 'jm_session',
-    );
+    const cookie = (await context.cookies()).find((item) => item.name === 'jm_session');
+
     expect(cookie).toMatchObject({
       httpOnly: true,
       sameSite: 'Strict',
@@ -240,9 +221,9 @@ test.describe('terminal login', () => {
     await page.keyboard.press(SHORTCUT);
     await expect(windowOf(page)).toHaveAttribute('data-status', 'open');
     await expect(page.locator('[data-session-pill]')).toBeVisible();
-    await expect(
-      page.getByRole('toolbar', { name: 'Window controls' }),
-    ).toContainText('julio@julio-muller');
+    await expect(page.getByRole('toolbar', { name: 'Window controls' })).toContainText(
+      'julio@julio-muller',
+    );
 
     await run(page, 'whoami');
     await expect(logOf(page)).toContainText('julio');
@@ -265,11 +246,11 @@ test.describe('terminal login', () => {
 });
 
 test.describe('admin shell', () => {
-  test('is non-localized, English, noindex and has no public chrome', async ({
-    page,
-  }) => {
+  test('is non-localized, English, noindex and has no public chrome', async ({ page }) => {
     await signIn(page);
+
     const response = await page.request.get('/admin');
+
     expect(response.status()).toBe(200);
     expect(response.headers()['x-robots-tag']).toContain('noindex');
     expect(response.headers()['x-robots-tag']).toContain('noai');
@@ -277,54 +258,42 @@ test.describe('admin shell', () => {
     expect(response.headers()['cache-control']).toContain('no-store');
 
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
-    await expect(page.locator('meta[name=robots]')).toHaveAttribute(
-      'content',
-      /noindex.*nofollow/,
-    );
-    await expect(
-      page.locator('link[rel=canonical], link[rel=alternate]'),
-    ).toHaveCount(0);
-    await expect(
-      page.getByRole('button', { name: 'Toggle terminal' }),
-    ).toHaveCount(0);
+    await expect(page.locator('meta[name=robots]')).toHaveAttribute('content', /noindex.*nofollow/);
+    await expect(page.locator('link[rel=canonical], link[rel=alternate]')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Toggle terminal' })).toHaveCount(0);
     await expect(page.getByText('Demo data')).toBeVisible();
     await expect(page.getByText(/Session · \d+ min/)).toBeVisible();
-    await expect(
-      page.getByRole('link', { name: /^Projects \d+/ }),
-    ).toBeVisible();
+    await expect(page.getByRole('link', { name: /^Projects \d+/ })).toBeVisible();
   });
 
-  test('warns before expiry and renews on request', async ({
-    page,
-    context,
-  }) => {
+  test('warns before expiry and renews on request', async ({ page, context }) => {
     await signIn(page);
-    const before = (await context.cookies()).find(
-      (item) => item.name === 'jm_session',
-    )?.value;
+
+    const before = (await context.cookies()).find((item) => item.name === 'jm_session')?.value;
+
     await page.clock.install();
     await page.reload({ waitUntil: 'domcontentloaded' });
     await page.clock.fastForward('28:30');
+
     const dialog = page.getByRole('dialog', {
       name: 'Your session expires soon',
     });
+
     await expect(dialog).toBeVisible();
     await dialog.getByRole('button', { name: 'Stay signed in' }).click();
     await expect
-      .poll(
-        async () =>
-          (await context.cookies()).find((item) => item.name === 'jm_session')
-            ?.value,
-      )
+      .poll(async () => (await context.cookies()).find((item) => item.name === 'jm_session')?.value)
       .not.toBe(before);
   });
 
   test('has no axe violations', async ({ page, browserName }) => {
     test.skip(browserName === 'webkit', 'axe runs on Chromium projects (D23)');
     await signIn(page);
+
     const results = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
       .analyze();
+
     expect(results.violations).toEqual([]);
   });
 });

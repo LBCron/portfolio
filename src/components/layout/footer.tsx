@@ -1,6 +1,6 @@
 import { ArrowUp } from 'lucide-react';
-import { locale as rootLocale } from 'next/root-params';
 import { getTranslations } from 'next-intl/server';
+import { locale as rootLocale } from 'next/root-params';
 
 import { LinkIcon } from '@/components/content/link-icon';
 import { externalRel } from '@/components/sections/links';
@@ -17,13 +17,9 @@ export async function Footer() {
   const [t, tA11y, links] = await Promise.all([
     getTranslations('footer'),
     getTranslations('a11y'),
-    isAppLocale(locale)
-      ? getContent().getFeaturedLinks(locale)
-      : Promise.resolve([]),
+    isAppLocale(locale) ? getContent().getFeaturedLinks(locale) : Promise.resolve([]),
   ]);
-  const footerLinks = links.filter((link) =>
-    link.placements.includes('footer'),
-  );
+  const footerLinks = links.filter((link) => link.placements.includes('footer'));
   const year = new Date().getFullYear();
 
   return (
@@ -32,9 +28,7 @@ export async function Footer() {
         <div className="space-y-4">
           <div className="space-y-2">
             <p className="text-text-1">{t('builtBy', { name: owner.name })}</p>
-            <p className="text-small text-text-3">
-              {t('copyright', { year, name: owner.name })}
-            </p>
+            <p className="text-small text-text-3">{t('copyright', { year, name: owner.name })}</p>
             <p className="text-small text-text-3">
               {t.rich('terminalHint', { kbd: () => <ShortcutKbd /> })}
             </p>
@@ -43,19 +37,14 @@ export async function Footer() {
             <ul aria-label={t('linksLabel')} className="-ml-3 flex gap-1">
               {footerLinks.map((link) => {
                 const external = !link.url.startsWith('mailto:');
+
                 return (
                   <li key={link.id}>
                     <a
                       href={link.url}
                       target={external ? '_blank' : undefined}
-                      rel={
-                        external ? externalRel(link.isOwnProfile) : undefined
-                      }
-                      aria-label={
-                        external
-                          ? `${link.label} ${tA11y('opensInNewTab')}`
-                          : link.label
-                      }
+                      rel={external ? externalRel(link.isOwnProfile) : undefined}
+                      aria-label={external ? `${link.label} ${tA11y('opensInNewTab')}` : link.label}
                       title={link.label}
                       className="inline-flex size-11 items-center justify-center rounded-full text-text-2 transition-colors hover-fine:bg-surface-1 hover-fine:text-text-1"
                     >

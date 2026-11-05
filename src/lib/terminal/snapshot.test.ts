@@ -9,8 +9,11 @@ import { fixtureSnapshot } from './test-utils';
 describe.each(['en', 'pt'] as const)('snapshot (%s)', (locale) => {
   it('contains only public, visible, localized content', async () => {
     const snapshot = await fixtureSnapshot(locale);
+
     expect(snapshot.locale).toBe(locale);
+
     const slugs = snapshot.projects.map((project) => project.slug);
+
     expect(slugs).toContain('orbit-dashboard');
     expect(slugs).not.toContain('scratch-pad');
     expect(snapshot.recommended.map((p) => p.name)).not.toContain('Sofia Demo');
@@ -65,6 +68,7 @@ describe.each(['en', 'pt'] as const)('snapshot (%s)', (locale) => {
       contact: contact && { ...contact, phone: '+55 41 99999-0000' },
     });
     const json = JSON.stringify(snapshot);
+
     expect(json).not.toContain('99999');
     expect(json).not.toContain('phone');
     expect(json).not.toContain('/fixtures/');

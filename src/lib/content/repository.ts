@@ -1,17 +1,17 @@
-import type { ContentLocale } from './schema';
-import type {
-  Contact,
-  Education,
-  Experience,
-  FeaturedLink,
-  Practice,
-  Profile,
-  ProjectLookup,
-  ProjectRoute,
-  ProjectSummary,
-  RecommendedProfile,
-  Resume,
-  Technology,
+import { type ContentLocale } from './schema';
+import {
+  type Contact,
+  type Education,
+  type Experience,
+  type FeaturedLink,
+  type Practice,
+  type Profile,
+  type ProjectLookup,
+  type ProjectRoute,
+  type ProjectSummary,
+  type RecommendedProfile,
+  type Resume,
+  type Technology,
 } from './types';
 
 /**
@@ -19,19 +19,21 @@ import type {
  * `order`; singletons resolve to `null` when missing or invalid.
  */
 export interface ContentRepository {
-  readonly source: 'sanity' | 'fixtures';
-
-  getProfile(locale: ContentLocale): Promise<Profile | null>;
   getContact(locale: ContentLocale): Promise<Contact | null>;
-  getResume(): Promise<Resume | null>;
+
+  getEducation(locale: ContentLocale): Promise<Education[]>;
+  getExperience(locale: ContentLocale): Promise<Experience[]>;
   getFeaturedLinks(locale: ContentLocale): Promise<FeaturedLink[]>;
-  getRecommendedProfiles(locale: ContentLocale): Promise<RecommendedProfile[]>;
-  getProjects(locale: ContentLocale): Promise<ProjectSummary[]>;
-  /** Resolves current slugs, answers `moved` for previous slugs. */
+  getPractices(locale: ContentLocale): Promise<Practice[]>;
+  getProfile(locale: ContentLocale): Promise<null | Profile>;
+  /**
+   * Resolves current slugs, answers `moved` for previous slugs.
+   */
   getProject(locale: ContentLocale, slug: string): Promise<ProjectLookup>;
   getProjectRoutes(): Promise<ProjectRoute[]>;
-  getExperience(locale: ContentLocale): Promise<Experience[]>;
-  getEducation(locale: ContentLocale): Promise<Education[]>;
+  getProjects(locale: ContentLocale): Promise<ProjectSummary[]>;
+  getRecommendedProfiles(locale: ContentLocale): Promise<RecommendedProfile[]>;
+  getResume(): Promise<null | Resume>;
   getTechnologies(locale: ContentLocale): Promise<Technology[]>;
-  getPractices(locale: ContentLocale): Promise<Practice[]>;
+  readonly source: 'fixtures' | 'sanity';
 }

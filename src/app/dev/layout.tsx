@@ -1,9 +1,9 @@
 import '@/styles/globals.css';
 
-import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { type Metadata } from 'next';
 import { NextIntlClientProvider } from 'next-intl';
-import type { ReactNode } from 'react';
+import { notFound } from 'next/navigation';
+import { type ReactNode } from 'react';
 
 import { Toaster } from '@/components/ui/toaster';
 import { fontVariables } from '@/styles/fonts';
@@ -15,9 +15,12 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-/** Development-only playground; the proxy also hides it in production. */
+/**
+ * Development-only playground; the proxy also hides it in production.
+ */
 export default function DevLayout({ children }: { children: ReactNode }) {
   if (process.env.NODE_ENV === 'production') notFound();
+
   return (
     <html lang="en" className={fontVariables}>
       <body>

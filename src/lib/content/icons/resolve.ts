@@ -1,21 +1,23 @@
 import 'server-only';
 
-import type { IconifyJSON } from '@iconify/types';
-import type { SimpleIcon } from 'simple-icons';
+import { type IconifyJSON } from '@iconify/types';
+import { type SimpleIcon } from 'simple-icons';
 
-import type { SvgData, TechnologyDocument } from '../schema';
-import type { LinkIcon, TechIcon } from '../types';
+import { type SvgData, type TechnologyDocument } from '../schema';
+import { type LinkIcon, type TechIcon } from '../types';
 import { monogramFor } from './monogram';
 import { svgBodyToPaths } from './svg-geometry';
 
 export type IconSourceUsed =
-  'simple-icons' | 'devicon-plain' | 'devicon' | 'custom-svg' | 'monogram';
+  'custom-svg' | 'devicon-plain' | 'devicon' | 'monogram' | 'simple-icons';
 
 export interface ResolvedTechIcon {
+  /**
+   * Simple Icons publishes brand colors; Devicon does not.
+   */
+  defaultBrandColor?: string;
   icon: TechIcon;
   source: IconSourceUsed;
-  /** Simple Icons publishes brand colors; Devicon does not. */
-  defaultBrandColor?: string;
 }
 
 let simpleIconsBySlug: Promise<Map<string, SimpleIcon>> | undefined;
@@ -27,11 +29,14 @@ function loadSimpleIcons(): Promise<Map<string, SimpleIcon>> {
     for (const value of Object.values(module)) {
       if (value && typeof value === 'object' && 'slug' in value) {
         const icon = value as SimpleIcon;
+
         map.set(icon.slug, icon);
       }
     }
+
     return map;
   });
+
   return simpleIconsBySlug;
 }
 
@@ -40,10 +45,13 @@ function loadDevicon(): Promise<IconifyJSON[]> {
     import('@iconify-json/devicon-plain').then((module) => module.icons),
     import('@iconify-json/devicon').then((module) => module.icons),
   ]);
+
   return deviconSets;
 }
 
-/** Every Simple Icons brand, for the admin picker. */
+/**
+ * Every Simple Icons brand, for the admin picker.
+ */
 export async function simpleIconCatalog() {
   return [...(await loadSimpleIcons()).values()].map((icon) => ({
     slug: icon.slug,
@@ -51,29 +59,38 @@ export async function simpleIconCatalog() {
   }));
 }
 
-/** Every Devicon name (plain and original sets), for the admin picker. */
+/**
+ * Every Devicon name (plain and original sets), for the admin picker.
+ */
 export async function deviconCatalog() {
   const sets = await loadDevicon();
+
   return [...new Set(sets.flatMap((set) => Object.keys(set.icons)))]
     .sort()
     .map((slug) => ({ slug, label: slug }));
 }
 
-export async function simpleIcon(slug: string): Promise<SvgData | null> {
+export async function simpleIcon(slug: string): Promise<null | SvgData> {
   const icon = (await loadSimpleIcons()).get(slug);
+
   return icon ? { viewBox: '0 0 24 24', paths: [icon.path] } : null;
 }
 
-function iconifyIcon(set: IconifyJSON, slug: string): SvgData | null {
+function iconifyIcon(set: IconifyJSON, slug: string): null | SvgData {
   const name = set.icons[slug] ? slug : set.aliases?.[slug]?.parent;
   const icon = name ? set.icons[name] : undefined;
+
   if (!icon) return null;
+
   const paths = svgBodyToPaths(icon.body);
+
   if (!paths) return null;
+
   const left = icon.left ?? set.left ?? 0;
   const top = icon.top ?? set.top ?? 0;
   const width = icon.width ?? set.width ?? 16;
   const height = icon.height ?? set.height ?? 16;
+
   return { viewBox: `${left} ${top} ${width} ${height}`, paths };
 }
 
@@ -82,10 +99,7 @@ function iconifyIcon(set: IconifyJSON, slug: string): SvgData | null {
  * the source actually used so `icons:audit` can report fallbacks.
  */
 export async function resolveTechIcon(
-  tech: Pick<
-    TechnologyDocument,
-    'name' | 'iconSource' | 'iconSlug' | 'customSvg' | 'monogram'
-  >,
+  tech: Pick<TechnologyDocument, 'customSvg' | 'iconSlug' | 'iconSource' | 'monogram' | 'name'>,
 ): Promise<ResolvedTechIcon> {
   const monogram: ResolvedTechIcon = {
     icon: { monogram: tech.monogram ?? monogramFor(tech.name) },
@@ -93,45 +107,55 @@ export async function resolveTechIcon(
   };
 
   switch (tech.iconSource) {
+    case 'custom-svg':
+      return tech.customSvg ? { icon: tech.customSvg, source: 'custom-svg' } : monogram;
+    case 'devicon': {
+      if (!tech.iconSlug) return monogram;
+
+      const [plain, original] = await loadDevicon();
+      const fromPlain = plain ? iconifyIcon(plain, tech.iconSlug) : null;
+
+      if (fromPlain) return { icon: fromPlain, source: 'devicon-plain' };
+
+      const fromOriginal = original ? iconifyIcon(original, tech.iconSlug) : null;
+
+      if (fromOriginal) return { icon: fromOriginal, source: 'devicon' };
+
+      return monogram;
+    }
+    case 'monogram':
+      return monogram;
     case 'simple-icons': {
       if (!tech.iconSlug) return monogram;
+
       const icon = (await loadSimpleIcons()).get(tech.iconSlug);
+
       if (!icon) return monogram;
+
       return {
         icon: { viewBox: '0 0 24 24', paths: [icon.path] },
         source: 'simple-icons',
         defaultBrandColor: `#${icon.hex}`,
       };
     }
-    case 'devicon': {
-      if (!tech.iconSlug) return monogram;
-      const [plain, original] = await loadDevicon();
-      const fromPlain = plain ? iconifyIcon(plain, tech.iconSlug) : null;
-      if (fromPlain) return { icon: fromPlain, source: 'devicon-plain' };
-      const fromOriginal = original
-        ? iconifyIcon(original, tech.iconSlug)
-        : null;
-      if (fromOriginal) return { icon: fromOriginal, source: 'devicon' };
-      return monogram;
-    }
-    case 'custom-svg':
-      return tech.customSvg
-        ? { icon: tech.customSvg, source: 'custom-svg' }
-        : monogram;
-    case 'monogram':
-      return monogram;
   }
 }
 
-/** `simple-icons:<slug>` → brand path; `lucide:<name>` and `link` → Lucide. */
+/**
+ * `simple-icons:<slug>` → brand path; `lucide:<name>` and `link` → Lucide.
+ */
 export async function resolveLinkIcon(icon: string): Promise<LinkIcon> {
   if (icon.startsWith('simple-icons:')) {
     const svg = await simpleIcon(icon.slice('simple-icons:'.length));
+
     if (svg) return { type: 'svg', ...svg };
+
     return { type: 'lucide', name: 'link' };
   }
+
   if (icon.startsWith('lucide:')) {
     return { type: 'lucide', name: icon.slice('lucide:'.length) };
   }
+
   return { type: 'lucide', name: 'link' };
 }

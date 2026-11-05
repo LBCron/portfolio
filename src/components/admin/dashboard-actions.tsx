@@ -10,12 +10,14 @@ import { toast } from '@/stores/toast-store';
 
 export function DashboardActions() {
   const [busy, setBusy] = useState(false);
+
   return (
     <div className="flex flex-wrap gap-3">
       <Button
         disabled={busy}
         onClick={async () => {
           setBusy(true);
+
           try {
             await revalidateAllAction();
             toast('Public pages refreshed', 'success');

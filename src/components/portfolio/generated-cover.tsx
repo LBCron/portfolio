@@ -10,14 +10,14 @@ import {
 import { useId } from 'react';
 
 import { cn } from '@/lib/cn';
-import type { ProjectKind } from '@/lib/content';
+import { type ProjectKind } from '@/lib/content';
 
 const GLYPHS: Record<ProjectKind, LucideIcon> = {
-  web: Globe,
-  mobile: Smartphone,
-  desktop: Monitor,
-  automation: Workflow,
-  integration: Cable,
+  'web': Globe,
+  'mobile': Smartphone,
+  'desktop': Monitor,
+  'automation': Workflow,
+  'integration': Cable,
   'open-source': GitBranch,
 };
 
@@ -29,38 +29,43 @@ const PALETTES = [
   ['#4ade80', '#8b7cff'],
 ] as const;
 
-/** FNV-1a: a stable 32-bit seed from the slug. */
+/**
+ * FNV-1a: a stable 32-bit seed from the slug.
+ */
 function hash(text: string) {
   let value = 0x811c9dc5;
   for (let index = 0; index < text.length; index += 1) {
     value ^= text.charCodeAt(index);
     value = Math.imul(value, 0x01000193);
   }
+
   return value >>> 0;
 }
 
 function seeded(seed: number) {
   let state = seed || 1;
+
   return () => {
     state ^= state << 13;
     state ^= state >>> 17;
     state ^= state << 5;
+
     return ((state >>> 0) % 10_000) / 10_000;
   };
 }
 
 /**
- * Deterministic abstract art for projects without a cover: gradient blobs,
- * a grid and a kind-specific glyph. Decorative; the card names the project.
+ * Deterministic abstract art for projects without a cover: gradient blobs, a
+ * grid and a kind-specific glyph. Decorative; the card names the project.
  */
 export function GeneratedCover({
   slug,
   kind,
   className,
 }: {
-  slug: string;
-  kind: ProjectKind;
   className?: string;
+  kind: ProjectKind;
+  slug: string;
 }) {
   const id = useId();
   const random = seeded(hash(slug));
@@ -75,10 +80,7 @@ export function GeneratedCover({
   return (
     <div
       aria-hidden="true"
-      className={cn(
-        'relative size-full overflow-hidden bg-surface-2',
-        className,
-      )}
+      className={cn('relative size-full overflow-hidden bg-surface-2', className)}
     >
       <svg
         viewBox="0 0 160 100"
@@ -89,31 +91,12 @@ export function GeneratedCover({
         <defs>
           {blobs.map((_, index) => (
             <radialGradient key={index} id={`${id}-g${index}`}>
-              <stop
-                offset="0"
-                stopColor={index === 0 ? from : to}
-                stopOpacity="0.75"
-              />
-              <stop
-                offset="1"
-                stopColor={index === 0 ? from : to}
-                stopOpacity="0"
-              />
+              <stop offset="0" stopColor={index === 0 ? from : to} stopOpacity="0.75" />
+              <stop offset="1" stopColor={index === 0 ? from : to} stopOpacity="0" />
             </radialGradient>
           ))}
-          <pattern
-            id={`${id}-grid`}
-            width="8"
-            height="8"
-            patternUnits="userSpaceOnUse"
-          >
-            <path
-              d="M8 0H0V8"
-              fill="none"
-              stroke="#fff"
-              strokeOpacity="0.06"
-              strokeWidth="0.4"
-            />
+          <pattern id={`${id}-grid`} width="8" height="8" patternUnits="userSpaceOnUse">
+            <path d="M8 0H0V8" fill="none" stroke="#fff" strokeOpacity="0.06" strokeWidth="0.4" />
           </pattern>
         </defs>
         <rect width="160" height="100" fill="#11141b" />

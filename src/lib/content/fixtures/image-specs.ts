@@ -4,22 +4,26 @@
  * Authored masters (real photos) are encoded from the listed source files.
  */
 
-export type FixtureArtStyle = 'cover' | 'avatar' | 'portrait';
+export type FixtureArtStyle = 'avatar' | 'cover' | 'portrait';
 
 export interface FixtureAuthoredSource {
-  /** Filename under `public/fixtures/images/`. */
-  source: string;
-  fit: 'cover' | 'inside';
-  /** Keep an alpha channel (lossy WebP otherwise flattens it). */
+  /**
+   * Keep an alpha channel (lossy WebP otherwise flattens it).
+   */
   alpha?: boolean;
+  fit: 'cover' | 'inside';
+  /**
+   * Filename under `public/fixtures/images/`.
+   */
+  source: string;
 }
 
 export interface FixtureImageSpec {
+  authored?: FixtureAuthoredSource;
+  height: number;
   key: string;
   style: FixtureArtStyle;
   width: number;
-  height: number;
-  authored?: FixtureAuthoredSource;
 }
 
 const cover = (key: string): FixtureImageSpec => ({

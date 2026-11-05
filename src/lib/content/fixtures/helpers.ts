@@ -1,14 +1,11 @@
-import type {
-  DocumentType,
-  FileAsset,
-  ImageAsset,
-  LocalizedText,
-} from '../schema';
+import { type DocumentType, type FileAsset, type ImageAsset, type LocalizedText } from '../schema';
 import { fixtureFileAssets, fixtureImageAssets } from './assets.generated';
 import { fixtureId } from './ids';
-import type { FixtureImageKey, FixturePdfKey } from './image-specs';
+import { type FixtureImageKey, type FixturePdfKey } from './image-specs';
 
-/** Fixed so fixture output is deterministic (Sanity sets its own on seed). */
+/**
+ * Fixed so fixture output is deterministic (Sanity sets its own on seed).
+ */
 export const FIXTURE_UPDATED_AT = '2026-10-01T12:00:00Z';
 
 export function L(en: string, pt: string): LocalizedText {
@@ -24,9 +21,7 @@ export function meta(type: DocumentType, key: string) {
   };
 }
 
-export function singletonMeta<T extends 'profile' | 'contact' | 'resume'>(
-  type: T,
-) {
+export function singletonMeta<T extends 'contact' | 'profile' | 'resume'>(type: T) {
   return {
     id: type,
     rev: 'fixture',
@@ -37,15 +32,13 @@ export function singletonMeta<T extends 'profile' | 'contact' | 'resume'>(
 
 function required<T>(value: T | undefined, key: string): T {
   if (value === undefined) {
-    throw new Error(
-      `Fixture asset "${key}" is missing; run bun run fixtures:generate`,
-    );
+    throw new Error(`Fixture asset "${key}" is missing; run bun run fixtures:generate`);
   }
+
   return value;
 }
 
-const imageAsset = (key: FixtureImageKey): ImageAsset =>
-  required(fixtureImageAssets[key], key);
+const imageAsset = (key: FixtureImageKey): ImageAsset => required(fixtureImageAssets[key], key);
 
 export function fixtureImage(
   key: FixtureImageKey,

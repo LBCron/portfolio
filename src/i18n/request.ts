@@ -1,5 +1,5 @@
-import { locale as rootLocale } from 'next/root-params';
 import { getRequestConfig } from 'next-intl/server';
+import { locale as rootLocale } from 'next/root-params';
 
 import { isAppLocale, routing } from './routing';
 

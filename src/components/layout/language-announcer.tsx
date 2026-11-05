@@ -15,27 +15,35 @@ export function LanguageAnnouncer() {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    let raw: string | null = null;
+    let raw: null | string = null;
+
     try {
       raw = sessionStorage.getItem(LANGUAGE_SWITCH_KEY);
       sessionStorage.removeItem(LANGUAGE_SWITCH_KEY);
     } catch {
       return;
     }
+
     if (!raw) return;
 
-    const { ratio, hash } = JSON.parse(raw) as { ratio: number; hash: string };
+    const { ratio, hash } = JSON.parse(raw) as { hash: string; ratio: number };
+
     requestAnimationFrame(() => {
       const target = hash ? document.getElementById(hash.slice(1)) : null;
+
       if (target && ratio === 0) {
         target.scrollIntoView({ block: 'start', behavior: 'instant' });
       } else {
         const max = document.documentElement.scrollHeight - window.innerHeight;
+
         window.scrollTo({ top: ratio * max, behavior: 'instant' });
       }
+
       setMessage(t('languageChanged'));
     });
+
     const timer = window.setTimeout(() => setMessage(''), 4000);
+
     return () => window.clearTimeout(timer);
   }, [locale, t]);
 

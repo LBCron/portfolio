@@ -7,13 +7,13 @@ import { Chip } from '@/components/ui/chip';
 import { Reveal } from '@/components/ui/reveal';
 import { SectionHeader } from '@/components/ui/section-header';
 import { type AppLocale, localeTags, routing } from '@/i18n/routing';
-import type {
-  Education,
-  Experience as ExperienceEntry,
-  ExperienceRole,
-  FeaturedLink,
-  Resume as ResumeFiles,
-  Technology,
+import {
+  type Education,
+  type Experience as ExperienceEntry,
+  type ExperienceRole,
+  type FeaturedLink,
+  type Resume as ResumeFiles,
+  type Technology,
 } from '@/lib/content';
 import { formatPartialDate } from '@/lib/format';
 
@@ -22,12 +22,12 @@ import { externalRel } from './links';
 import { ResumePanes } from './resume-panes';
 
 interface ResumeProps {
-  locale: AppLocale;
-  experience: ExperienceEntry[];
   education: Education[];
-  technologies: Technology[];
-  resume: ResumeFiles | null;
+  experience: ExperienceEntry[];
   links: FeaturedLink[];
+  locale: AppLocale;
+  resume: null | ResumeFiles;
+  technologies: Technology[];
 }
 
 const linkClass =
@@ -36,9 +36,9 @@ const linkClass =
 function ownLinkedIn(links: FeaturedLink[]) {
   return links.find(
     (link) =>
-      link.isOwnProfile &&
-      (link.url.toLowerCase().includes('linkedin') ||
-        link.id.toLowerCase().includes('linkedin')),
+      link.isOwnProfile
+      && (link.url.toLowerCase().includes('linkedin')
+        || link.id.toLowerCase().includes('linkedin')),
   );
 }
 
@@ -48,24 +48,20 @@ function DateRange({
   end,
   presentLabel,
 }: {
-  locale: AppLocale;
-  start?: string;
   end?: string;
+  locale: AppLocale;
   presentLabel?: string;
+  start?: string;
 }) {
   if (!start && !end) return null;
+
   const showEnd = Boolean(end) || Boolean(presentLabel);
+
   return (
     <span className="font-mono text-[0.8125rem] text-text-3">
-      {start ? (
-        <time dateTime={start}>{formatPartialDate(locale, start)}</time>
-      ) : null}
+      {start ? <time dateTime={start}>{formatPartialDate(locale, start)}</time> : null}
       {start && showEnd ? ' – ' : null}
-      {end ? (
-        <time dateTime={end}>{formatPartialDate(locale, end)}</time>
-      ) : (
-        presentLabel
-      )}
+      {end ? <time dateTime={end}>{formatPartialDate(locale, end)}</time> : presentLabel}
     </span>
   );
 }
@@ -106,10 +102,9 @@ export async function Resume({
   ]);
   const names = new Map(technologies.map((tech) => [tech.id, tech.name]));
   const linkedIn = ownLinkedIn(links);
-  const resumeLocales = [
-    locale,
-    ...routing.locales.filter((other) => other !== locale),
-  ].filter((candidate) => resume?.files[candidate]);
+  const resumeLocales = [locale, ...routing.locales.filter((other) => other !== locale)].filter(
+    (candidate) => resume?.files[candidate],
+  );
 
   const experiencePane =
     experience.length > 0 ? (
@@ -127,9 +122,7 @@ export async function Resume({
                   {first ? <RoleBody role={first} /> : null}
                   {rest.map((role) => (
                     <div key={`${role.title}-${role.start}`} className="mt-8">
-                      <h4 className="font-semibold text-text-1">
-                        {role.title}
-                      </h4>
+                      <h4 className="font-semibold text-text-1">{role.title}</h4>
                       <DateRange
                         locale={locale}
                         start={role.start}
@@ -179,9 +172,7 @@ export async function Resume({
                           className="size-4 text-text-3 transition-transform group-open/details:rotate-180"
                         />
                       </span>
-                      <span className="w-full text-small text-text-3">
-                        {entry.location}
-                      </span>
+                      <span className="w-full text-small text-text-3">{entry.location}</span>
                     </summary>
                     <div className="pb-4">{details}</div>
                   </JobDetails>
@@ -203,19 +194,11 @@ export async function Resume({
                 index={index}
                 className="card flex h-full flex-col rounded-lg border border-line bg-surface-1 p-5 shadow-(--shadow-card-inset)"
               >
-                <p className="font-label text-text-3">
-                  {t(`kinds.${item.kind}`)}
-                </p>
+                <p className="font-label text-text-3">{t(`kinds.${item.kind}`)}</p>
                 <h3 className="mt-3 font-semibold text-text-1">{item.title}</h3>
-                <p className="mt-1 text-small text-text-2">
-                  {item.institution}
-                </p>
+                <p className="mt-1 text-small text-text-2">{item.institution}</p>
                 <p className="mt-auto pt-4">
-                  <DateRange
-                    locale={locale}
-                    start={item.start}
-                    end={item.end}
-                  />
+                  <DateRange locale={locale} start={item.start} end={item.end} />
                 </p>
                 {item.url ? (
                   <a
@@ -285,10 +268,7 @@ export async function Resume({
                 >
                   <LinkIcon icon={linkedIn.icon} />
                   {linkedIn.label}
-                  <ArrowUpRight
-                    aria-hidden="true"
-                    className="size-3.5 text-text-3"
-                  />
+                  <ArrowUpRight aria-hidden="true" className="size-3.5 text-text-3" />
                   <span className="sr-only"> {tA11y('opensInNewTab')}</span>
                 </a>
               </li>

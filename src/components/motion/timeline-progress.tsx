@@ -5,9 +5,9 @@ import { type ReactNode, useEffect, useRef } from 'react';
 import { useReducedMotionPreference } from '@/lib/motion-preference';
 
 /**
- * Wraps the experience timeline: the rail draws with scroll (scaleY) and
- * each `[data-timeline-node]` pulses once when the rail reaches it. Without
- * JS, or with reduced motion, the rail is simply drawn.
+ * Wraps the experience timeline: the rail draws with scroll (scaleY) and each
+ * `[data-timeline-node]` pulses once when the rail reaches it. Without JS, or
+ * with reduced motion, the rail is simply drawn.
  */
 export function TimelineProgress({ children }: { children: ReactNode }) {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -17,9 +17,12 @@ export function TimelineProgress({ children }: { children: ReactNode }) {
   useEffect(() => {
     const root = rootRef.current;
     const rail = railRef.current;
+
     if (!root || !rail) return;
+
     if (reduced) {
       rail.style.transform = '';
+
       return;
     }
 
@@ -28,10 +31,7 @@ export function TimelineProgress({ children }: { children: ReactNode }) {
       frame = 0;
       const rect = root.getBoundingClientRect();
       const anchor = window.innerHeight * 0.6;
-      const progress = Math.min(
-        1,
-        Math.max(0, (anchor - rect.top) / Math.max(rect.height, 1)),
-      );
+      const progress = Math.min(1, Math.max(0, (anchor - rect.top) / Math.max(rect.height, 1)));
       rail.style.transform = `scaleY(${progress})`;
     };
     const onScroll = () => {
@@ -43,17 +43,20 @@ export function TimelineProgress({ children }: { children: ReactNode }) {
       (entries) => {
         for (const entry of entries) {
           if (!entry.isIntersecting) continue;
+
           (entry.target as HTMLElement).dataset.reached = 'true';
           observer.unobserve(entry.target);
         }
       },
       { rootMargin: '0px 0px -40% 0px' },
     );
+
     nodes.forEach((node) => observer.observe(node));
 
     update();
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll, { passive: true });
+
     return () => {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);

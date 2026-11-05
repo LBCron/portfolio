@@ -1,13 +1,13 @@
 import { ArrowRight, ArrowUpRight } from 'lucide-react';
-import Image from 'next/image';
 import { getTranslations } from 'next-intl/server';
+import Image from 'next/image';
 
 import { Tilt } from '@/components/motion/tilt';
 import { buttonVariants } from '@/components/ui/button';
 import { cardSurface } from '@/components/ui/card-styles';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/cn';
-import type { ProjectStatus, ProjectSummary } from '@/lib/content';
+import { type ProjectStatus, type ProjectSummary } from '@/lib/content';
 
 import { CoverTransition } from './cover-transition';
 import { GeneratedCover } from './generated-cover';
@@ -15,27 +15,33 @@ import { GeneratedCover } from './generated-cover';
 const MAX_CHIPS = 4;
 
 const STATUS_DOT: Record<ProjectStatus, string> = {
-  live: 'bg-term-green shadow-[0_0_8px_rgb(74_222_128/0.7)]',
+  'live': 'bg-term-green shadow-[0_0_8px_rgb(74_222_128/0.7)]',
   'in-progress': 'bg-warn',
-  archived: 'bg-text-3',
-  private: 'bg-accent-1',
+  'archived': 'bg-text-3',
+  'private': 'bg-accent-1',
 };
 
 interface ProjectCardProps {
-  project: ProjectSummary;
-  /** Names of the project's technologies, in order. */
-  techNames: readonly string[];
-  headingLevel?: 'h2' | 'h3';
-  /** Above-the-fold covers load eagerly. */
+  /**
+   * Above-the-fold covers load eagerly.
+   */
   eager?: boolean;
-  /** The likely LCP element: fetched at high priority. */
+  headingLevel?: 'h2' | 'h3';
+  /**
+   * The likely LCP element: fetched at high priority.
+   */
   lcp?: boolean;
+  project: ProjectSummary;
+  /**
+   * Names of the project's technologies, in order.
+   */
+  techNames: readonly string[];
 }
 
 /**
- * Cover, kind and status, title, summary, up to four stack chips and the
- * CTAs. The whole card is clickable through the stretched "View details"
- * link; "Visit app" sits above it as its own tab stop.
+ * Cover, kind and status, title, summary, up to four stack chips and the CTAs.
+ * The whole card is clickable through the stretched "View details" link; "Visit
+ * app" sits above it as its own tab stop.
  */
 export async function ProjectCard({
   project,
@@ -96,10 +102,7 @@ export async function ProjectCard({
               <span className="inline-flex items-center gap-1.5 rounded-full border border-line-strong glass px-2.5 py-1 text-[0.75rem] text-text-1">
                 <span
                   aria-hidden="true"
-                  className={cn(
-                    'size-1.5 rounded-full',
-                    STATUS_DOT[project.status],
-                  )}
+                  className={cn('size-1.5 rounded-full', STATUS_DOT[project.status])}
                 />
                 {t(`statuses.${project.status}`)}
               </span>
@@ -108,9 +111,7 @@ export async function ProjectCard({
 
           <div className="flex flex-1 flex-col p-5 sm:p-6">
             <Heading className="text-h3">{project.title}</Heading>
-            <p className="mt-2 line-clamp-3 text-[0.9375rem] text-text-2">
-              {project.summary}
-            </p>
+            <p className="mt-2 line-clamp-3 text-[0.9375rem] text-text-2">{project.summary}</p>
             {chips.length > 0 ? (
               <ul className="mt-4 flex flex-wrap gap-1.5">
                 {chips.map((name) => (
@@ -124,9 +125,7 @@ export async function ProjectCard({
                 {overflow > 0 ? (
                   <li className="rounded-full border border-line px-2.5 py-0.5 font-mono text-[0.75rem] text-text-2">
                     <span aria-hidden="true">+{overflow}</span>
-                    <span className="sr-only">
-                      {t('moreTechnologies', { count: overflow })}
-                    </span>
+                    <span className="sr-only">{t('moreTechnologies', { count: overflow })}</span>
                   </li>
                 ) : null}
               </ul>

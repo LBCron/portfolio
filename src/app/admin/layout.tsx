@@ -1,6 +1,6 @@
 import '@/styles/globals.css';
 
-import type { Metadata, Viewport } from 'next';
+import { type Metadata, type Viewport } from 'next';
 
 import { AdminShell } from '@/components/admin/shell';
 import { Toaster } from '@/components/ui/toaster';

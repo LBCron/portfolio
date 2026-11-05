@@ -1,7 +1,7 @@
 import { owner } from '@/config/site';
 
-import type { DocumentInput } from '../../schema';
-import { L, fixtureImage, singletonMeta } from '../helpers';
+import { type DocumentInput } from '../../schema';
+import { fixtureImage, L, singletonMeta } from '../helpers';
 
 const photoAlt = L('Portrait of Julio L. Muller', 'Retrato de Julio L. Muller');
 
@@ -54,10 +54,7 @@ export const profile: DocumentInput<'profile'> = {
     },
     {
       value: '99.9%',
-      label: L(
-        'uptime on flagship projects',
-        'de disponibilidade nos projetos principais',
-      ),
+      label: L('uptime on flagship projects', 'de disponibilidade nos projetos principais'),
     },
   ],
 };

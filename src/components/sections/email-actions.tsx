@@ -9,18 +9,20 @@ import { cn } from '@/lib/cn';
 import { toast } from '@/stores/toast-store';
 
 interface EmailActionsProps {
-  /** Address parts; joined only in the browser to deter scrapers. */
-  user: string;
   domain: string;
-  labels: { copy: string; copied: string; copyFailed: string };
+  labels: { copied: string; copy: string; copyFailed: string };
+  /**
+   * Address parts; joined only in the browser to deter scrapers.
+   */
+  user: string;
 }
 
 const subscribe = () => () => {};
 
 /**
- * `mailto:` link plus a copy button. The address is assembled after
- * hydration; the server renders an invisible placeholder of the same size
- * and the section provides a `<noscript>` fallback.
+ * `mailto:` link plus a copy button. The address is assembled after hydration;
+ * the server renders an invisible placeholder of the same size and the section
+ * provides a `<noscript>` fallback.
  */
 export function EmailActions({ user, domain, labels }: EmailActionsProps) {
   const isClient = useSyncExternalStore(
@@ -48,10 +50,7 @@ export function EmailActions({ user, domain, labels }: EmailActionsProps) {
     <div className="flex flex-wrap items-center gap-3">
       <a
         href={`mailto:${address}`}
-        className={cn(
-          buttonVariants({ variant: 'primary' }),
-          'min-h-14 px-6 text-base sm:text-lg',
-        )}
+        className={cn(buttonVariants({ variant: 'primary' }), 'min-h-14 px-6 text-base sm:text-lg')}
       >
         <Mail aria-hidden="true" className="size-5!" />
         {address}
@@ -61,10 +60,7 @@ export function EmailActions({ user, domain, labels }: EmailActionsProps) {
         onClick={copy}
         aria-label={labels.copy}
         title={labels.copy}
-        className={cn(
-          buttonVariants({ variant: 'secondary', size: 'icon' }),
-          'size-14',
-        )}
+        className={cn(buttonVariants({ variant: 'secondary', size: 'icon' }), 'size-14')}
       >
         <Copy aria-hidden="true" className="size-5!" />
       </button>

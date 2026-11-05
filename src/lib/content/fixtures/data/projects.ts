@@ -1,5 +1,5 @@
-import type { DocumentInput } from '../../schema';
-import { L, fixtureImage, meta } from '../helpers';
+import { type DocumentInput } from '../../schema';
+import { fixtureImage, L, meta } from '../helpers';
 import { techId } from '../ids';
 
 const ORBIT_BODY_EN = `## Why this concept exists
@@ -78,7 +78,7 @@ O próximo experimento são anotações escritas pelo próprio sistema: quando u
 
 Este é um conceito de design e engenharia com dados inventados. Os números, as pessoas usuárias e as sessões de teste descritos aqui são fictícios e existem só para mostrar como eu abordo um problema desse tipo.`;
 
-export const projects: DocumentInput<'project'>[] = [
+export const projects: Array<DocumentInput<'project'>> = [
   {
     ...meta('project', 'orbit-dashboard'),
     slug: 'orbit-dashboard',
@@ -88,9 +88,7 @@ export const projects: DocumentInput<'project'>[] = [
     year: 2025,
     kind: 'web',
     status: 'live',
-    techIds: ['TypeScript', 'React', 'Next.js', 'PostgreSQL', 'Redis'].map(
-      techId,
-    ),
+    techIds: ['TypeScript', 'React', 'Next.js', 'PostgreSQL', 'Redis'].map(techId),
     cover: fixtureImage(
       'project-orbit-dashboard-cover',
       L(
@@ -149,10 +147,7 @@ export const projects: DocumentInput<'project'>[] = [
       'Analytics concept built from metric definitions first: every panel shows its formula, its comparison and how fresh the data is.',
       'Conceito de analytics que parte das definições de métricas: cada painel mostra a fórmula, a comparação e o quanto os dados estão atualizados.',
     ),
-    role: L(
-      'Design and full stack development',
-      'Design e desenvolvimento full stack',
-    ),
+    role: L('Design and full stack development', 'Design e desenvolvimento full stack'),
     context: L(
       'Dashboards tend to answer what happened but rarely why, and almost never how much to trust a number. This fictional product explores the opposite starting point.',
       'Dashboards costumam responder o que aconteceu, raramente o porquê, e quase nunca o quanto dá para confiar em um número. Este produto fictício explora o ponto de partida oposto.',
@@ -211,10 +206,7 @@ export const projects: DocumentInput<'project'>[] = [
       'Mobile finance concept that records expenses in two taps, syncs when a connection returns and never loses an entry.',
       'Conceito mobile de finanças que registra gastos em dois toques, sincroniza quando a conexão volta e nunca perde um lançamento.',
     ),
-    role: L(
-      'Product design and development',
-      'Design de produto e desenvolvimento',
-    ),
+    role: L('Product design and development', 'Design de produto e desenvolvimento'),
     context: L(
       'Most budgeting apps assume a stable connection and a patient user. People log expenses in line at the bakery, often with poor signal.',
       'A maioria dos apps de orçamento pressupõe conexão estável e paciência. As pessoas registram gastos na fila da padaria, muitas vezes com sinal fraco.',
@@ -279,10 +271,7 @@ export const projects: DocumentInput<'project'>[] = [
       'As regras são escritas em um formato pequeno e legível e avaliadas por um watcher de arquivos em Go. A interface mostra uma simulação antes de mover qualquer coisa.',
     ),
     highlights: [
-      L(
-        'Dry run preview for every rule change',
-        'Simulação prévia a cada mudança de regra',
-      ),
+      L('Dry run preview for every rule change', 'Simulação prévia a cada mudança de regra'),
       L(
         'Full undo history stored as a journal',
         'Histórico completo de desfazer guardado como journal',
@@ -306,9 +295,7 @@ export const projects: DocumentInput<'project'>[] = [
     year: 2022,
     kind: 'automation',
     status: 'private',
-    techIds: ['Python', 'Excel / Power Query', 'SharePoint', 'Power BI'].map(
-      techId,
-    ),
+    techIds: ['Python', 'Excel / Power Query', 'SharePoint', 'Power BI'].map(techId),
     title: L('Invoice Bot', 'Invoice Bot'),
     tagline: L(
       'Back-office automation for supplier invoices.',
@@ -336,10 +323,7 @@ export const projects: DocumentInput<'project'>[] = [
         'Every automated decision is logged with its reason',
         'Cada decisão automática fica registrada com o motivo',
       ),
-      L(
-        'Exceptions dashboard refreshed every morning',
-        'Painel de exceções atualizado toda manhã',
-      ),
+      L('Exceptions dashboard refreshed every morning', 'Painel de exceções atualizado toda manhã'),
     ],
     outcome: L(
       'In the scenario, the monthly close went from four days of manual matching to a half-day review.',
@@ -356,9 +340,7 @@ export const projects: DocumentInput<'project'>[] = [
     year: 2024,
     kind: 'integration',
     status: 'live',
-    techIds: ['Node.js', 'TypeScript', 'Stripe', 'RabbitMQ', 'PostgreSQL'].map(
-      techId,
-    ),
+    techIds: ['Node.js', 'TypeScript', 'Stripe', 'RabbitMQ', 'PostgreSQL'].map(techId),
     cover: fixtureImage(
       'project-pay-bridge-cover',
       L(
@@ -448,10 +430,7 @@ export const projects: DocumentInput<'project'>[] = [
       'As regras são agrupadas por intenção, cada uma com uma justificativa de um parágrafo e autofix quando possível. As releases seguem versionamento semântico com notas de migração.',
     ),
     highlights: [
-      L(
-        'Every rule documented with a rationale',
-        'Toda regra documentada com uma justificativa',
-      ),
+      L('Every rule documented with a rationale', 'Toda regra documentada com uma justificativa'),
       L(
         'Autofix available for most stylistic rules',
         'Autofix disponível para a maioria das regras de estilo',
@@ -490,10 +469,7 @@ export const projects: DocumentInput<'project'>[] = [
       'Exists only to test visibility rules.',
       'Existe apenas para testar as regras de visibilidade.',
     ),
-    approach: L(
-      'Marked as hidden in the dataset.',
-      'Marcado como oculto no dataset.',
-    ),
+    approach: L('Marked as hidden in the dataset.', 'Marcado como oculto no dataset.'),
     highlights: [
       L('Hidden from pages', 'Oculto nas páginas'),
       L('Hidden from the sitemap', 'Oculto no sitemap'),

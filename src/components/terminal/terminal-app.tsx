@@ -3,30 +3,20 @@
 import { useLocale } from 'next-intl';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
-import {
-  terminalTitle,
-  TERMINAL_ID,
-} from '@/components/window-manager/terminal-controls';
-import type { AppLocale } from '@/i18n/routing';
+import { TERMINAL_ID, terminalTitle } from '@/components/window-manager/terminal-controls';
+import { type AppLocale } from '@/i18n/routing';
 import { getSessionStatus, type SessionStatus } from '@/lib/auth/actions';
+import { isMotionReduced, useReducedMotionPreference } from '@/lib/motion-preference';
+import { isApplePlatform, TERMINAL_SHORTCUT } from '@/lib/shortcuts';
 import { MARK } from '@/lib/terminal/commands/public/explore';
+import { type TerminalEffect } from '@/lib/terminal/commands/types';
 import { applyCompletion, complete } from '@/lib/terminal/completion';
 import { buildContext, type EngineDeps, execute } from '@/lib/terminal/engine';
-import { text, type Span } from '@/lib/terminal/output';
-import {
-  defaultRegistry,
-  isRecordable,
-  isSecretLine,
-} from '@/lib/terminal/registry';
+import { type Span, text } from '@/lib/terminal/output';
+import { defaultRegistry, isRecordable, isSecretLine } from '@/lib/terminal/registry';
 import { loadSession, saveSession } from '@/lib/terminal/session';
 import { emptySnapshot } from '@/lib/terminal/snapshot';
-import type { TerminalEffect } from '@/lib/terminal/commands/types';
-import type { Translate } from '@/lib/terminal/vfs';
-import { isApplePlatform, TERMINAL_SHORTCUT } from '@/lib/shortcuts';
-import {
-  isMotionReduced,
-  useReducedMotionPreference,
-} from '@/lib/motion-preference';
+import { type Translate } from '@/lib/terminal/vfs';
 import { useSessionStore } from '@/stores/session-store';
 import { useTerminalStore } from '@/stores/terminal-store';
 import { useWindowStore } from '@/stores/window-store';
@@ -38,14 +28,7 @@ import { OutputRenderer } from './output-renderer';
 import { loadSnapshot, peekSnapshot } from './snapshot-client';
 import { useTerminalActions } from './use-terminal-actions';
 
-const QUICK_COMMANDS = [
-  'help',
-  'projects',
-  'skills',
-  'experience',
-  'contact',
-  'resume',
-];
+const QUICK_COMMANDS = ['help', 'projects', 'skills', 'experience', 'contact', 'resume'];
 
 function promptSpans(cwd: string, admin: boolean): Span[] {
   return [
@@ -59,23 +42,19 @@ function promptSpans(cwd: string, admin: boolean): Span[] {
 const applyStatus = (status: SessionStatus) =>
   useSessionStore
     .getState()
-    .set(
-      status.isAdmin
-        ? { expiresAt: status.expiresAt, base: status.base }
-        : null,
-    );
+    .set(status.isAdmin ? { expiresAt: status.expiresAt, base: status.base } : null);
 
-/** The terminal body: boot, output log, quick commands and the input line. */
+/**
+ * The terminal body: boot, output log, quick commands and the input line.
+ */
 export default function TerminalApp() {
   const locale = useLocale() as AppLocale;
   const actions = useTerminalActions();
   const reduced = useReducedMotionPreference();
-  const [t, setT] = useState<Translate | null>(null);
+  const [t, setT] = useState<null | Translate>(null);
 
   const status = useWindowStore((state) => state.windows[TERMINAL_ID]?.status);
-  const windowFocused = useWindowStore(
-    (state) => state.windows[TERMINAL_ID]?.focused,
-  );
+  const windowFocused = useWindowStore((state) => state.windows[TERMINAL_ID]?.focused);
   const blocks = useTerminalStore((state) => state.blocks);
   const cwd = useTerminalStore((state) => state.cwd);
   const running = useTerminalStore((state) => state.running);
@@ -86,8 +65,8 @@ export default function TerminalApp() {
   const session = useSessionStore((state) => state.session);
   const admin = session !== null;
   const [secretInput, setSecretInput] = useState(false);
-  const [effect, setEffect] = useState<TerminalEffect | null>(null);
-  const secretResolver = useRef<((value: string | null) => void) | null>(null);
+  const [effect, setEffect] = useState<null | TerminalEffect>(null);
+  const secretResolver = useRef<((value: null | string) => void) | null>(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const logRef = useRef<HTMLDivElement>(null);
@@ -103,21 +82,27 @@ export default function TerminalApp() {
   // Tapping anywhere in the terminal focuses the input (unless selecting text).
   useEffect(() => {
     const root = rootRef.current;
+
     if (!root) return;
+
     const focusInput = () => {
       if (!window.getSelection()?.toString()) {
         inputRef.current?.focus({ preventScroll: true });
       }
     };
+
     root.addEventListener('click', focusInput);
+
     return () => root.removeEventListener('click', focusInput);
   }, [t]);
 
   useEffect(() => {
     let cancelled = false;
+
     void loadTranslator(locale).then((translator) => {
       if (!cancelled) setT(() => translator);
     });
+
     return () => {
       cancelled = true;
     };
@@ -125,8 +110,10 @@ export default function TerminalApp() {
 
   useEffect(() => {
     useTerminalStore.getState().hydrate(loadSession(sessionStorage));
+
     return useTerminalStore.subscribe((state) => {
       if (!state.hydrated) return;
+
       saveSession(sessionStorage, {
         blocks: state.blocks,
         history: state.history,
@@ -143,16 +130,22 @@ export default function TerminalApp() {
   // The server owns the session; ask on mount and when the window regains focus.
   useEffect(() => {
     const refresh = () => void getSessionStatus().then(applyStatus, () => {});
+
     refresh();
+
     if (!admin) return;
+
     window.addEventListener('focus', refresh);
+
     return () => window.removeEventListener('focus', refresh);
   }, [admin]);
 
   // Boot once per session (not on rehydrate), always while open.
   useEffect(() => {
     if (status !== 'open' || !t || !hydrated || booted) return;
+
     const store = useTerminalStore.getState();
+
     store.markBooted();
     store.append({ type: 'ascii', lines: MARK, fallback: 'julio-muller' });
     for (const key of ['terminal.welcome1', 'terminal.welcome2']) {
@@ -167,6 +160,7 @@ export default function TerminalApp() {
   // Closing the window ends the session: the log goes, the history stays.
   useEffect(() => {
     if (status !== 'closed') return;
+
     controllerRef.current?.abort();
     useTerminalStore.getState().endSession();
   }, [status]);
@@ -182,8 +176,8 @@ export default function TerminalApp() {
   // moved inside the window (for example to the title bar).
   useEffect(() => {
     const active = document.activeElement;
-    const idle =
-      !active || active === document.body || active.matches('[data-window]');
+    const idle = !active || active === document.body || active.matches('[data-window]');
+
     if (t && idle && status === 'open' && windowFocused) {
       inputRef.current?.focus({ preventScroll: true });
     }
@@ -193,11 +187,13 @@ export default function TerminalApp() {
 
   useLayoutEffect(() => {
     const log = logRef.current;
+
     if (log && stickToBottom.current) log.scrollTop = log.scrollHeight;
   }, [blocks]);
 
   function makeDeps(translator: Translate): EngineDeps {
     const state = useTerminalStore.getState();
+
     return {
       registry: defaultRegistry,
       locale,
@@ -210,9 +206,10 @@ export default function TerminalApp() {
       session: useSessionStore.getState().session,
       loadSecret: () => import('@/lib/terminal/commands/secret'),
       readSecret: (label, signal) =>
-        new Promise<string | null>((resolve) => {
-          const finish = (value: string | null) => {
+        new Promise<null | string>((resolve) => {
+          const finish = (value: null | string) => {
             if (secretResolver.current !== finish) return;
+
             secretResolver.current = null;
             setSecretInput(false);
             resolve(value);
@@ -228,6 +225,7 @@ export default function TerminalApp() {
           ? Promise.resolve()
           : new Promise<void>((resolve, reject) => {
               const timer = window.setTimeout(resolve, ms);
+
               signal.addEventListener(
                 'abort',
                 () => {
@@ -245,6 +243,7 @@ export default function TerminalApp() {
 
   function echo(line: string, suffix = '', volatile = false) {
     const { cwd: current } = useTerminalStore.getState();
+
     useTerminalStore.getState().append(
       {
         type: 'text',
@@ -259,33 +258,33 @@ export default function TerminalApp() {
 
   async function run(line: string, options?: { multiline: boolean }) {
     const store = useTerminalStore.getState();
+
     if (!t || store.running) return;
+
     stickToBottom.current = true;
     const trimmed = line.trim();
     // Secret lines and their output are never persisted.
     const volatile = isSecretLine(defaultRegistry, trimmed);
+
     echo(line, '', volatile);
+
     if (!trimmed) return;
-    if (options?.multiline)
-      store.append(text(t('terminal.pasteMultiline'), 'dim'));
+
+    if (options?.multiline) store.append(text(t('terminal.pasteMultiline'), 'dim'));
+
     if (isRecordable(defaultRegistry, trimmed)) store.record(trimmed);
 
     const controller = new AbortController();
     controllerRef.current = controller;
     store.setRunning(true);
+
     try {
-      for await (const node of execute(
-        trimmed,
-        makeDeps(t),
-        controller.signal,
-      )) {
+      for await (const node of execute(trimmed, makeDeps(t), controller.signal)) {
         useTerminalStore.getState().append(node, { volatile });
       }
     } catch {
       if (!controller.signal.aborted) {
-        useTerminalStore
-          .getState()
-          .append(text(t('terminal.unexpectedError'), 'error'));
+        useTerminalStore.getState().append(text(t('terminal.unexpectedError'), 'error'));
       }
     } finally {
       controllerRef.current = null;
@@ -295,6 +294,7 @@ export default function TerminalApp() {
 
   function interrupt(line: string) {
     const store = useTerminalStore.getState();
+
     if (secretResolver.current) {
       secretResolver.current(null);
       store.append(text('^C', 'dim'), { volatile: true });
@@ -305,19 +305,16 @@ export default function TerminalApp() {
   }
 
   function completeLine(line: string, cursor: number) {
-    if (!t)
-      return applyCompletion(line, cursor, { start: cursor, candidates: [] });
+    if (!t) return applyCompletion(line, cursor, { start: cursor, candidates: [] });
+
     const deps = makeDeps(t);
     const ctx = buildContext(
       deps,
       peekSnapshot(locale) ?? emptySnapshot(locale),
       new AbortController().signal,
     );
-    return applyCompletion(
-      line,
-      cursor,
-      complete(line, cursor, defaultRegistry, ctx),
-    );
+
+    return applyCompletion(line, cursor, complete(line, cursor, defaultRegistry, ctx));
   }
 
   function listCandidates(line: string, candidates: string[]) {
@@ -344,8 +341,7 @@ export default function TerminalApp() {
           tabIndex={0}
           onScroll={(event) => {
             const el = event.currentTarget;
-            stickToBottom.current =
-              el.scrollHeight - el.scrollTop - el.clientHeight < 24;
+            stickToBottom.current = el.scrollHeight - el.scrollTop - el.clientHeight < 24;
           }}
           className="min-h-0 flex-1 overflow-y-auto px-3 py-2"
         >
@@ -408,8 +404,7 @@ export default function TerminalApp() {
           onComplete={completeLine}
           onListCandidates={listCandidates}
           onKey={() => {
-            if (!useTerminalStore.getState().skipTyping)
-              useTerminalStore.getState().skipBoot();
+            if (!useTerminalStore.getState().skipTyping) useTerminalStore.getState().skipBoot();
           }}
         />
       </div>

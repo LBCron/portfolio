@@ -16,6 +16,7 @@ export default async function Image({
   const { locale, slug } = await params;
   const resolved = isAppLocale(locale) ? locale : routing.defaultLocale;
   const lookup = await getContent().getProject(resolved, slug);
+
   if (lookup.status !== 'found') {
     return renderOgImage({
       title: owner.name,
@@ -23,7 +24,9 @@ export default async function Image({
       alt,
     });
   }
+
   const { project } = lookup;
+
   return renderOgImage({
     title: project.title,
     subtitle: project.tagline,

@@ -1,6 +1,6 @@
-import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { type Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
+import { notFound } from 'next/navigation';
 
 import { KindFilter } from '@/components/portfolio/kind-filter';
 import { Pagination } from '@/components/portfolio/pagination';
@@ -39,7 +39,9 @@ export async function generateMetadata({
   const locale = await currentLocale();
   const search = await searchParams;
   const parsed = parseProjectsQuery(search);
+
   if (!parsed.ok) return {};
+
   const { kind, page } = parsed.query;
   const t = await getTranslations('projects');
   const kindLabel = kind ? t(`filters.${kind}`) : undefined;
@@ -54,39 +56,36 @@ export async function generateMetadata({
     locale,
     path: projectsHref({ kind, page }),
     title,
-    description: pickDescription(
-      t('metaDescription', { name: owner.name }),
-      t('intro'),
-    ),
+    description: pickDescription(t('metaDescription', { name: owner.name }), t('intro')),
     canonicalPath: kind ? '/projects' : projectsHref({ page }),
     noindex: Boolean(kind),
   });
 }
 
-export default async function ProjectsPage({
-  searchParams,
-}: PageProps<'/[locale]/projects'>) {
+export default async function ProjectsPage({ searchParams }: PageProps<'/[locale]/projects'>) {
   const locale = await currentLocale();
   const parsed = parseProjectsQuery(await searchParams);
+
   if (!parsed.ok) notFound();
 
   const content = getContent();
-  const [t, projects, technologies, profile, links, practices] =
-    await Promise.all([
-      getTranslations('projects'),
-      content.getProjects(locale).then(indexOrder),
-      content.getTechnologies(locale),
-      content.getProfile(locale),
-      content.getFeaturedLinks(locale),
-      content.getPractices(locale),
-    ]);
+  const [t, projects, technologies, profile, links, practices] = await Promise.all([
+    getTranslations('projects'),
+    content.getProjects(locale).then(indexOrder),
+    content.getTechnologies(locale),
+    content.getProfile(locale),
+    content.getFeaturedLinks(locale),
+    content.getPractices(locale),
+  ]);
 
   const { kind, page } = parsed.query;
   const available = kindsWithCounts(projects);
+
   if (kind && !available.some((entry) => entry.kind === kind)) notFound();
 
   const filtered = filterByKind(projects, kind);
   const listing = paginate(filtered, page);
+
   if (listing.outOfRange) notFound();
 
   const namesFor = techNameLookup(technologies);
@@ -101,20 +100,13 @@ export default async function ProjectsPage({
 
   const jsonLd = graph(
     websiteNode(),
-    ...(profile
-      ? [personNode({ locale, profile, links, technologies, practices })]
-      : []),
+    ...(profile ? [personNode({ locale, profile, links, technologies, practices })] : []),
     collectionPageNode(locale, path, t('title'), t('intro'), {
       breadcrumbId,
       listId,
     }),
     breadcrumbNode(locale, crumbs, breadcrumbId),
-    projectListNode(
-      locale,
-      listing.items,
-      listId,
-      (page - 1) * PROJECTS_PAGE_SIZE,
-    ),
+    projectListNode(locale, listing.items, listId, (page - 1) * PROJECTS_PAGE_SIZE),
   );
 
   return (

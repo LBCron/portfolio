@@ -1,11 +1,13 @@
 /**
  * Security headers (SPEC §15, D4, D56). Shared by `next.config.ts` (every
- * response) and `src/proxy.ts` (the admin's nonce policy), so this module
- * must stay dependency-free and must not import `server-only`.
+ * response) and `src/proxy.ts` (the admin's nonce policy), so this module must
+ * stay dependency-free and must not import `server-only`.
  */
 
 export interface SecurityOptions {
-  /** `next dev` needs `'unsafe-eval'` for React's error overlay. */
+  /**
+   * `next dev` needs `'unsafe-eval'` for React's error overlay.
+   */
   dev: boolean;
   /**
    * HSTS and `upgrade-insecure-requests` only make sense on https; on the
@@ -43,13 +45,14 @@ function baseDirectives({ https }: SecurityOptions): Record<string, string[]> {
 }
 
 /**
- * Public pages are prerendered with ISR, so a per-request nonce is
- * impossible and the inline RSC flight scripts change on every revalidation
- * (no build-time hashes). Scripts therefore keep `'unsafe-inline'`, limited to
- * `'self'` with no third-party origin to load from or exfiltrate to (D4).
+ * Public pages are prerendered with ISR, so a per-request nonce is impossible
+ * and the inline RSC flight scripts change on every revalidation (no build-time
+ * hashes). Scripts therefore keep `'unsafe-inline'`, limited to `'self'` with
+ * no third-party origin to load from or exfiltrate to (D4).
  */
 export function publicCsp(options: SecurityOptions) {
   const unsafeEval = options.dev ? ["'unsafe-eval'"] : [];
+
   return serialize({
     ...baseDirectives(options),
     'script-src': ["'self'", "'unsafe-inline'", ...unsafeEval],
@@ -58,26 +61,23 @@ export function publicCsp(options: SecurityOptions) {
   });
 }
 
-/** The admin is dynamic, so it gets a per-request nonce instead. */
+/**
+ * The admin is dynamic, so it gets a per-request nonce instead.
+ */
 export function adminCsp(nonce: string, options: SecurityOptions) {
   const unsafeEval = options.dev ? ["'unsafe-eval'"] : [];
+
   return serialize({
     ...baseDirectives(options),
-    'script-src': [
-      "'self'",
-      `'nonce-${nonce}'`,
-      "'strict-dynamic'",
-      ...unsafeEval,
-    ],
-    'style-src': [
-      "'self'",
-      ...(options.dev ? ["'unsafe-inline'"] : [`'nonce-${nonce}'`]),
-    ],
+    'script-src': ["'self'", `'nonce-${nonce}'`, "'strict-dynamic'", ...unsafeEval],
+    'style-src': ["'self'", ...(options.dev ? ["'unsafe-inline'"] : [`'nonce-${nonce}'`])],
     'style-src-attr': ["'unsafe-inline'"],
   });
 }
 
-/** Features the site never uses; each is denied to every origin. */
+/**
+ * Features the site never uses; each is denied to every origin.
+ */
 const DENIED_FEATURES = [
   'accelerometer',
   'autoplay',
@@ -101,19 +101,17 @@ const DENIED_FEATURES = [
   'xr-spatial-tracking',
 ];
 
-export const PERMISSIONS_POLICY = DENIED_FEATURES.map((f) => `${f}=()`).join(
-  ', ',
-);
+export const PERMISSIONS_POLICY = DENIED_FEATURES.map((f) => `${f}=()`).join(', ');
 
 export const HSTS = 'max-age=63072000; includeSubDomains';
 
-/** Headers for every response; the admin overrides CSP and the referrer. */
+/**
+ * Headers for every response; the admin overrides CSP and the referrer.
+ */
 export function securityHeaders(options: SecurityOptions) {
   return [
     { key: 'Content-Security-Policy', value: publicCsp(options) },
-    ...(options.https
-      ? [{ key: 'Strict-Transport-Security', value: HSTS }]
-      : []),
+    ...(options.https ? [{ key: 'Strict-Transport-Security', value: HSTS }] : []),
     { key: 'X-Content-Type-Options', value: 'nosniff' },
     { key: 'X-Frame-Options', value: 'DENY' },
     { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },

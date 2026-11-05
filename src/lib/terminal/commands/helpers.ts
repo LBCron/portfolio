@@ -1,16 +1,11 @@
 import { type OutputNode, type Span, text } from '../output';
-import type { Command, CommandContext } from './types';
+import { type Command, type CommandContext } from './types';
 
-export const SECTIONS = [
-  'about',
-  'experience',
-  'stack',
-  'work',
-  'recommended',
-  'contact',
-] as const;
+export const SECTIONS = ['about', 'experience', 'stack', 'work', 'recommended', 'contact'] as const;
 
-/** One text node from several lines, each with its own tone. */
+/**
+ * One text node from several lines, each with its own tone.
+ */
 export function lines(...items: Span[]): OutputNode {
   return {
     type: 'text',
@@ -32,17 +27,16 @@ export function errorText(message: string): OutputNode {
   return text(message, 'error');
 }
 
-/** `2023-03` start/end pair, "present" when the end is missing. */
+/**
+ * `2023-03` start/end pair, "present" when the end is missing.
+ */
 export function periodLabel(
   ctx: CommandContext,
   format: (value: string) => string,
   start?: string,
   end?: string,
 ) {
-  return [
-    start ? format(start) : '',
-    end ? format(end) : ctx.t('resume.present'),
-  ]
+  return [start ? format(start) : '', end ? format(end) : ctx.t('resume.present')]
     .filter(Boolean)
     .join(' – ');
 }

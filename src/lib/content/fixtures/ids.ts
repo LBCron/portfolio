@@ -1,10 +1,10 @@
 import { createHash } from 'node:crypto';
 
-import type { DocumentType } from '../schema';
+import { type DocumentType } from '../schema';
 
 /**
- * Stable `<type>.<uuid>` id for a fixture document, derived from a readable
- * key so the seed stays idempotent and references can be written by name.
+ * Stable `<type>.<uuid>` id for a fixture document, derived from a readable key
+ * so the seed stays idempotent and references can be written by name.
  */
 export function fixtureId(type: DocumentType, key: string): string {
   const hex = createHash('sha1').update(`${type}:${key}`).digest('hex');
@@ -18,6 +18,7 @@ export function fixtureId(type: DocumentType, key: string): string {
     `${variant}${hex.slice(18, 20)}`,
     hex.slice(20, 32),
   ].join('-');
+
   return `${type}.${uuid}`;
 }
 

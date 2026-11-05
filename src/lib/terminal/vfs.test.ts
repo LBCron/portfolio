@@ -24,6 +24,7 @@ describe.each(['en', 'pt'] as const)('buildVfs (%s)', (locale) => {
     const snapshot = await fixtureSnapshot(locale);
     const vfs = buildVfs(snapshot, translator(locale));
     const root = vfs.list('~').map((entry) => entry.name);
+
     expect(root).toEqual([
       'experience',
       'projects',
@@ -35,9 +36,7 @@ describe.each(['en', 'pt'] as const)('buildVfs (%s)', (locale) => {
       'recommended.md',
       'resume.pdf',
     ]);
-    expect(vfs.list('~/projects').map((e) => e.name)).not.toContain(
-      'scratch-pad.md',
-    );
+    expect(vfs.list('~/projects').map((e) => e.name)).not.toContain('scratch-pad.md');
     expect(vfs.list('~/experience')).toHaveLength(snapshot.experience.length);
     expect(vfs.list('~/stack').map((e) => e.name)).toContain('frontend.txt');
     expect(vfs.stat('~/projects')).toBe('dir');
@@ -48,18 +47,20 @@ describe.each(['en', 'pt'] as const)('buildVfs (%s)', (locale) => {
   it('localizes file contents and marks the résumé binary', async () => {
     const snapshot = await fixtureSnapshot(locale);
     const vfs = buildVfs(snapshot, translator(locale));
+
     expect(vfs.read('~/about.md')?.text).toContain(snapshot.profile!.bio);
     expect(vfs.read('~/resume.pdf')).toEqual({ text: '', binary: true });
     expect(vfs.read('~/projects')).toBeNull();
+
     const project = snapshot.projects[0]!;
-    expect(vfs.read(`~/projects/${project.slug}.md`)?.text).toContain(
-      project.context,
-    );
+
+    expect(vfs.read(`~/projects/${project.slug}.md`)?.text).toContain(project.context);
   });
 
   it('draws a tree', async () => {
     const vfs = buildVfs(await fixtureSnapshot(locale), translator(locale));
     const lines = vfs.tree('~');
+
     expect(lines[0]).toBe('~');
     expect(lines).toContain('├── experience/');
     expect(lines.at(-1)).toBe('└── resume.pdf');

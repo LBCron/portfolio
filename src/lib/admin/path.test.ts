@@ -14,6 +14,7 @@ describe('paths', () => {
 
   it('writes immutably and creates missing containers', () => {
     const next = setIn(doc, 'title.en', 'z');
+
     expect(next).not.toBe(doc);
     expect(doc.title.en).toBe('a');
     expect(next.title.en).toBe('z');

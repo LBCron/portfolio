@@ -1,4 +1,4 @@
-import type { DocumentInput } from '../../schema';
+import { type DocumentInput } from '../../schema';
 import { L, meta } from '../helpers';
 
 const labels = [
@@ -20,11 +20,9 @@ const labels = [
   L('Automation', 'Automação'),
 ];
 
-export const practices: DocumentInput<'practice'>[] = labels.map(
-  (label, index) => ({
-    ...meta('practice', label.en),
-    label,
-    order: (index + 1) * 10,
-    visible: true,
-  }),
-);
+export const practices: Array<DocumentInput<'practice'>> = labels.map((label, index) => ({
+  ...meta('practice', label.en),
+  label,
+  order: (index + 1) * 10,
+  visible: true,
+}));

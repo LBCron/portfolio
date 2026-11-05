@@ -1,30 +1,25 @@
 import { ArrowUpRight } from 'lucide-react';
-import Image from 'next/image';
 import { getTranslations } from 'next-intl/server';
+import Image from 'next/image';
 
 import { cardSurface } from '@/components/ui/card-styles';
 import { Reveal } from '@/components/ui/reveal';
 import { SectionHeader } from '@/components/ui/section-header';
 import { cn } from '@/lib/cn';
-import type { RecommendedProfile } from '@/lib/content';
+import { type RecommendedProfile } from '@/lib/content';
 
 import { externalRel } from './links';
 
-/** "Worth following": hidden when no profile is visible. */
-export async function Recommended({
-  profiles,
-}: {
-  profiles: RecommendedProfile[];
-}) {
+/**
+ * "Worth following": hidden when no profile is visible.
+ */
+export async function Recommended({ profiles }: { profiles: RecommendedProfile[] }) {
   if (profiles.length === 0) return null;
+
   const t = await getTranslations('recommended');
 
   return (
-    <section
-      id="recommended"
-      aria-labelledby="recommended-title"
-      className="section-y"
-    >
+    <section id="recommended" aria-labelledby="recommended-title" className="section-y">
       <div className="container-page">
         <SectionHeader
           id="recommended-title"
@@ -36,10 +31,7 @@ export async function Recommended({
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {profiles.map((person, index) => (
             <li key={person.id}>
-              <Reveal
-                index={index % 3}
-                className={cn(cardSurface, 'flex h-full flex-col p-5')}
-              >
+              <Reveal index={index % 3} className={cn(cardSurface, 'flex h-full flex-col p-5')}>
                 <div className="flex items-center gap-4">
                   {person.avatar ? (
                     <Image
@@ -65,9 +57,7 @@ export async function Recommended({
                     <p className="text-small text-text-2">{person.role}</p>
                   </div>
                 </div>
-                <p className="mt-4 text-[0.9375rem] text-text-2">
-                  {person.note}
-                </p>
+                <p className="mt-4 text-[0.9375rem] text-text-2">{person.note}</p>
                 <a
                   href={person.url}
                   target="_blank"

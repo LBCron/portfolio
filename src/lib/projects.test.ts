@@ -6,8 +6,8 @@ import {
   kindsWithCounts,
   paginate,
   parseProjectsQuery,
-  PROJECTS_PAGE_SIZE,
   projectNeighbors,
+  PROJECTS_PAGE_SIZE,
   projectsHref,
   relatedProjects,
 } from './projects';
@@ -42,19 +42,14 @@ describe('projects listing helpers', () => {
   it('builds crawlable hrefs', () => {
     expect(projectsHref({ page: 1 })).toBe('/projects');
     expect(projectsHref({ kind: 'web', page: 1 })).toBe('/projects?kind=web');
-    expect(projectsHref({ kind: 'web', page: 3 })).toBe(
-      '/projects?kind=web&page=3',
-    );
+    expect(projectsHref({ kind: 'web', page: 3 })).toBe('/projects?kind=web&page=3');
   });
 
   it('filters, counts and paginates the fixture set', async () => {
     const projects = await repository.getProjects('en');
-    expect(projects.map((project) => project.slug)).not.toContain(
-      'scratch-pad',
-    );
-    expect(filterByKind(projects, 'web').every((p) => p.kind === 'web')).toBe(
-      true,
-    );
+
+    expect(projects.map((project) => project.slug)).not.toContain('scratch-pad');
+    expect(filterByKind(projects, 'web').every((p) => p.kind === 'web')).toBe(true);
     expect(kindsWithCounts(projects).map((entry) => entry.kind)).toEqual([
       'web',
       'mobile',
@@ -63,7 +58,9 @@ describe('projects listing helpers', () => {
       'integration',
       'open-source',
     ]);
+
     const page = paginate(projects, 1);
+
     expect(page.items).toHaveLength(projects.length);
     expect(page.totalPages).toBe(1);
     expect(page.outOfRange).toBe(false);
@@ -75,17 +72,17 @@ describe('projects listing helpers', () => {
 describe('relatedProjects and neighbors', () => {
   it('ranks by shared technologies and wraps neighbors', async () => {
     const projects = await repository.getProjects('en');
-    const orbit = projects.find(
-      (project) => project.slug === 'orbit-dashboard',
-    );
+    const orbit = projects.find((project) => project.slug === 'orbit-dashboard');
+
     if (!orbit) throw new Error('orbit-dashboard missing');
+
     const related = relatedProjects(orbit, projects, 3);
+
     expect(related).toHaveLength(3);
-    expect(related.map((project) => project.slug)).not.toContain(
-      'orbit-dashboard',
-    );
+    expect(related.map((project) => project.slug)).not.toContain('orbit-dashboard');
 
     const neighbors = projectNeighbors(orbit, projects);
+
     expect(neighbors?.previous.slug).toBeDefined();
     expect(neighbors?.next.slug).toBeDefined();
     expect(neighbors?.previous.id).not.toBe(orbit.id);

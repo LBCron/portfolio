@@ -8,8 +8,8 @@ import {
   TextField,
   ToggleField,
 } from '../editor/fields';
-import { ImageField } from '../editor/image-field';
 import { LinkIconField } from '../editor/icon-fields';
+import { ImageField } from '../editor/image-field';
 
 export function LinkForm() {
   return (
@@ -56,20 +56,8 @@ export function RecommendedForm() {
     <Section title="Person">
       <TextField path="name" label="Name" maxLength={80} />
       <LocalizedField path="role" label="Role" max={80} />
-      <LocalizedField
-        path="note"
-        label="Why follow them"
-        max={140}
-        multiline
-        rows={2}
-      />
-      <TextField
-        path="url"
-        label="Profile URL"
-        type="url"
-        hint="https only"
-        maxLength={2048}
-      />
+      <LocalizedField path="note" label="Why follow them" max={140} multiline rows={2} />
+      <TextField path="url" label="Profile URL" type="url" hint="https only" maxLength={2048} />
       <ImageField path="avatar" label="Avatar" alt={false} />
       <ToggleField path="visible" label="Visible on the site" />
     </Section>

@@ -1,8 +1,8 @@
 import { ArrowLeft, ArrowRight, ArrowUpRight } from 'lucide-react';
-import type { Metadata } from 'next';
+import { type Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import { notFound, permanentRedirect } from 'next/navigation';
-import { getTranslations } from 'next-intl/server';
 
 import { TechIcon } from '@/components/content/tech-icon';
 import { Markdown } from '@/components/markdown/markdown';
@@ -18,13 +18,7 @@ import { ButtonAnchor, ButtonLink } from '@/components/ui/button';
 import { currentLocale } from '@/i18n/locale';
 import { getContent } from '@/lib/content';
 import { projectNeighbors, relatedProjects } from '@/lib/projects';
-import {
-  breadcrumbNode,
-  graph,
-  personNode,
-  projectNode,
-  websiteNode,
-} from '@/lib/seo/json-ld';
+import { breadcrumbNode, graph, personNode, projectNode, websiteNode } from '@/lib/seo/json-ld';
 import { pageMetadata } from '@/lib/seo/metadata';
 import { pickDescription } from '@/lib/seo/text';
 import { absoluteUrl, localizedPath } from '@/lib/seo/urls';
@@ -34,16 +28,20 @@ export const dynamicParams = true;
 
 export async function generateStaticParams() {
   const routes = await getContent().getProjectRoutes();
+
   return routes.map((route) => ({ slug: route.slug }));
 }
 
 async function loadProject(slug: string) {
   const locale = await currentLocale();
   const lookup = await getContent().getProject(locale, slug);
+
   if (lookup.status === 'missing') notFound();
+
   if (lookup.status === 'moved') {
     permanentRedirect(`/${locale}/projects/${lookup.slug}`);
   }
+
   return { locale, project: lookup.project };
 }
 
@@ -52,46 +50,32 @@ export async function generateMetadata({
 }: PageProps<'/[locale]/projects/[slug]'>): Promise<Metadata> {
   const { slug } = await params;
   const { locale, project } = await loadProject(slug);
+
   return pageMetadata({
     locale,
     path: `/projects/${project.slug}`,
     title: project.title,
-    description: pickDescription(
-      project.summary,
-      project.tagline,
-      project.context,
-    ),
+    description: pickDescription(project.summary, project.tagline, project.context),
     modifiedTime: project.updatedAt,
   });
 }
 
-export default async function ProjectPage({
-  params,
-}: PageProps<'/[locale]/projects/[slug]'>) {
+export default async function ProjectPage({ params }: PageProps<'/[locale]/projects/[slug]'>) {
   const { slug } = await params;
   const { locale, project } = await loadProject(slug);
   const content = getContent();
-  const [
-    t,
-    tWork,
-    tA11y,
-    tProjects,
-    all,
-    technologies,
-    profile,
-    links,
-    practices,
-  ] = await Promise.all([
-    getTranslations('project'),
-    getTranslations('work'),
-    getTranslations('a11y'),
-    getTranslations('projects'),
-    content.getProjects(locale),
-    content.getTechnologies(locale),
-    content.getProfile(locale),
-    content.getFeaturedLinks(locale),
-    content.getPractices(locale),
-  ]);
+  const [t, tWork, tA11y, tProjects, all, technologies, profile, links, practices] =
+    await Promise.all([
+      getTranslations('project'),
+      getTranslations('work'),
+      getTranslations('a11y'),
+      getTranslations('projects'),
+      content.getProjects(locale),
+      content.getTechnologies(locale),
+      content.getProfile(locale),
+      content.getFeaturedLinks(locale),
+      content.getPractices(locale),
+    ]);
 
   const namesFor = techNameLookup(technologies);
   const techById = new Map(technologies.map((tech) => [tech.id, tech]));
@@ -109,9 +93,7 @@ export default async function ProjectPage({
 
   const jsonLd = graph(
     websiteNode(),
-    ...(profile
-      ? [personNode({ locale, profile, links, technologies, practices })]
-      : []),
+    ...(profile ? [personNode({ locale, profile, links, technologies, practices })] : []),
     projectNode(locale, project, technologies),
     breadcrumbNode(locale, crumbs, `${url}#crumbs`),
   );
@@ -128,14 +110,8 @@ export default async function ProjectPage({
               <p className="mt-4 measure text-text-2">{project.tagline}</p>
               <dl className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-small text-text-3">
                 <Meta label={t('year')} value={String(project.year)} />
-                <Meta
-                  label={t('kind')}
-                  value={tWork(`kinds.${project.kind}`)}
-                />
-                <Meta
-                  label={t('status')}
-                  value={tWork(`statuses.${project.status}`)}
-                />
+                <Meta label={t('kind')} value={tWork(`kinds.${project.kind}`)} />
+                <Meta label={t('status')} value={tWork(`statuses.${project.status}`)} />
                 <Meta label={t('role')} value={project.role} />
               </dl>
               <div className="mt-8 flex flex-wrap gap-3">
@@ -211,9 +187,7 @@ export default async function ProjectPage({
                   ))}
                 </ul>
               </section>
-              {project.outcome ? (
-                <Block title={t('outcome')} body={project.outcome} />
-              ) : null}
+              {project.outcome ? <Block title={t('outcome')} body={project.outcome} /> : null}
               {project.body ? (
                 <section>
                   <h2 className="text-h3">{t('details')}</h2>
@@ -259,16 +233,8 @@ export default async function ProjectPage({
               <h2 className="font-label text-text-3">{t('facts')}</h2>
               <dl className="mt-4 space-y-3 text-small">
                 <Meta label={t('year')} value={String(project.year)} stacked />
-                <Meta
-                  label={t('kind')}
-                  value={tWork(`kinds.${project.kind}`)}
-                  stacked
-                />
-                <Meta
-                  label={t('status')}
-                  value={tWork(`statuses.${project.status}`)}
-                  stacked
-                />
+                <Meta label={t('kind')} value={tWork(`kinds.${project.kind}`)} stacked />
+                <Meta label={t('status')} value={tWork(`statuses.${project.status}`)} stacked />
                 <Meta label={t('role')} value={project.role} stacked />
               </dl>
             </aside>
@@ -280,10 +246,7 @@ export default async function ProjectPage({
               <ul className="mt-8 grid gap-6 min-[1100px]:grid-cols-3 md:grid-cols-2">
                 {related.map((item) => (
                   <li key={item.id}>
-                    <ProjectCard
-                      project={item}
-                      techNames={namesFor(item.techIds)}
-                    />
+                    <ProjectCard project={item} techNames={namesFor(item.techIds)} />
                   </li>
                 ))}
               </ul>
@@ -295,15 +258,10 @@ export default async function ProjectPage({
               aria-label={t('projectNav')}
               className="mt-16 flex flex-wrap justify-between gap-4 border-t border-line pt-8"
             >
-              <ButtonLink
-                href={`/projects/${neighbors.previous.slug}`}
-                variant="ghost"
-              >
+              <ButtonLink href={`/projects/${neighbors.previous.slug}`} variant="ghost">
                 <ArrowLeft aria-hidden="true" />
                 <span>
-                  <span className="block font-label text-text-3">
-                    {t('previousProject')}
-                  </span>
+                  <span className="block font-label text-text-3">{t('previousProject')}</span>
                   {neighbors.previous.title}
                 </span>
               </ButtonLink>
@@ -313,9 +271,7 @@ export default async function ProjectPage({
                 className="ml-auto"
               >
                 <span className="text-right">
-                  <span className="block font-label text-text-3">
-                    {t('nextProject')}
-                  </span>
+                  <span className="block font-label text-text-3">{t('nextProject')}</span>
                   {neighbors.next.title}
                 </span>
                 <ArrowRight aria-hidden="true" />
@@ -328,15 +284,7 @@ export default async function ProjectPage({
   );
 }
 
-function Meta({
-  label,
-  value,
-  stacked,
-}: {
-  label: string;
-  value: string;
-  stacked?: boolean;
-}) {
+function Meta({ label, value, stacked }: { label: string; stacked?: boolean; value: string }) {
   return (
     <div className={stacked ? 'flex flex-col gap-1' : 'flex gap-2'}>
       <dt className="text-text-3">{label}</dt>
@@ -345,7 +293,7 @@ function Meta({
   );
 }
 
-function Block({ title, body }: { title: string; body: string }) {
+function Block({ title, body }: { body: string; title: string }) {
   return (
     <section>
       <h2 className="text-h3">{title}</h2>

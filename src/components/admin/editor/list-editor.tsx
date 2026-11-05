@@ -9,15 +9,17 @@ import { useForm } from './form';
 import { hintClass, labelClass, smallButton } from './styles';
 
 interface ListEditorProps {
-  path: string;
-  label: string;
-  /** Singular noun for buttons: "highlight", "role". */
-  itemLabel: string;
-  newItem: () => unknown;
-  min?: number;
-  max?: number;
-  hint?: ReactNode;
   children: (index: number, itemPath: string) => ReactNode;
+  hint?: ReactNode;
+  /**
+   * Singular noun for buttons: "highlight", "role".
+   */
+  itemLabel: string;
+  label: string;
+  max?: number;
+  min?: number;
+  newItem: () => unknown;
+  path: string;
 }
 
 /**
@@ -35,8 +37,8 @@ export function ListEditor({
   children,
 }: ListEditorProps) {
   const form = useForm();
-  const items = (form.get(path) as unknown[] | undefined) ?? [];
-  const [dragging, setDragging] = useState<number | null>(null);
+  const items = (form.get(path) as undefined | unknown[]) ?? [];
+  const [dragging, setDragging] = useState<null | number>(null);
   const error = form.error(path);
   const id = fieldId(path);
 
@@ -45,17 +47,18 @@ export function ListEditor({
     // Keep the keyboard on the row that moved.
     requestAnimationFrame(() => {
       const kind = to < from ? 'up' : 'down';
+
       document
-        .querySelector<HTMLButtonElement>(
-          `[data-row="${path}.${to}"] [data-move="${kind}"]`,
-        )
+        .querySelector<HTMLButtonElement>(`[data-row="${path}.${to}"] [data-move="${kind}"]`)
         ?.focus();
     });
   }
 
   function onDrop(event: DragEvent, to: number) {
     event.preventDefault();
+
     if (dragging !== null) move(dragging, to);
+
     setDragging(null);
   }
 

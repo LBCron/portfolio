@@ -5,13 +5,15 @@ import { useEffect, useState } from 'react';
  * sections that exist on the page are observed.
  */
 export function useActiveSection(ids: readonly string[], enabled: boolean) {
-  const [active, setActive] = useState<string | null>(null);
+  const [active, setActive] = useState<null | string>(null);
 
   useEffect(() => {
     if (!enabled) return;
+
     const elements = ids
       .map((id) => document.getElementById(id))
       .filter((element): element is HTMLElement => element !== null);
+
     if (elements.length === 0) return;
 
     const observer = new IntersectionObserver(
@@ -22,12 +24,15 @@ export function useActiveSection(ids: readonly string[], enabled: boolean) {
       },
       { rootMargin: '-40% 0px -55% 0px' },
     );
+
     elements.forEach((element) => observer.observe(element));
 
     const onScroll = () => {
       if (window.scrollY < 80) setActive(null);
     };
+
     window.addEventListener('scroll', onScroll, { passive: true });
+
     return () => {
       observer.disconnect();
       window.removeEventListener('scroll', onScroll);

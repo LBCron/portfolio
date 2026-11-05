@@ -2,17 +2,21 @@ import { cn } from '@/lib/cn';
 import { type PublicTechIcon, withFill } from '@/lib/content/icon-src';
 import { cloudIconFill } from '@/lib/tech-cloud/geoid';
 
-/** Brand-colored glyph for the geoid (D37). List view keeps single-tone TechIcon. */
+/**
+ * Brand-colored glyph for the geoid (D37). List view keeps single-tone
+ * TechIcon.
+ */
 export function CloudMark({
   icon,
   brandColor,
   className,
 }: {
-  icon: PublicTechIcon;
   brandColor?: string;
   className?: string;
+  icon: PublicTechIcon;
 }) {
   const fill = cloudIconFill(brandColor);
+
   if ('monogram' in icon) {
     return (
       <span
@@ -27,6 +31,7 @@ export function CloudMark({
       </span>
     );
   }
+
   return (
     // A plain <img> rasterizes once like the prototype; next/image would only
     // add a wrapper and an optimizer round trip for a tiny cached SVG (D59).

@@ -16,19 +16,22 @@ export function FitTitle({
   fontFamily,
   children,
 }: {
-  id?: string;
+  children: string;
   className?: string;
   fontFamily?: string | undefined;
-  children: string;
+  id?: string;
 }) {
   const ref = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
     const el = ref.current;
     const parent = el?.parentElement;
+
     if (!el || !parent) return;
+
     const fit = () => {
       el.style.removeProperty('--fit');
+
       const style = getComputedStyle(el);
       const max = parseFloat(style.getPropertyValue('--title-max'));
       const size = fitFontSize({
@@ -37,12 +40,17 @@ export function FitTitle({
         fontSize: parseFloat(style.fontSize),
         max: max > 0 ? max : parseFloat(style.fontSize),
       });
+
       el.style.setProperty('--fit', `${size}px`);
     };
+
     fit();
+
     const observer = new ResizeObserver(fit);
+
     observer.observe(parent);
     void document.fonts.ready.then(fit);
+
     return () => observer.disconnect();
   }, [children]);
 

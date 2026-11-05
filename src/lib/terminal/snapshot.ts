@@ -1,102 +1,103 @@
-import type { AppLocale } from '@/i18n/routing';
-import type {
-  Contact,
-  Education,
-  Experience,
-  FeaturedLink,
-  Practice,
-  Profile,
-  ProjectSummary,
-  RecommendedProfile,
-  Resume,
-  Technology,
+import { type AppLocale } from '@/i18n/routing';
+import {
+  type Contact,
+  type Education,
+  type Experience,
+  type FeaturedLink,
+  type Practice,
+  type Profile,
+  type ProjectSummary,
+  type RecommendedProfile,
+  type Resume,
+  type Technology,
 } from '@/lib/content';
 
 /**
  * Public, localized, JSON-safe content for the terminal. Hidden items never
- * reach it (the repository already filters them) and there is no phone
- * number, icon data or file URL.
+ * reach it (the repository already filters them) and there is no phone number,
+ * icon data or file URL.
  */
 export interface ContentSnapshot {
-  locale: AppLocale;
-  profile: {
-    displayName: string;
-    jobTitle: string;
-    bio: string;
-    location: string;
-    spokenLanguages: string[];
-    focus: string;
-    metrics: { value: string; label: string }[];
-  } | null;
-  /** Address parts, joined only in the browser (same idea as the site). */
-  contact: { user: string; domain: string; bookingUrl?: string } | null;
-  resume: Record<AppLocale, boolean>;
-  links: {
-    label: string;
-    url: string;
-    kind: string;
-    isOwnProfile: boolean;
-  }[];
-  recommended: { name: string; role: string; note: string; url: string }[];
-  projects: {
-    slug: string;
+  /**
+   * Address parts, joined only in the browser (same idea as the site).
+   */
+  contact: { bookingUrl?: string; domain: string; user: string } | null;
+  education: Array<{
+    end?: string;
+    institution: string;
+    kind: 'certification' | 'degree';
+    start?: string;
     title: string;
-    tagline: string;
-    summary: string;
-    kind: string;
-    status: string;
-    year: number;
-    featured: boolean;
-    role: string;
-    context: string;
-    approach: string;
-    highlights: string[];
-    outcome?: string;
-    links: { live?: string; repo?: string };
-    technologies: string[];
-  }[];
-  experience: {
-    slug: string;
+  }>;
+  experience: Array<{
     company: string;
     location: string;
-    roles: {
-      title: string;
-      start: string;
-      end?: string;
-      summary: string;
+    roles: Array<{
       bullets: string[];
-    }[];
+      end?: string;
+      start: string;
+      summary: string;
+      title: string;
+    }>;
+    slug: string;
     technologies: string[];
-  }[];
-  education: {
-    kind: 'degree' | 'certification';
-    title: string;
-    institution: string;
-    start?: string;
-    end?: string;
-  }[];
-  technologies: { name: string; category: string }[];
+  }>;
+  links: Array<{
+    isOwnProfile: boolean;
+    kind: string;
+    label: string;
+    url: string;
+  }>;
+  locale: AppLocale;
   practices: string[];
+  profile: {
+    bio: string;
+    displayName: string;
+    focus: string;
+    jobTitle: string;
+    location: string;
+    metrics: Array<{ label: string; value: string }>;
+    spokenLanguages: string[];
+  } | null;
+  projects: Array<{
+    approach: string;
+    context: string;
+    featured: boolean;
+    highlights: string[];
+    kind: string;
+    links: { live?: string; repo?: string };
+    outcome?: string;
+    role: string;
+    slug: string;
+    status: string;
+    summary: string;
+    tagline: string;
+    technologies: string[];
+    title: string;
+    year: number;
+  }>;
+  recommended: Array<{ name: string; note: string; role: string; url: string }>;
+  resume: Record<AppLocale, boolean>;
+  technologies: Array<{ category: string; name: string }>;
 }
 
 export interface SnapshotSource {
-  locale: AppLocale;
-  profile: Profile | null;
   contact: Contact | null;
-  resume: Resume | null;
-  links: FeaturedLink[];
-  recommended: RecommendedProfile[];
-  projects: ProjectSummary[];
-  experience: Experience[];
   education: Education[];
-  technologies: Technology[];
+  experience: Experience[];
+  links: FeaturedLink[];
+  locale: AppLocale;
   practices: Practice[];
+  profile: null | Profile;
+  projects: ProjectSummary[];
+  recommended: RecommendedProfile[];
+  resume: null | Resume;
+  technologies: Technology[];
 }
 
 export function buildSnapshot(source: SnapshotSource): ContentSnapshot {
   const techNames = new Map(source.technologies.map((t) => [t.id, t.name]));
-  const namesOf = (ids: string[]) =>
-    ids.flatMap((id) => techNames.get(id) ?? []);
+  const namesOf = (ids: string[]) => ids.flatMap((id) => techNames.get(id) ?? []);
   const [user = '', domain = ''] = source.contact?.email.split('@') ?? [];
 
   return {
@@ -116,9 +117,7 @@ export function buildSnapshot(source: SnapshotSource): ContentSnapshot {
     contact: source.contact && {
       user,
       domain,
-      ...(source.contact.bookingUrl
-        ? { bookingUrl: source.contact.bookingUrl }
-        : {}),
+      ...(source.contact.bookingUrl ? { bookingUrl: source.contact.bookingUrl } : {}),
     },
     resume: {
       en: Boolean(source.resume?.files.en),
@@ -160,15 +159,13 @@ export function buildSnapshot(source: SnapshotSource): ContentSnapshot {
       roles: entry.roles,
       technologies: namesOf(entry.techIds),
     })),
-    education: source.education.map(
-      ({ kind, title, institution, start, end }) => ({
-        kind,
-        title,
-        institution,
-        ...(start ? { start } : {}),
-        ...(end ? { end } : {}),
-      }),
-    ),
+    education: source.education.map(({ kind, title, institution, start, end }) => ({
+      kind,
+      title,
+      institution,
+      ...(start ? { start } : {}),
+      ...(end ? { end } : {}),
+    })),
     technologies: source.technologies.map(({ name, category }) => ({
       name,
       category,

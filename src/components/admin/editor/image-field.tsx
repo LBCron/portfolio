@@ -3,8 +3,8 @@
 import Image from 'next/image';
 import { type KeyboardEvent, type PointerEvent, useRef, useState } from 'react';
 
-import { cn } from '@/lib/cn';
 import { fieldId } from '@/lib/admin/path';
+import { cn } from '@/lib/cn';
 import { toast } from '@/stores/toast-store';
 
 import { LocalizedField } from './fields';
@@ -13,25 +13,32 @@ import { hintClass, labelClass, smallButton } from './styles';
 
 async function upload(file: File, kind: 'image' | 'pdf') {
   const body = new FormData();
+
   body.set('file', file);
   body.set('kind', kind);
+
   const response = await fetch('/admin/api/upload', { method: 'POST', body });
   const data = (await response.json().catch(() => ({}))) as {
     asset?: Record<string, unknown>;
     error?: string;
   };
+
   // Only the route answers with JSON; a bare 400/404/405 is the proxy's 404
   // page, i.e. no session.
   if (!data.error && [400, 404, 405].includes(response.status)) {
     throw new Error(SESSION_EXPIRED);
   }
+
   if (!response.ok || !data.asset) {
     throw new Error(data.error ?? 'Upload failed');
   }
+
   return data.asset;
 }
 
-/** Click-or-drop target shared by the image and PDF fields. */
+/**
+ * Click-or-drop target shared by the image and PDF fields.
+ */
 function DropZone({
   id,
   accept,
@@ -39,15 +46,16 @@ function DropZone({
   label,
   onFile,
 }: {
-  id: string;
   accept: string;
   busy: boolean;
+  id: string;
   label: string;
   onFile: (file: File) => void;
 }) {
   const input = useRef<HTMLInputElement>(null);
   const form = useForm();
   const [over, setOver] = useState(false);
+
   return (
     // Dropping is a pointer extra; the button inside is the keyboard path.
     // eslint-disable-next-line jsx-a11y/no-static-element-interactions
@@ -60,7 +68,9 @@ function DropZone({
       onDrop={(event) => {
         event.preventDefault();
         setOver(false);
+
         const file = event.dataTransfer.files[0];
+
         if (file && !form.disabled) onFile(file);
       }}
       className={cn(
@@ -78,6 +88,7 @@ function DropZone({
         onChange={(event) => {
           const file = event.target.files?.[0];
           event.target.value = '';
+
           if (file) onFile(file);
         }}
         className="sr-only"
@@ -96,20 +107,24 @@ function DropZone({
 }
 
 interface ImageValue {
-  asset?: { url: string; width: number; height: number };
+  asset?: { height: number; url: string; width: number };
   focal?: { x: number; y: number };
 }
 
-/** Upload, preview, focal point and bilingual alt text for one image. */
+/**
+ * Upload, preview, focal point and bilingual alt text for one image.
+ */
 export function ImageField({
   path,
   label,
   alt = true,
 }: {
-  path: string;
-  label: string;
-  /** Avatars derive their alt text from the person's name. */
+  /**
+   * Avatars derive their alt text from the person's name.
+   */
   alt?: boolean;
+  label: string;
+  path: string;
 }) {
   const form = useForm();
   const value = form.get(path) as ImageValue | undefined;
@@ -123,6 +138,7 @@ export function ImageField({
   async function onFile(file: File) {
     setBusy(true);
     setMessage('');
+
     try {
       form.set(`${path}.asset`, await upload(file, 'image'));
       toast('Image uploaded. Save to publish it.', 'success');
@@ -134,17 +150,15 @@ export function ImageField({
   }
 
   function setFocal(x: number, y: number) {
-    const clamp = (n: number) =>
-      Math.min(1, Math.max(0, Math.round(n * 100) / 100));
+    const clamp = (n: number) => Math.min(1, Math.max(0, Math.round(n * 100) / 100));
+
     form.set(`${path}.focal`, { x: clamp(x), y: clamp(y) });
   }
 
   function onPick(event: PointerEvent<HTMLDivElement>) {
     const box = event.currentTarget.getBoundingClientRect();
-    setFocal(
-      (event.clientX - box.left) / box.width,
-      (event.clientY - box.top) / box.height,
-    );
+
+    setFocal((event.clientX - box.left) / box.width, (event.clientY - box.top) / box.height);
   }
 
   function onKey(event: KeyboardEvent<HTMLButtonElement>) {
@@ -156,7 +170,9 @@ export function ImageField({
       ArrowDown: [0, step],
     };
     const move = delta[event.key];
+
     if (!move) return;
+
     event.preventDefault();
     setFocal(focal.x + move[0], focal.y + move[1]);
   }
@@ -190,9 +206,9 @@ export function ImageField({
             />
           </div>
           <p className={hintClass}>
-            {asset.width}×{asset.height}. Click the image to set the focal point
-            ({Math.round(focal.x * 100)}%, {Math.round(focal.y * 100)}%); it
-            stays visible when the image is cropped.
+            {asset.width}×{asset.height}. Click the image to set the focal point (
+            {Math.round(focal.x * 100)}%, {Math.round(focal.y * 100)}%); it stays visible when the
+            image is cropped.
           </p>
           <div>
             <button
@@ -231,12 +247,14 @@ export function ImageField({
 }
 
 interface PdfValue {
-  url: string;
   size: number;
+  url: string;
 }
 
-/** A PDF per language (the résumé). */
-export function PdfField({ path, label }: { path: string; label: string }) {
+/**
+ * A PDF per language (the résumé).
+ */
+export function PdfField({ path, label }: { label: string; path: string }) {
   const form = useForm();
   const value = form.get(path) as PdfValue | undefined;
   const [busy, setBusy] = useState(false);
@@ -245,6 +263,7 @@ export function PdfField({ path, label }: { path: string; label: string }) {
   async function onFile(file: File) {
     setBusy(true);
     setMessage('');
+
     try {
       form.set(path, await upload(file, 'pdf'));
       toast('PDF uploaded. Save to publish it.', 'success');
@@ -260,17 +279,10 @@ export function PdfField({ path, label }: { path: string; label: string }) {
       <legend className={labelClass}>{label}</legend>
       {value ? (
         <p className="text-small">
-          <a
-            href={value.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline"
-          >
+          <a href={value.url} target="_blank" rel="noopener noreferrer" className="underline">
             Current file (opens in a new tab)
           </a>{' '}
-          <span className="text-text-3">
-            · {(value.size / 1024).toFixed(0)} KB
-          </span>
+          <span className="text-text-3">· {(value.size / 1024).toFixed(0)} KB</span>
         </p>
       ) : (
         <p className="text-small text-text-3">No file yet.</p>

@@ -1,7 +1,7 @@
 /**
  * GROQ projections. They rename Sanity's storage shape (`_id`, `slug.current`,
- * references, asset documents) to the field names of `schema.ts`, so the
- * shared pipeline validates Sanity and fixture reads the same way.
+ * references, asset documents) to the field names of `schema.ts`, so the shared
+ * pipeline validates Sanity and fixture reads the same way.
  */
 
 const META = /* groq */ `"id": _id, "rev": _rev, "updatedAt": _updatedAt, isFixture`;
@@ -125,7 +125,9 @@ const ADMIN_FIELDS = {
   practice: PRACTICE_FIELDS,
 } as const;
 
-/** Lists leave out the long-form project fields (`body`, `gallery`). */
+/**
+ * Lists leave out the long-form project fields (`body`, `gallery`).
+ */
 const ADMIN_LIST_FIELDS: Record<keyof typeof ADMIN_FIELDS, string> = {
   ...ADMIN_FIELDS,
   project: PROJECT_SUMMARY,

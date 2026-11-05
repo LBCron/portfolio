@@ -6,14 +6,15 @@ import { DocumentEditor } from '@/components/admin/editor/form';
 import { requireAdmin } from '@/lib/auth/session';
 import { getAdminStore } from '@/lib/content/admin';
 
-export default async function NewPage({
-  params,
-}: PageProps<'/admin/[area]/new'>) {
+export default async function NewPage({ params }: PageProps<'/admin/[area]/new'>) {
   await requireAdmin();
+
   const { area: slug } = await params;
   const area = findArea(slug);
   const config = AREA_CONFIG[slug];
+
   if (!area || !config || area.singleton) notFound();
+
   const store = getAdminStore();
   const techOptions = config.needsTechnologies
     ? (await store.list('technology')).map((tech) => ({

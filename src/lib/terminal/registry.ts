@@ -1,19 +1,23 @@
-import type { Command } from './commands/types';
-import { isSecretName } from './commands/secret/names';
 import { exploreCommands } from './commands/public/explore';
 import { fileCommands } from './commands/public/files';
 import { funCommands } from './commands/public/fun';
 import { systemCommands } from './commands/public/system';
+import { isSecretName } from './commands/secret/names';
+import { type Command } from './commands/types';
 import { tokenize } from './parser';
 import { didYouMean } from './suggest';
 
 export interface Registry {
-  /** Public commands, in help order. */
-  publicCommands(): readonly Command[];
   find(name: string): Command | undefined;
-  /** True for secret commands: never recorded, completed or suggested. */
+  /**
+   * True for secret commands: never recorded, completed or suggested.
+   */
   isSecret(name: string): boolean;
-  suggest(name: string): string | null;
+  /**
+   * Public commands, in help order.
+   */
+  publicCommands(): readonly Command[];
+  suggest(name: string): null | string;
 }
 
 /**
@@ -27,10 +31,7 @@ export function createRegistry(commands: readonly Command[]): Registry {
     for (const alias of command.aliases ?? []) byName.set(alias, command);
   }
   const visible = commands.filter((command) => command.visibility === 'public');
-  const visibleNames = visible.flatMap((command) => [
-    command.name,
-    ...(command.aliases ?? []),
-  ]);
+  const visibleNames = visible.flatMap((command) => [command.name, ...(command.aliases ?? [])]);
 
   return {
     publicCommands: () => visible,
@@ -48,12 +49,13 @@ export function isSecretLine(registry: Registry, line: string) {
   const raw = line.trim().split(/\s+/)[0] ?? '';
   const tokens = tokenize(line);
   const parsed = tokens.ok ? tokens.tokens[0] : undefined;
-  return [raw, parsed].some(
-    (name) => isSecretName(name) || (!!name && registry.isSecret(name)),
-  );
+
+  return [raw, parsed].some((name) => isSecretName(name) || (!!name && registry.isSecret(name)));
 }
 
-/** Secret commands are never recorded in history (nor persisted anywhere). */
+/**
+ * Secret commands are never recorded in history (nor persisted anywhere).
+ */
 export function isRecordable(registry: Registry, line: string) {
   return line.trim() !== '' && !isSecretLine(registry, line);
 }

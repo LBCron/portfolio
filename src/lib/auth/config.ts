@@ -6,26 +6,28 @@ import { parseHash } from './password';
 import { isStrongSecret } from './token';
 
 export type AdminConfig =
+  | { enabled: false; problems: string[] }
   | {
       enabled: true;
-      secret: string;
       hash?: string | undefined;
       plain?: string | undefined;
-    }
-  | { enabled: false; problems: string[] };
+      secret: string;
+    };
 
 let cached: AdminConfig | undefined;
 
 export function resolveAdminConfig(source: {
-  password?: string | undefined;
   hash?: string | undefined;
-  secret?: string | undefined;
+  password?: string | undefined;
   production: boolean;
+  secret?: string | undefined;
 }): AdminConfig {
   const problems: string[] = [];
+
   if (!isStrongSecret(source.secret)) {
     problems.push('SESSION_SECRET (missing or shorter than 32 characters)');
   }
+
   if (source.hash) {
     if (!parseHash(source.hash)) problems.push('ADMIN_PASSWORD_HASH (invalid)');
   } else if (!source.password) {
@@ -33,9 +35,11 @@ export function resolveAdminConfig(source: {
   } else if (source.production && source.password.length < 16) {
     problems.push('ADMIN_PASSWORD (shorter than 16 characters)');
   }
+
   if (problems.length > 0 || !isStrongSecret(source.secret)) {
     return { enabled: false, problems };
   }
+
   return {
     enabled: true,
     secret: source.secret,
@@ -44,7 +48,9 @@ export function resolveAdminConfig(source: {
   };
 }
 
-/** Checked once; problems are reported by name, never by value. */
+/**
+ * Checked once; problems are reported by name, never by value.
+ */
 export function getAdminConfig(): AdminConfig {
   if (!cached) {
     cached = resolveAdminConfig({
@@ -53,12 +59,11 @@ export function getAdminConfig(): AdminConfig {
       secret: env.SESSION_SECRET,
       production: isProduction,
     });
-    if (
-      !cached.enabled &&
-      (env.ADMIN_PASSWORD || env.ADMIN_PASSWORD_HASH || env.SESSION_SECRET)
-    ) {
+
+    if (!cached.enabled && (env.ADMIN_PASSWORD || env.ADMIN_PASSWORD_HASH || env.SESSION_SECRET)) {
       console.warn(`[auth] admin disabled: ${cached.problems.join('; ')}`);
     }
   }
+
   return cached;
 }

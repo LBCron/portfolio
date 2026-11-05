@@ -10,32 +10,38 @@ import {
 } from 'react';
 
 import { cn } from '@/lib/cn';
-import type { AppliedCompletion } from '@/lib/terminal/completion';
+import { type AppliedCompletion } from '@/lib/terminal/completion';
 import { HistoryNavigator } from '@/lib/terminal/history';
-import type { Span } from '@/lib/terminal/output';
+import { type Span } from '@/lib/terminal/output';
 
 import { TONE_CLASS } from './output-renderer';
 
 interface InputLineProps {
-  prompt: Span[];
-  label: string;
   history: readonly string[];
   inputRef: React.RefObject<HTMLInputElement | null>;
-  onSubmit: (line: string, options?: { multiline: boolean }) => void;
-  /** Ctrl+C: aborts a running command, or discards the typed line. */
-  onInterrupt: (line: string) => void;
+  label: string;
   onClear: () => void;
   onComplete: (line: string, cursor: number) => AppliedCompletion;
-  onListCandidates: (line: string, candidates: string[]) => void;
-  /** Secret-input mode: nothing is echoed and no caret is drawn. */
-  secret?: boolean;
-  /** Any key press (skips the boot typing). */
+  /**
+   * Ctrl+C: aborts a running command, or discards the typed line.
+   */
+  onInterrupt: (line: string) => void;
+  /**
+   * Any key press (skips the boot typing).
+   */
   onKey: () => void;
+  onListCandidates: (line: string, candidates: string[]) => void;
+  onSubmit: (line: string, options?: { multiline: boolean }) => void;
+  prompt: Span[];
+  /**
+   * Secret-input mode: nothing is echoed and no caret is drawn.
+   */
+  secret?: boolean;
 }
 
 /**
- * A hidden native <input> takes the real typing (IME, paste, mobile
- * keyboards); the visible line and block caret are mirrored from it.
+ * A hidden native <input> takes the real typing (IME, paste, mobile keyboards);
+ * the visible line and block caret are mirrored from it.
  */
 export function InputLine(props: InputLineProps) {
   const { inputRef } = props;
@@ -44,14 +50,12 @@ export function InputLine(props: InputLineProps) {
   const [inputFocused, setInputFocused] = useState(false);
   const navigator = useRef<HistoryNavigator | null>(null);
   const tabPending = useRef(false);
-  const pendingCaret = useRef<number | null>(null);
+  const pendingCaret = useRef<null | number>(null);
 
   useLayoutEffect(() => {
     if (pendingCaret.current === null) return;
-    inputRef.current?.setSelectionRange(
-      pendingCaret.current,
-      pendingCaret.current,
-    );
+
+    inputRef.current?.setSelectionRange(pendingCaret.current, pendingCaret.current);
     pendingCaret.current = null;
   }, [value, selection, inputRef]);
 
@@ -63,6 +67,7 @@ export function InputLine(props: InputLineProps) {
 
   function syncSelection(event: SyntheticEvent<HTMLInputElement>) {
     const { selectionStart, selectionEnd } = event.currentTarget;
+
     setSelection({ start: selectionStart ?? 0, end: selectionEnd ?? 0 });
   }
 
@@ -74,8 +79,11 @@ export function InputLine(props: InputLineProps) {
 
   function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
     if (event.nativeEvent.isComposing) return;
+
     props.onKey();
+
     if (event.key !== 'Tab') tabPending.current = false;
+
     const caret = event.currentTarget.selectionStart ?? value.length;
     const ctrl = event.ctrlKey && !event.metaKey && !event.altKey;
 
@@ -88,6 +96,7 @@ export function InputLine(props: InputLineProps) {
         props.onInterrupt('');
         edit('', 0);
       }
+
       return;
     }
 
@@ -97,15 +106,16 @@ export function InputLine(props: InputLineProps) {
     } else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
       event.preventDefault();
       navigator.current ??= new HistoryNavigator(props.history);
-      const next =
-        event.key === 'ArrowUp'
-          ? navigator.current.up(value)
-          : navigator.current.down();
+      const next = event.key === 'ArrowUp' ? navigator.current.up(value) : navigator.current.down();
+
       if (next !== null) edit(next, next.length);
     } else if (event.key === 'Tab' && !event.shiftKey && value.trim()) {
       const applied = props.onComplete(value, caret);
+
       if (applied.candidates.length === 0) return; // let Tab leave the window
+
       event.preventDefault();
+
       if (applied.progressed) {
         tabPending.current = false;
         edit(applied.line, applied.cursor);
@@ -129,7 +139,9 @@ export function InputLine(props: InputLineProps) {
       edit(value.slice(0, caret), caret);
     } else if (ctrl && event.key === 'w') {
       event.preventDefault();
+
       const kept = value.slice(0, caret).replace(/\S+\s*$/, '');
+
       edit(kept + value.slice(caret), kept.length);
     } else if (ctrl && event.key === 'l') {
       event.preventDefault();
@@ -144,11 +156,16 @@ export function InputLine(props: InputLineProps) {
 
   function handlePaste(event: ClipboardEvent<HTMLInputElement>) {
     if (props.secret) return;
+
     const pasted = event.clipboardData.getData('text');
+
     if (!/[\r\n]/.test(pasted)) return;
+
     event.preventDefault();
+
     const first = pasted.split(/\r?\n/)[0] ?? '';
     const { start, end } = selection;
+
     submit(value.slice(0, start) + first + value.slice(end), true);
   }
 
@@ -158,10 +175,7 @@ export function InputLine(props: InputLineProps) {
 
   return (
     <div className="relative flex min-h-6 items-start gap-2 rounded-sm has-[input:focus-visible]:outline-2 has-[input:focus-visible]:outline-offset-2 has-[input:focus-visible]:outline-accent-2">
-      <span
-        aria-hidden="true"
-        className={cn('shrink-0 whitespace-pre', props.secret && 'hidden')}
-      >
+      <span aria-hidden="true" className={cn('shrink-0 whitespace-pre', props.secret && 'hidden')}>
         {props.prompt.map((span, index) => (
           <span key={index} className={TONE_CLASS[span.tone ?? 'default']}>
             {span.text}
@@ -182,17 +196,13 @@ export function InputLine(props: InputLineProps) {
             data-active={inputFocused}
             className={cn(
               'inline-block min-w-[1ch]',
-              inputFocused
-                ? 'bg-text-1 text-bg-0'
-                : 'outline-1 -outline-offset-1 outline-text-2',
+              inputFocused ? 'bg-text-1 text-bg-0' : 'outline-1 -outline-offset-1 outline-text-2',
             )}
           >
             {caretChar}
           </span>
         ) : (
-          <mark className="bg-accent-2/40 text-text-1">
-            {value.slice(start, end)}
-          </mark>
+          <mark className="bg-accent-2/40 text-text-1">{value.slice(start, end)}</mark>
         )}
         {collapsed ? value.slice(start + 1) : value.slice(end)}
       </span>

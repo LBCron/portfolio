@@ -1,7 +1,7 @@
 import { ArrowRight } from 'lucide-react';
-import { getImageProps } from 'next/image';
 import { getTranslations } from 'next-intl/server';
-import type { CSSProperties } from 'react';
+import { getImageProps } from 'next/image';
+import { type CSSProperties } from 'react';
 
 import { Monogram } from '@/components/layout/monogram';
 import { HeroBackdrop } from '@/components/motion/hero-backdrop';
@@ -10,9 +10,9 @@ import { ScrollCue } from '@/components/motion/scroll-cue';
 import { ButtonAnchor } from '@/components/ui/button';
 import { Chip } from '@/components/ui/chip';
 import { owner } from '@/config/site';
-import type { AppLocale } from '@/i18n/routing';
+import { type AppLocale } from '@/i18n/routing';
 import { cn } from '@/lib/cn';
-import type { Profile } from '@/lib/content';
+import { type Profile } from '@/lib/content';
 
 import { FitTitle } from './fit-title';
 
@@ -21,8 +21,8 @@ const HERO_SIZES =
 
 interface HeroProps {
   locale: AppLocale;
-  profile: Profile | null;
   nextSection: 'about' | 'stack';
+  profile: null | Profile;
 }
 
 export async function Hero({ profile, nextSection }: HeroProps) {
@@ -40,11 +40,7 @@ export async function Hero({ profile, nextSection }: HeroProps) {
       <HeroBackdrop />
       <div className="container-page grid flex-1 items-center gap-10 pt-[calc(var(--header-height)+3rem)] pb-24 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-10 xl:gap-12">
         <div className="lg:order-last">
-          <Portrait
-            photo={photo}
-            photoLg={photoLg}
-            role={t('eyebrow', { jobTitle })}
-          />
+          <Portrait photo={photo} photoLg={photoLg} role={t('eyebrow', { jobTitle })} />
         </div>
         <div className="@container min-w-0">
           <p className="mb-3 font-label text-text-3 lg:hidden">{jobTitle}</p>
@@ -52,14 +48,8 @@ export async function Hero({ profile, nextSection }: HeroProps) {
             id="hero-title"
             // A CSS variable from the layout: importing the font module here
             // would split its CSS into a second render-blocking stylesheet.
-            fontFamily={
-              profile?.titleFont && `var(--font-title-${profile.titleFont})`
-            }
-            className={
-              profile?.titleFont
-                ? 'font-normal [font-synthesis:none]'
-                : 'font-semibold'
-            }
+            fontFamily={profile?.titleFont && `var(--font-title-${profile.titleFont})`}
+            className={profile?.titleFont ? 'font-normal [font-synthesis:none]' : 'font-semibold'}
           >
             {profile?.displayName ?? owner.name}
           </FitTitle>

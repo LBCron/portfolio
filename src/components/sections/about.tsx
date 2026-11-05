@@ -6,18 +6,13 @@ import { Reveal } from '@/components/ui/reveal';
 import { SectionHeader } from '@/components/ui/section-header';
 import { type AppLocale, localeTags } from '@/i18n/routing';
 import { cn } from '@/lib/cn';
-import type { Metric, Profile } from '@/lib/content';
+import { type Metric, type Profile } from '@/lib/content';
 
 const MAX_METRICS = 4;
 
-function MetricValue({
-  metric,
-  locale,
-}: {
-  metric: Metric;
-  locale: AppLocale;
-}) {
+function MetricValue({ metric, locale }: { locale: AppLocale; metric: Metric }) {
   if (metric.countTo === undefined) return metric.value;
+
   return (
     <CountUp
       to={metric.countTo}
@@ -28,13 +23,7 @@ function MetricValue({
   );
 }
 
-export async function About({
-  locale,
-  profile,
-}: {
-  locale: AppLocale;
-  profile: Profile;
-}) {
+export async function About({ locale, profile }: { locale: AppLocale; profile: Profile }) {
   const [t, tSummary, tA11y] = await Promise.all([
     getTranslations('about'),
     getTranslations('summary'),
@@ -45,16 +34,11 @@ export async function About({
   return (
     <section id="about" aria-labelledby="about-title" className="section-y">
       <div className="container-page">
-        <SectionHeader
-          id="about-title"
-          index={1}
-          eyebrow={t('eyebrow')}
-          title={t('title')}
-        />
+        <SectionHeader id="about-title" index={1} eyebrow={t('eyebrow')} title={t('title')} />
         <div
           className={cn(
-            metrics.length > 0 &&
-              'grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,22rem)] lg:gap-16',
+            metrics.length > 0
+              && 'grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,22rem)] lg:gap-16',
           )}
         >
           <Reveal className="measure">
@@ -81,9 +65,7 @@ export async function About({
                     <p className="text-[2rem] leading-none font-semibold tracking-tight text-text-1 tabular-nums">
                       <MetricValue metric={metric} locale={locale} />
                     </p>
-                    <p className="mt-2 text-small text-text-2">
-                      {metric.label}
-                    </p>
+                    <p className="mt-2 text-small text-text-2">{metric.label}</p>
                   </li>
                 ))}
               </ul>

@@ -2,14 +2,7 @@
 
 import { Menu, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import {
-  type CSSProperties,
-  type ReactNode,
-  useEffect,
-  useId,
-  useRef,
-  useState,
-} from 'react';
+import { type CSSProperties, type ReactNode, useEffect, useId, useRef, useState } from 'react';
 
 import { Link, usePathname } from '@/i18n/navigation';
 
@@ -18,8 +11,8 @@ import { MotionToggle } from './motion-toggle';
 import { NAV_SECTIONS } from './nav-items';
 
 /**
- * Full-screen menu below 768px. A native modal `<dialog>` gives the focus
- * trap, Esc and inert background; the page scroll is locked only while open.
+ * Full-screen menu below 768px. A native modal `<dialog>` gives the focus trap,
+ * Esc and inert background; the page scroll is locked only while open.
  */
 export function MobileMenu({ links }: { links?: ReactNode }) {
   const t = useTranslations('header');
@@ -30,12 +23,17 @@ export function MobileMenu({ links }: { links?: ReactNode }) {
 
   useEffect(() => {
     const dialog = dialogRef.current;
+
     if (!dialog) return;
+
     if (open && !dialog.open) dialog.showModal();
+
     if (!open && dialog.open) dialog.close();
 
     const root = document.documentElement;
+
     if (open) root.style.overflow = 'hidden';
+
     return () => {
       root.style.overflow = '';
     };
@@ -43,9 +41,12 @@ export function MobileMenu({ links }: { links?: ReactNode }) {
 
   useEffect(() => {
     if (!open) return;
+
     const desktop = window.matchMedia('(min-width: 48rem)');
     const onChange = () => desktop.matches && setOpen(false);
+
     desktop.addEventListener('change', onChange);
+
     return () => desktop.removeEventListener('change', onChange);
   }, [open]);
 

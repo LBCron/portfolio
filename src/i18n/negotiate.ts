@@ -1,9 +1,9 @@
 import { type AppLocale, isAppLocale, routing } from './routing';
 
 interface WeightedTag {
-  tag: string;
-  q: number;
   index: number;
+  q: number;
+  tag: string;
 }
 
 function parseAcceptLanguage(header: string): WeightedTag[] {
@@ -11,10 +11,9 @@ function parseAcceptLanguage(header: string): WeightedTag[] {
     .split(',')
     .map((part, index) => {
       const [rawTag = '', ...params] = part.trim().split(';');
-      const qParam = params
-        .map((param) => param.trim())
-        .find((param) => param.startsWith('q='));
+      const qParam = params.map((param) => param.trim()).find((param) => param.startsWith('q='));
       const q = qParam ? Number.parseFloat(qParam.slice(2)) : 1;
+
       return {
         tag: rawTag.trim().toLowerCase(),
         q: Number.isFinite(q) ? q : 0,
@@ -31,14 +30,17 @@ function parseAcceptLanguage(header: string): WeightedTag[] {
  */
 export function negotiateLocale(
   cookieValue: string | undefined,
-  acceptLanguage: string | null,
+  acceptLanguage: null | string,
 ): AppLocale {
   if (isAppLocale(cookieValue)) return cookieValue;
+
   if (!acceptLanguage) return routing.defaultLocale;
 
   for (const { tag } of parseAcceptLanguage(acceptLanguage)) {
     const primary = tag.split('-')[0];
+
     if (isAppLocale(primary)) return primary;
   }
+
   return routing.defaultLocale;
 }

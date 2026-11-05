@@ -18,13 +18,12 @@ import { Dialog } from '@/components/ui/dialog';
 import { deleteDocumentAction, saveDocumentAction } from '@/lib/admin/actions';
 import { fieldId, getIn, setIn } from '@/lib/admin/path';
 import { getSessionStatus, renewSession } from '@/lib/auth/actions';
-import type { FieldErrors } from '@/lib/content/admin/normalize';
-import type { Reference } from '@/lib/content/admin/types';
-import type { DocumentType } from '@/lib/content/schema';
+import { type FieldErrors } from '@/lib/content/admin/normalize';
+import { type Reference } from '@/lib/content/admin/types';
+import { type DocumentType } from '@/lib/content/schema';
 import { toast } from '@/stores/toast-store';
 
 import { idToSegment } from '../areas';
-
 import { inputClass } from './styles';
 
 type Values = Record<string, unknown>;
@@ -32,15 +31,17 @@ type Values = Record<string, unknown>;
 export const SESSION_EXPIRED =
   'Your session expired. Sign in again in another tab, then retry. Your edits are kept here.';
 
-/** Renewing on a timer keeps long edits from outliving the 30 min idle limit. */
+/**
+ * Renewing on a timer keeps long edits from outliving the 30 min idle limit.
+ */
 const KEEP_ALIVE_MS = 10 * 60_000;
 
 export interface FormApi {
-  values: Values;
+  disabled: boolean;
+  error: (path: string) => string | undefined;
   get: (path: string) => unknown;
   set: (path: string, value: unknown) => void;
-  error: (path: string) => string | undefined;
-  disabled: boolean;
+  values: Values;
 }
 
 const noSubscription = () => () => {};
@@ -49,25 +50,35 @@ const FormContext = createContext<FormApi | null>(null);
 
 export function useForm(): FormApi {
   const api = useContext(FormContext);
+
   if (!api) throw new Error('Fields must be inside a DocumentEditor');
+
   return api;
 }
 
 interface DocumentEditorProps {
-  /** Document type, e.g. `project`. */
-  type: string;
-  /** `null` creates a new document. */
-  id: string | null;
-  initial: Values;
-  rev?: string | undefined;
-  readOnlyReason: string | null;
-  /** The list this editor belongs to (also where deleting returns). */
+  /**
+   * The list this editor belongs to (also where deleting returns).
+   */
   basePath: string;
-  title: string;
-  singleton?: boolean;
-  /** Text the owner must type to delete the document. */
-  deleteConfirm?: string | undefined;
   children: ReactNode;
+  /**
+   * Text the owner must type to delete the document.
+   */
+  deleteConfirm?: string | undefined;
+  /**
+   * `null` creates a new document.
+   */
+  id: null | string;
+  initial: Values;
+  readOnlyReason: null | string;
+  rev?: string | undefined;
+  singleton?: boolean;
+  title: string;
+  /**
+   * Document type, e.g. `project`.
+   */
+  type: string;
 }
 
 function humanize(path: string) {
@@ -112,28 +123,34 @@ export function DocumentEditor({
   // confirm for in-app links.
   useEffect(() => {
     if (!dirty) return;
+
     const beforeUnload = (event: BeforeUnloadEvent) => {
       event.preventDefault();
     };
     const onClick = (event: MouseEvent) => {
       const link = (event.target as Element).closest?.('a[href]');
-      if (!(link instanceof HTMLAnchorElement) || link.target === '_blank')
-        return;
+
+      if (!(link instanceof HTMLAnchorElement) || link.target === '_blank') return;
+
       const url = new URL(link.href);
+
       if (
-        url.origin === window.location.origin &&
-        url.pathname === window.location.pathname &&
-        url.search === window.location.search
+        url.origin === window.location.origin
+        && url.pathname === window.location.pathname
+        && url.search === window.location.search
       ) {
         return;
       }
+
       if (!window.confirm('Discard unsaved changes?')) {
         event.preventDefault();
         event.stopPropagation();
       }
     };
+
     window.addEventListener('beforeunload', beforeUnload);
     document.addEventListener('click', onClick, true);
+
     return () => {
       window.removeEventListener('beforeunload', beforeUnload);
       document.removeEventListener('click', onClick, true);
@@ -143,9 +160,11 @@ export function DocumentEditor({
   // Typing sends no requests, so renew the session while edits are pending.
   useEffect(() => {
     if (!dirty) return;
+
     const timer = window.setInterval(() => {
       renewSession().catch(() => {});
     }, KEEP_ALIVE_MS);
+
     return () => window.clearInterval(timer);
   }, [dirty]);
 
@@ -157,8 +176,10 @@ export function DocumentEditor({
         setValues((current) => setIn(current, path, value));
         setErrors((current) => {
           if (!(path in current)) return current;
+
           const { [path]: _removed, ...rest } = current;
           void _removed;
+
           return rest;
         });
       },
@@ -170,13 +191,10 @@ export function DocumentEditor({
 
   async function save(overwrite = false) {
     setSaving(true);
+
     try {
-      const outcome = await saveDocumentAction(
-        type,
-        id,
-        values,
-        overwrite ? undefined : rev,
-      );
+      const outcome = await saveDocumentAction(type, id, values, overwrite ? undefined : rev);
+
       if (outcome.ok) {
         setValues(outcome.doc);
         setBaseline(outcome.doc);
@@ -184,12 +202,13 @@ export function DocumentEditor({
         setErrors({});
         setFormErrors([]);
         toast('Published · public pages refreshed', 'success');
+
         if (!id && !singleton)
-          router.replace(
-            `${basePath}/${idToSegment(type as DocumentType, outcome.id)}`,
-          );
+          router.replace(`${basePath}/${idToSegment(type as DocumentType, outcome.id)}`);
+
         return;
       }
+
       if (outcome.kind === 'invalid') {
         setErrors(outcome.fieldErrors);
         setFormErrors(outcome.formErrors);
@@ -207,15 +226,14 @@ export function DocumentEditor({
     } catch {
       // Without a session the action is answered with the 404 page and throws.
       const signedIn =
-        !navigator.onLine ||
-        (await getSessionStatus().then(
+        !navigator.onLine
+        || (await getSessionStatus().then(
           (status) => status.isAdmin,
           () => false,
         ));
+
       toast(
-        signedIn
-          ? 'Could not save. Check your connection and try again.'
-          : SESSION_EXPIRED,
+        signedIn ? 'Could not save. Check your connection and try again.' : SESSION_EXPIRED,
         'error',
       );
     } finally {
@@ -225,6 +243,7 @@ export function DocumentEditor({
 
   function onSubmit(event: FormEvent) {
     event.preventDefault();
+
     if (!disabled && dirty) void save();
   }
 
@@ -232,12 +251,7 @@ export function DocumentEditor({
 
   return (
     <FormContext.Provider value={api}>
-      <form
-        onSubmit={onSubmit}
-        noValidate
-        data-hydrated={hydrated}
-        className="mx-auto max-w-4xl"
-      >
+      <form onSubmit={onSubmit} noValidate data-hydrated={hydrated} className="mx-auto max-w-4xl">
         <h1 className="text-h2">{title}</h1>
         {readOnlyReason ? (
           <p
@@ -268,6 +282,7 @@ export function DocumentEditor({
                     href={`#${fieldId(path)}`}
                     onClick={(event) => {
                       const target = document.getElementById(fieldId(path));
+
                       if (target) {
                         event.preventDefault();
                         target.focus();
@@ -327,8 +342,8 @@ export function DocumentEditor({
         closeLabel="Close"
       >
         <p className="mb-6">
-          Someone saved a newer version while you were editing. Reload to see it
-          (your edits here are lost), or overwrite it with your version.
+          Someone saved a newer version while you were editing. Reload to see it (your edits here
+          are lost), or overwrite it with your version.
         </p>
         <div className="flex flex-wrap gap-3">
           <Button onClick={() => window.location.reload()}>Reload</Button>
@@ -355,12 +370,12 @@ function DeleteSection({
   basePath,
   disabled,
 }: {
-  type: string;
+  basePath: string;
+  confirmText: string;
+  disabled: boolean;
   id: string;
   rev: string | undefined;
-  confirmText: string;
-  basePath: string;
-  disabled: boolean;
+  type: string;
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -370,8 +385,10 @@ function DeleteSection({
 
   async function remove() {
     setBusy(true);
+
     try {
       const outcome = await deleteDocumentAction(type, id, rev);
+
       if (outcome.ok) {
         toast('Deleted', 'success');
         router.push(basePath);
@@ -393,8 +410,7 @@ function DeleteSection({
     <section className="mt-12 rounded-md border border-danger/40 p-4">
       <h2 className="text-h3">Delete</h2>
       <p className="mt-1 text-small text-text-3">
-        Hiding the item removes it from the site and can be undone. Deleting is
-        permanent.
+        Hiding the item removes it from the site and can be undone. Deleting is permanent.
       </p>
       <Button
         className="mt-4"
@@ -415,8 +431,7 @@ function DeleteSection({
         closeLabel="Close"
       >
         <p className="mb-4">
-          Type <strong className="font-mono text-text-1">{confirmText}</strong>{' '}
-          to confirm.
+          Type <strong className="font-mono text-text-1">{confirmText}</strong> to confirm.
         </p>
         <label className="sr-only" htmlFor="delete-confirm">
           Confirmation text
@@ -440,9 +455,7 @@ function DeleteSection({
                 </li>
               ))}
             </ul>
-            <p className="mt-2">
-              Remove those references first, or hide it instead.
-            </p>
+            <p className="mt-2">Remove those references first, or hide it instead.</p>
           </div>
         ) : null}
         <Button

@@ -1,35 +1,43 @@
 import { create } from 'zustand';
 
 import { addHistory } from '@/lib/terminal/history';
-import type { Block, OutputNode } from '@/lib/terminal/output';
-import type { SavedSession } from '@/lib/terminal/session';
+import { type Block, type OutputNode } from '@/lib/terminal/output';
+import { type SavedSession } from '@/lib/terminal/session';
 import { HOME } from '@/lib/terminal/vfs';
 
-/** Live blocks kept in memory; only the newest 300 are persisted. */
+/**
+ * Live blocks kept in memory; only the newest 300 are persisted.
+ */
 const LIVE_LIMIT = 500;
 
 interface TerminalStore {
-  blocks: Block[];
-  nextId: number;
-  cwd: string;
-  history: string[];
-  hydrated: boolean;
-  booted: boolean;
-  running: boolean;
-  /** Any key during the boot lines shows them at once. */
-  skipTyping: boolean;
-  hydrate: (saved: SavedSession | null) => void;
   append: (node: OutputNode, options?: { volatile?: boolean }) => void;
-  setRunning: (running: boolean) => void;
-  /** Ends a run: a spinner nobody replaced would otherwise stay forever. */
-  endRun: () => void;
-  markBooted: () => void;
-  skipBoot: () => void;
+  blocks: Block[];
+  booted: boolean;
   clear: () => void;
-  setCwd: (cwd: string) => void;
-  record: (line: string) => void;
-  /** The window closed: the log ends, the history stays. */
+  cwd: string;
+  /**
+   * Ends a run: a spinner nobody replaced would otherwise stay forever.
+   */
+  endRun: () => void;
+  /**
+   * The window closed: the log ends, the history stays.
+   */
   endSession: () => void;
+  history: string[];
+  hydrate: (saved: null | SavedSession) => void;
+  hydrated: boolean;
+  markBooted: () => void;
+  nextId: number;
+  record: (line: string) => void;
+  running: boolean;
+  setCwd: (cwd: string) => void;
+  setRunning: (running: boolean) => void;
+  skipBoot: () => void;
+  /**
+   * Any key during the boot lines shows them at once.
+   */
+  skipTyping: boolean;
 }
 
 function withoutTrailingSpinner(blocks: Block[]) {
@@ -49,7 +57,9 @@ export const useTerminalStore = create<TerminalStore>()((set) => ({
   hydrate: (saved) =>
     set((state) => {
       if (state.hydrated) return {};
+
       if (!saved) return { hydrated: true };
+
       return {
         hydrated: true,
         blocks: saved.blocks,
@@ -67,11 +77,10 @@ export const useTerminalStore = create<TerminalStore>()((set) => ({
         node,
         ...(options?.volatile ? { volatile: true } : {}),
       };
+
       return {
         nextId: state.nextId + 1,
-        blocks: [...withoutTrailingSpinner(state.blocks), block].slice(
-          -LIVE_LIMIT,
-        ),
+        blocks: [...withoutTrailingSpinner(state.blocks), block].slice(-LIVE_LIMIT),
       };
     }),
 
@@ -87,8 +96,7 @@ export const useTerminalStore = create<TerminalStore>()((set) => ({
   skipBoot: () => set({ skipTyping: true }),
   clear: () => set({ blocks: [] }),
   setCwd: (cwd) => set({ cwd }),
-  record: (line) =>
-    set((state) => ({ history: addHistory(state.history, line) })),
+  record: (line) => set((state) => ({ history: addHistory(state.history, line) })),
 
   endSession: () =>
     set({

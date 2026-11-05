@@ -4,27 +4,21 @@ import { parseArgs, tokenize, wantsHelp } from './parser';
 
 const tokens = (input: string) => {
   const result = tokenize(input);
+
   if (!result.ok) throw new Error(result.reason);
+
   return result.tokens;
 };
 
 describe('tokenize', () => {
   it('splits on whitespace and ignores empty input', () => {
-    expect(tokens('  projects   --kind web ')).toEqual([
-      'projects',
-      '--kind',
-      'web',
-    ]);
+    expect(tokens('  projects   --kind web ')).toEqual(['projects', '--kind', 'web']);
     expect(tokens('')).toEqual([]);
     expect(tokens('   ')).toEqual([]);
   });
 
   it('keeps quoted text together and allows empty arguments', () => {
-    expect(tokens(`echo "hello   world" 'it is'`)).toEqual([
-      'echo',
-      'hello   world',
-      'it is',
-    ]);
+    expect(tokens(`echo "hello   world" 'it is'`)).toEqual(['echo', 'hello   world', 'it is']);
     expect(tokens('echo ""')).toEqual(['echo', '']);
     expect(tokens(`echo a"b c"d`)).toEqual(['echo', 'ab cd']);
   });
@@ -38,11 +32,7 @@ describe('tokenize', () => {
   });
 
   it('allows operators inside quotes', () => {
-    expect(tokens(`echo "a; b | c > d" '$HOME *'`)).toEqual([
-      'echo',
-      'a; b | c > d',
-      '$HOME *',
-    ]);
+    expect(tokens(`echo "a; b | c > d" '$HOME *'`)).toEqual(['echo', 'a; b | c > d', '$HOME *']);
   });
 
   it.each([

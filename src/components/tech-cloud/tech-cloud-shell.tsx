@@ -1,38 +1,26 @@
 'use client';
 
-import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
-import {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  useSyncExternalStore,
-} from 'react';
+import dynamic from 'next/dynamic';
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 
 import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { cn } from '@/lib/cn';
 import { techCategories, type TechCategory } from '@/lib/content/taxonomy';
-import type { Practice } from '@/lib/content/types';
+import { type Practice } from '@/lib/content/types';
 import { useReducedMotionPreference } from '@/lib/motion-preference';
 
-import type { CloudTech } from './geoid-sphere';
+import { type CloudTech } from './geoid-sphere';
 import { StackList } from './stack-list';
 import { geoidStageClassName } from './stage';
-import type { StackTech } from './types';
+import { type StackTech } from './types';
 
-const GeoidSphere = dynamic(
-  () => import('./geoid-sphere').then((module) => module.GeoidSphere),
-  {
-    ssr: false,
-    loading: () => (
-      <div
-        aria-hidden="true"
-        className={`${geoidStageClassName} rounded-[50%] bg-surface-1/40`}
-      />
-    ),
-  },
-);
+const GeoidSphere = dynamic(() => import('./geoid-sphere').then((module) => module.GeoidSphere), {
+  ssr: false,
+  loading: () => (
+    <div aria-hidden="true" className={`${geoidStageClassName} rounded-[50%] bg-surface-1/40`} />
+  ),
+});
 
 function toCloudTech(tech: StackTech): CloudTech {
   return {
@@ -48,15 +36,20 @@ function toCloudTech(tech: StackTech): CloudTech {
 
 function useMobileCull(technologies: CloudTech[]) {
   const [narrow, setNarrow] = useState(false);
+
   useEffect(() => {
     const media = window.matchMedia('(max-width: 767px)');
     const update = () => setNarrow(media.matches);
+
     update();
     media.addEventListener('change', update);
+
     return () => media.removeEventListener('change', update);
   }, []);
+
   return useMemo(() => {
     if (!narrow) return technologies;
+
     return technologies.filter((tech) => tech.priority <= 2);
   }, [narrow, technologies]);
 }
@@ -65,8 +58,8 @@ export function TechCloudShell({
   technologies,
   practices,
 }: {
-  technologies: StackTech[];
   practices: Practice[];
+  technologies: StackTech[];
 }) {
   const t = useTranslations('stack');
   const reduced = useReducedMotionPreference();
@@ -76,44 +69,48 @@ export function TechCloudShell({
     () => false,
   );
   const [failed, setFailed] = useState(false);
-  const [category, setCategory] = useState<TechCategory | null>(null);
+  const [category, setCategory] = useState<null | TechCategory>(null);
   const [selected, setSelected] = useState<CloudTech | null>(null);
   const [near, setNear] = useState(false);
   const hostRef = useRef<HTMLDivElement>(null);
   const showCloud = isClient && !reduced && !failed;
 
-  const cloudTechs = useMemo(
-    () => technologies.map(toCloudTech),
-    [technologies],
-  );
+  const cloudTechs = useMemo(() => technologies.map(toCloudTech), [technologies]);
   const visibleCloud = useMobileCull(cloudTechs);
 
   const categoryLabels = Object.fromEntries(
     techCategories.map((key) => [key, t(`categories.${key}`)]),
   ) as Record<TechCategory, string>;
 
-  const announced =
-    selected && (!category || selected.category === category) ? selected : null;
+  const announced = selected && (!category || selected.category === category) ? selected : null;
 
   useEffect(() => {
     if (!selected) return;
+
     const timer = window.setTimeout(() => setSelected(null), 2500);
+
     return () => window.clearTimeout(timer);
   }, [selected]);
 
   useEffect(() => {
     if (!showCloud || near) return;
+
     const host = hostRef.current;
+
     if (!host) return;
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (!entry?.isIntersecting) return;
+
         setNear(true);
         observer.disconnect();
       },
       { rootMargin: '300px' },
     );
+
     observer.observe(host);
+
     return () => observer.disconnect();
   }, [showCloud, near]);
 
@@ -122,6 +119,7 @@ export function TechCloudShell({
     for (const tech of visibleCloud) {
       map.set(tech.category, (map.get(tech.category) ?? 0) + 1);
     }
+
     return map;
   }, [visibleCloud]);
 
@@ -142,9 +140,12 @@ export function TechCloudShell({
     >
       {techCategories.map((key) => {
         const count = counts.get(key) ?? 0;
+
         if (count === 0) return null;
+
         const active = category === key;
         const label = categoryLabels[key];
+
         return (
           <button
             key={key}
@@ -197,17 +198,11 @@ export function TechCloudShell({
             )}
           </div>
 
-          <div
-            aria-live="polite"
-            className="container-page text-center text-small text-text-2"
-          >
+          <div aria-live="polite" className="container-page text-center text-small text-text-2">
             {announced ? (
               <p>
                 <span className="text-text-1">{announced.name}</span>
-                <span className="text-text-3">
-                  {' '}
-                  · {categoryLabels[announced.category]}
-                </span>
+                <span className="text-text-3"> · {categoryLabels[announced.category]}</span>
                 {announced.url ? (
                   <>
                     {' '}

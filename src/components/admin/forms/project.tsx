@@ -12,18 +12,11 @@ import {
 import { useForm } from '../editor/form';
 import { ImageField } from '../editor/image-field';
 import { ListEditor } from '../editor/list-editor';
-import type { Option } from './career';
+import { type Option } from './career';
 
 const blank = () => ({ en: '', pt: '' });
 
-const KINDS = [
-  'web',
-  'mobile',
-  'desktop',
-  'automation',
-  'integration',
-  'open-source',
-];
+const KINDS = ['web', 'mobile', 'desktop', 'automation', 'integration', 'open-source'];
 const STATUSES = [
   { value: 'live', label: 'Live' },
   { value: 'in-progress', label: 'In progress' },
@@ -32,15 +25,13 @@ const STATUSES = [
 ];
 
 interface GalleryItem {
-  asset?: { url: string; width: number; height: number; lqip?: string };
   alt?: { en?: string };
+  asset?: { height: number; lqip?: string; url: string; width: number };
 }
 
 export function ProjectForm({ techOptions }: { techOptions: Option[] }) {
   const form = useForm();
-  const gallery = (
-    (form.get('gallery') as GalleryItem[] | undefined) ?? []
-  ).flatMap((item) =>
+  const gallery = ((form.get('gallery') as GalleryItem[] | undefined) ?? []).flatMap((item) =>
     item.asset ? [{ ...item.asset, alt: item.alt?.en ?? '' }] : [],
   );
   const previous = (form.get('previousSlugs') as string[] | undefined) ?? [];
@@ -95,20 +86,8 @@ export function ProjectForm({ techOptions }: { techOptions: Option[] }) {
       </Section>
 
       <Section title="The story">
-        <LocalizedField
-          path="context"
-          label="Context"
-          max={1200}
-          multiline
-          rows={5}
-        />
-        <LocalizedField
-          path="approach"
-          label="Approach"
-          max={1200}
-          multiline
-          rows={5}
-        />
+        <LocalizedField path="context" label="Context" max={1200} multiline rows={5} />
+        <LocalizedField path="approach" label="Approach" max={1200} multiline rows={5} />
         <ListEditor
           path="highlights"
           label="Highlights"
@@ -117,17 +96,9 @@ export function ProjectForm({ techOptions }: { techOptions: Option[] }) {
           max={5}
           newItem={blank}
         >
-          {(_, itemPath) => (
-            <LocalizedField path={itemPath} label="Highlight" max={160} />
-          )}
+          {(_, itemPath) => <LocalizedField path={itemPath} label="Highlight" max={160} />}
         </ListEditor>
-        <LocalizedField
-          path="outcome"
-          label="Outcome (optional)"
-          max={400}
-          multiline
-          rows={3}
-        />
+        <LocalizedField path="outcome" label="Outcome (optional)" max={400} multiline rows={3} />
         <LocalizedField
           path="body"
           label="Full write-up (optional, Markdown)"
@@ -140,36 +111,17 @@ export function ProjectForm({ techOptions }: { techOptions: Option[] }) {
 
       <Section title="Links and stack">
         <TextField path="links.live" label="Live URL (optional)" type="url" />
-        <TextField
-          path="links.repo"
-          label="Repository URL (optional)"
-          type="url"
-        />
-        <CheckboxGroup
-          path="techIds"
-          label="Technologies"
-          options={techOptions}
-          max={24}
-        />
+        <TextField path="links.repo" label="Repository URL (optional)" type="url" />
+        <CheckboxGroup path="techIds" label="Technologies" options={techOptions} max={24} />
       </Section>
 
       <Section title="Images">
         <ImageField path="cover" label="Cover image" />
-        <ListEditor
-          path="gallery"
-          label="Gallery"
-          itemLabel="image"
-          max={12}
-          newItem={() => ({})}
-        >
+        <ListEditor path="gallery" label="Gallery" itemLabel="image" max={12} newItem={() => ({})}>
           {(_, itemPath) => (
             <>
               <ImageField path={itemPath} label="Image" />
-              <LocalizedField
-                path={`${itemPath}.caption`}
-                label="Caption (optional)"
-                max={160}
-              />
+              <LocalizedField path={`${itemPath}.caption`} label="Caption (optional)" max={160} />
             </>
           )}
         </ListEditor>

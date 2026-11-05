@@ -1,5 +1,5 @@
-import { locale as rootLocale } from 'next/root-params';
 import { getTranslations } from 'next-intl/server';
+import { locale as rootLocale } from 'next/root-params';
 
 import { owner } from '@/config/site';
 import { Link } from '@/i18n/navigation';
@@ -18,9 +18,7 @@ export async function Header() {
   const t = await getTranslations('header');
   const links = await HeaderLinks();
   const locale = await rootLocale();
-  const profile = isAppLocale(locale)
-    ? await getContent().getProfile(locale)
-    : null;
+  const profile = isAppLocale(locale) ? await getContent().getProfile(locale) : null;
   const titleFont = profile?.titleFont;
 
   return (
@@ -35,11 +33,7 @@ export async function Header() {
           <span
             aria-hidden="true"
             data-header-name
-            style={
-              titleFont
-                ? { fontFamily: `var(--font-title-${titleFont})` }
-                : undefined
-            }
+            style={titleFont ? { fontFamily: `var(--font-title-${titleFont})` } : undefined}
             className={`hidden text-[0.9375rem] tracking-[-0.01em] text-text-1 transition-opacity duration-300 motion-reduce:transition-none min-[400px]:inline ${
               titleFont ? 'font-normal [font-synthesis:none]' : 'font-semibold'
             }`}

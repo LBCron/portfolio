@@ -1,16 +1,13 @@
 'use client';
 
-import {
-  type ComponentProps,
-  type CSSProperties,
-  useLayoutEffect,
-  useRef,
-} from 'react';
+import { type ComponentProps, type CSSProperties, useLayoutEffect, useRef } from 'react';
 
 import { cn } from '@/lib/cn';
 
 interface RevealProps extends ComponentProps<'div'> {
-  /** Position inside a group; each step adds a 60ms delay. */
+  /**
+   * Position inside a group; each step adds a 60ms delay.
+   */
   index?: number;
 }
 
@@ -24,11 +21,14 @@ export function Reveal({ index = 0, className, style, ...props }: RevealProps) {
 
   useLayoutEffect(() => {
     const element = ref.current;
+
     if (!element) return;
+
     const root = document.documentElement;
     const reduced =
-      root.dataset.motion === 'reduced' ||
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      root.dataset.motion === 'reduced'
+      || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     if (reduced || element.getBoundingClientRect().top < window.innerHeight) {
       return;
     }
@@ -37,12 +37,15 @@ export function Reveal({ index = 0, className, style, ...props }: RevealProps) {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (!entry?.isIntersecting) return;
+
         element.dataset.reveal = 'shown';
         observer.disconnect();
       },
       { threshold: 0.2 },
     );
+
     observer.observe(element);
+
     return () => observer.disconnect();
   }, []);
 

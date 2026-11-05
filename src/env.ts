@@ -8,9 +8,7 @@ const optionalString = z.preprocess(
 );
 
 const schema = z.object({
-  NODE_ENV: z
-    .enum(['development', 'test', 'production'])
-    .default('development'),
+  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   VERCEL_ENV: z.enum(['development', 'preview', 'production']).optional(),
   NEXT_PUBLIC_SITE_URL: z
     .url({ protocol: /^https?$/ })
@@ -39,7 +37,9 @@ const schema = z.object({
   SANITY_READ_TOKEN: optionalString,
   SANITY_WRITE_TOKEN: optionalString,
   SANITY_WEBHOOK_SECRET: optionalString,
-  /** `1` lets the admin write fixtures in production (e2e only). */
+  /**
+   * `1` lets the admin write fixtures in production (e2e only).
+   */
   ADMIN_FIXTURE_WRITES: optionalString,
   ADMIN_PASSWORD: optionalString,
   ADMIN_PASSWORD_HASH: optionalString,
@@ -54,6 +54,7 @@ export type Env = z.infer<typeof schema>;
 
 function parseEnv(): Env {
   const result = schema.safeParse(process.env);
+
   if (result.success) return result.data;
 
   // Report variable names and issue codes only, never values.
@@ -67,11 +68,11 @@ export const env = parseEnv();
 
 export const isProduction = env.NODE_ENV === 'production';
 
-/** Indexable only on the production deployment (never on previews). */
+/**
+ * Indexable only on the production deployment (never on previews).
+ */
 export const isIndexable =
-  isProduction &&
-  (env.VERCEL_ENV === undefined || env.VERCEL_ENV === 'production');
+  isProduction && (env.VERCEL_ENV === undefined || env.VERCEL_ENV === 'production');
 
-export const contentSource: 'sanity' | 'fixtures' =
-  env.CONTENT_SOURCE ??
-  (env.SANITY_PROJECT_ID && env.SANITY_DATASET ? 'sanity' : 'fixtures');
+export const contentSource: 'fixtures' | 'sanity' =
+  env.CONTENT_SOURCE ?? (env.SANITY_PROJECT_ID && env.SANITY_DATASET ? 'sanity' : 'fixtures');

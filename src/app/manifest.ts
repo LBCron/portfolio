@@ -1,4 +1,4 @@
-import type { MetadataRoute } from 'next';
+import { type MetadataRoute } from 'next';
 
 import { owner, THEME_COLOR } from '@/config/site';
 

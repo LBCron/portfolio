@@ -1,18 +1,18 @@
 import { formatPartialDate } from '@/lib/format';
 
-import type { ContentSnapshot } from './snapshot';
+import { type ContentSnapshot } from './snapshot';
 
-export type Translate = (
-  key: string,
-  values?: Record<string, string | number | Date>,
-) => string;
+export type Translate = (key: string, values?: Record<string, Date | number | string>) => string;
 
 export const HOME = '~';
 
-/** `~`, `~/x`, `/x` and relative paths resolve to a canonical `~/…` path. */
+/**
+ * `~`, `~/x`, `/x` and relative paths resolve to a canonical `~/…` path.
+ */
 export function resolvePath(cwd: string, input: string): string {
   let base: string[];
   let rest = input;
+
   if (input === '~' || input.startsWith('~/')) {
     base = [];
     rest = input.slice(1);
@@ -22,27 +22,32 @@ export function resolvePath(cwd: string, input: string): string {
   const segments = [...base];
   for (const part of rest.split('/')) {
     if (part === '' || part === '.') continue;
+
     if (part === '..') segments.pop();
     else segments.push(part);
   }
+
   return [HOME, ...segments].join('/');
 }
 
 interface DirNode {
-  type: 'dir';
   children: string[];
+  type: 'dir';
 }
+
 interface FileNode {
-  type: 'file';
-  text: string;
   binary: boolean;
+  text: string;
+  type: 'file';
 }
 
 export interface VirtualFS {
+  /**
+   * Directories first, then files; names only.
+   */
+  list(path: string): Array<{ name: string; type: 'dir' | 'file' }>;
+  read(path: string): { binary: boolean; text: string } | null;
   stat(path: string): 'dir' | 'file' | null;
-  /** Directories first, then files; names only. */
-  list(path: string): { name: string; type: 'dir' | 'file' }[];
-  read(path: string): { text: string; binary: boolean } | null;
   tree(path: string): string[];
 }
 
@@ -61,15 +66,14 @@ export function buildVfs(snapshot: ContentSnapshot, t: Translate): VirtualFS {
   const locale = snapshot.locale;
   const date = (value: string) => formatPartialDate(locale, value);
   const period = (start?: string, end?: string) =>
-    [start ? date(start) : '', end ? date(end) : t('resume.present')]
-      .filter(Boolean)
-      .join(' – ');
+    [start ? date(start) : '', end ? date(end) : t('resume.present')].filter(Boolean).join(' – ');
 
   function dir(path: string) {
     if (!nodes.has(path)) nodes.set(path, { type: 'dir', children: [] });
   }
-  function file(path: string, lines: (string | undefined)[], binary = false) {
+  function file(path: string, lines: Array<string | undefined>, binary = false) {
     const parent = path.slice(0, path.lastIndexOf('/'));
+
     dir(parent);
     (nodes.get(parent) as DirNode).children.push(path);
     nodes.set(path, {
@@ -80,22 +84,22 @@ export function buildVfs(snapshot: ContentSnapshot, t: Translate): VirtualFS {
   }
 
   dir(HOME);
+
   const { profile } = snapshot;
+
   if (profile) {
-    file(`${HOME}/about.md`, [
-      `# ${profile.displayName}`,
-      profile.jobTitle,
-      '',
-      profile.bio,
-    ]);
+    file(`${HOME}/about.md`, [`# ${profile.displayName}`, profile.jobTitle, '', profile.bio]);
   }
+
   if (snapshot.contact) {
     const { user, domain, bookingUrl } = snapshot.contact;
+
     file(`${HOME}/contact.md`, [
       `${t('terminal.labels.email')}: ${user}@${domain}`,
       bookingUrl ? `${t('terminal.labels.booking')}: ${bookingUrl}` : undefined,
     ]);
   }
+
   file(
     `${HOME}/education.md`,
     snapshot.education.flatMap((item) => [
@@ -164,9 +168,7 @@ export function buildVfs(snapshot: ContentSnapshot, t: Translate): VirtualFS {
         ? `${t('project.technologies')}: ${project.technologies.join(', ')}`
         : undefined,
       project.links.live ? `URL: ${project.links.live}` : undefined,
-      project.links.repo
-        ? `${t('project.repository')}: ${project.links.repo}`
-        : undefined,
+      project.links.repo ? `${t('project.repository')}: ${project.links.repo}` : undefined,
     ]);
   }
 
@@ -175,8 +177,10 @@ export function buildVfs(snapshot: ContentSnapshot, t: Translate): VirtualFS {
     const names = snapshot.technologies
       .filter((tech) => tech.category === category)
       .map((tech) => tech.name);
+
     if (names.length > 0) file(`${HOME}/stack/${category}.txt`, names);
   }
+
   if (snapshot.practices.length > 0) {
     file(`${HOME}/stack/practices.txt`, snapshot.practices);
   }
@@ -185,7 +189,9 @@ export function buildVfs(snapshot: ContentSnapshot, t: Translate): VirtualFS {
 
   function list(path: string) {
     const node = nodes.get(path);
+
     if (node?.type !== 'dir') return [];
+
     return node.children
       .map((child) => ({
         name: child.slice(child.lastIndexOf('/') + 1),
@@ -193,8 +199,7 @@ export function buildVfs(snapshot: ContentSnapshot, t: Translate): VirtualFS {
       }))
       .sort(
         (a, b) =>
-          Number(b.type === 'dir') - Number(a.type === 'dir') ||
-          a.name.localeCompare(b.name),
+          Number(b.type === 'dir') - Number(a.type === 'dir') || a.name.localeCompare(b.name),
       );
   }
 
@@ -202,14 +207,9 @@ export function buildVfs(snapshot: ContentSnapshot, t: Translate): VirtualFS {
     return list(path).flatMap((entry, index, all) => {
       const last = index === all.length - 1;
       const line = `${prefix}${last ? '└── ' : '├── '}${entry.name}${entry.type === 'dir' ? '/' : ''}`;
+
       return entry.type === 'dir'
-        ? [
-            line,
-            ...tree(
-              `${path}/${entry.name}`,
-              `${prefix}${last ? '    ' : '│   '}`,
-            ),
-          ]
+        ? [line, ...tree(`${path}/${entry.name}`, `${prefix}${last ? '    ' : '│   '}`)]
         : [line];
     });
   }
@@ -217,8 +217,10 @@ export function buildVfs(snapshot: ContentSnapshot, t: Translate): VirtualFS {
   // Directories sort after their parent was registered; link them in.
   for (const path of [...nodes.keys()]) {
     if (path === HOME) continue;
+
     const parent = path.slice(0, path.lastIndexOf('/'));
     const node = nodes.get(parent);
+
     if (node?.type === 'dir' && !node.children.includes(path)) {
       node.children.push(path);
     }
@@ -230,9 +232,8 @@ export function buildVfs(snapshot: ContentSnapshot, t: Translate): VirtualFS {
     tree: (path) => [path === HOME ? HOME : path, ...tree(path)],
     read(path) {
       const node = nodes.get(path);
-      return node?.type === 'file'
-        ? { text: node.text, binary: node.binary }
-        : null;
+
+      return node?.type === 'file' ? { text: node.text, binary: node.binary } : null;
     },
   };
 }

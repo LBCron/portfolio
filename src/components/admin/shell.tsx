@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import type { ReactNode } from 'react';
+import { type ReactNode } from 'react';
 
 import { getAdminStore } from '@/lib/content/admin';
 
@@ -10,8 +10,8 @@ export async function AdminShell({
   expiresAt,
   children,
 }: {
-  expiresAt: number;
   children: ReactNode;
+  expiresAt: number;
 }) {
   const source = getAdminStore().label;
 
@@ -42,11 +42,7 @@ export async function AdminShell({
           </Link>
           <SessionControls expiresAt={expiresAt} />
         </header>
-        <main
-          id="main"
-          tabIndex={-1}
-          className="flex-1 p-4 outline-none md:p-8"
-        >
+        <main id="main" tabIndex={-1} className="flex-1 p-4 outline-none md:p-8">
           {children}
         </main>
       </div>

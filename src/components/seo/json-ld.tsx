@@ -1,8 +1,10 @@
-import type { Graph } from 'schema-dts';
+import { type Graph } from 'schema-dts';
 
 import { serializeJsonLd } from '@/lib/seo/json-ld';
 
-/** The page's single structured-data block. */
+/**
+ * The page's single structured-data block.
+ */
 export function JsonLd({ data }: { data: Graph }) {
   return (
     <script

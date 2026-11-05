@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { type Command } from './commands/types';
 import { addHistory, HISTORY_LIMIT, HistoryNavigator } from './history';
 import {
   createRegistry,
@@ -8,7 +9,6 @@ import {
   isSecretLine,
   publicCommands,
 } from './registry';
-import type { Command } from './commands/types';
 
 describe('addHistory', () => {
   it('trims, skips blanks and immediate repeats', () => {
@@ -32,6 +32,7 @@ describe('addHistory', () => {
 describe('HistoryNavigator', () => {
   it('walks back and forward, restoring the draft', () => {
     const navigator = new HistoryNavigator(['a', 'b', 'c']);
+
     expect(navigator.up('draft')).toBe('c');
     expect(navigator.up('ignored')).toBe('b');
     expect(navigator.up('')).toBe('a');
@@ -60,6 +61,7 @@ describe('isRecordable', () => {
       },
     };
     const registry = createRegistry([...publicCommands, secret]);
+
     expect(isRecordable(registry, 'help')).toBe(true);
     expect(isRecordable(registry, 'unknown-thing')).toBe(true);
     expect(isRecordable(registry, 'hush now')).toBe(false);

@@ -8,28 +8,30 @@ import { cn } from '@/lib/cn';
 import { inputClass, smallButton } from './styles';
 
 interface MarkdownEditorProps {
-  id: string;
-  value: string;
-  onChange: (value: string) => void;
-  disabled: boolean;
-  invalid: boolean;
   describedBy?: string | undefined;
-  gallery: {
+  disabled: boolean;
+  gallery: Array<{
+    alt: string;
+    height: number;
+    lqip?: string;
     url: string;
     width: number;
-    height: number;
-    alt: string;
-    lqip?: string;
-  }[];
+  }>;
+  id: string;
+  invalid: boolean;
+  onChange: (value: string) => void;
+  value: string;
 }
 
 interface Tool {
-  label: string;
-  glyph: string;
-  before: string;
   after: string;
+  before: string;
+  glyph: string;
+  label: string;
   placeholder: string;
-  /** Line-based tools (lists, headings) set this instead. */
+  /**
+   * Line-based tools (lists, headings) set this instead.
+   */
   prefix?: string;
 }
 
@@ -73,7 +75,9 @@ const tools: Tool[] = [
   },
 ];
 
-/** A textarea with a keyboard-reachable toolbar and a safe live preview. */
+/**
+ * A textarea with a keyboard-reachable toolbar and a safe live preview.
+ */
 export function MarkdownEditor({
   id,
   value,
@@ -86,13 +90,14 @@ export function MarkdownEditor({
   const ref = useRef<HTMLTextAreaElement>(null);
   const [preview, setPreview] = useState(false);
 
-  function edit(
-    change: (selected: string) => { text: string; select: [number, number] },
-  ) {
+  function edit(change: (selected: string) => { select: [number, number]; text: string }) {
     const area = ref.current;
+
     if (!area) return;
+
     const { selectionStart: start, selectionEnd: end } = area;
     const { text, select } = change(value.slice(start, end));
+
     onChange(value.slice(0, start) + text + value.slice(end));
     requestAnimationFrame(() => {
       area.focus();
@@ -107,9 +112,12 @@ export function MarkdownEditor({
           .split('\n')
           .map((line) => `${tool.prefix}${line}`)
           .join('\n');
+
         return { text, select: [tool.prefix.length, text.length] };
       }
+
       const inner = selected || tool.placeholder;
+
       return {
         text: `${tool.before}${inner}${tool.after}`,
         select: [tool.before.length, tool.before.length + inner.length],
@@ -120,11 +128,7 @@ export function MarkdownEditor({
   return (
     <div className="flex flex-col gap-2">
       <div className="flex flex-wrap items-center gap-2">
-        <div
-          role="toolbar"
-          aria-label="Formatting"
-          className="flex flex-wrap gap-1"
-        >
+        <div role="toolbar" aria-label="Formatting" className="flex flex-wrap gap-1">
           {tools.map((tool) => (
             <button
               key={tool.label}
@@ -145,10 +149,12 @@ export function MarkdownEditor({
             value=""
             onChange={(event) => {
               const index = Number(event.target.value);
+
               if (index) {
                 edit(() => {
                   const alt = gallery[index - 1]?.alt ?? '';
                   const text = `![${alt}](gallery:${index})`;
+
                   return { text, select: [text.length, text.length] };
                 });
               }

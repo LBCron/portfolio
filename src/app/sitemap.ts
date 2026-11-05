@@ -1,4 +1,4 @@
-import type { MetadataRoute } from 'next';
+import { type MetadataRoute } from 'next';
 
 import { type AppLocale, routing } from '@/i18n/routing';
 import { getContent } from '@/lib/content';
@@ -6,17 +6,13 @@ import { absoluteUrl, languageAlternates, localizedPath } from '@/lib/seo/urls';
 
 export const revalidate = 86400;
 
-function newest(...dates: (string | undefined)[]) {
+function newest(...dates: Array<string | undefined>) {
   return dates
     .filter((date): date is string => Boolean(date))
     .reduce((latest, date) => (date > latest ? date : latest), '');
 }
 
-function entries(
-  path: string,
-  lastModified?: string,
-  images?: string[],
-): MetadataRoute.Sitemap {
+function entries(path: string, lastModified?: string, images?: string[]): MetadataRoute.Sitemap {
   return routing.locales.map((locale: AppLocale) => ({
     url: absoluteUrl(localizedPath(locale, path)),
     lastModified: lastModified || undefined,
@@ -41,10 +37,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     ...entries('/', homeModified),
-    ...entries(
-      '/projects',
-      newest(...projects.map((project) => project.updatedAt)),
-    ),
+    ...entries('/projects', newest(...projects.map((project) => project.updatedAt))),
     ...entries('/accessibility'),
     ...projects.flatMap((project) =>
       entries(

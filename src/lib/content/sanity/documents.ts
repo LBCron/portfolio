@@ -1,12 +1,12 @@
 import { createHash } from 'node:crypto';
 
-import type { FixtureDataset } from '../fixtures/dataset';
-import type {
-  DocumentInput,
-  DocumentType,
-  FileAsset,
-  ImageAsset,
-  LocalizedText,
+import { type FixtureDataset } from '../fixtures/dataset';
+import {
+  type DocumentInput,
+  type DocumentType,
+  type FileAsset,
+  type ImageAsset,
+  type LocalizedText,
 } from '../schema';
 
 /**
@@ -22,11 +22,11 @@ export interface SanityDocument {
 }
 
 export interface AssetResolver {
-  image(asset: ImageAsset): string;
   file(asset: FileAsset): string;
+  image(asset: ImageAsset): string;
 }
 
-function key(...parts: (string | number)[]): string {
+function key(...parts: Array<number | string>): string {
   return createHash('sha1').update(parts.join(':')).digest('hex').slice(0, 12);
 }
 
@@ -51,8 +51,8 @@ function optional<T, R>(value: T | undefined, map: (value: T) => R) {
 }
 
 interface ImageInput {
-  asset: ImageAsset;
   alt?: LocalizedText;
+  asset: ImageAsset;
   focal?: { x: number; y: number };
 }
 
@@ -94,10 +94,7 @@ function base<T extends DocumentType>(type: T, doc: DocumentInput<T>) {
 }
 
 type Converters = {
-  [T in DocumentType]: (
-    doc: DocumentInput<T>,
-    assets: AssetResolver,
-  ) => SanityDocument;
+  [T in DocumentType]: (doc: DocumentInput<T>, assets: AssetResolver) => SanityDocument;
 };
 
 const converters: Converters = {
@@ -112,11 +109,7 @@ const converters: Converters = {
       photoLg: optional(doc.photoLg, (photo) => image(assets, photo)),
       bio: localeText(doc.bio),
       location: localeString(doc.location),
-      spokenLanguages: localeStrings(
-        doc.id,
-        'spokenLanguages',
-        doc.spokenLanguages,
-      ),
+      spokenLanguages: localeStrings(doc.id, 'spokenLanguages', doc.spokenLanguages),
       focus: localeString(doc.focus),
       metrics: (doc.metrics ?? []).map((metric, index) =>
         compact({
@@ -229,11 +222,7 @@ const converters: Converters = {
           start: role.start,
           end: role.end,
           summary: localeText(role.summary),
-          bullets: localeStrings(
-            doc.id,
-            `roles.${index}.bullets`,
-            role.bullets ?? [],
-          ),
+          bullets: localeStrings(doc.id, `roles.${index}.bullets`, role.bullets ?? []),
         }),
       ),
       technologies: references(doc.id, 'technologies', doc.techIds),
@@ -293,10 +282,13 @@ export function toSanityDocument<T extends DocumentType>(
     doc: DocumentInput<T>,
     assets: AssetResolver,
   ) => SanityDocument;
+
   return convert(doc, assets);
 }
 
-/** Every document of a dataset, singletons first, in a stable order. */
+/**
+ * Every document of a dataset, singletons first, in a stable order.
+ */
 export function toSanityDocuments(
   dataset: FixtureDataset,
   assets: AssetResolver,
