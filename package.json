@@ -2,6 +2,7 @@
   "name": "juliolmuller.com",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "scripts": {
     "dev": "bun run --bun next dev",
     "build": "bun run --bun next build",
