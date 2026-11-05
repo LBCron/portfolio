@@ -34,8 +34,8 @@ export function ResumePanes({
   experienceLabel: string;
   tablistLabel: string;
 }) {
-  const hasExperience = experience != null;
-  const hasEducation = education != null;
+  const hasExperience = experience !== null && experience !== undefined;
+  const hasEducation = education !== null && education !== undefined;
 
   useEffect(() => {
     const apply = () => {
