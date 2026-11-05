@@ -49,7 +49,7 @@ export function FitTitle({
     const observer = new ResizeObserver(fit);
 
     observer.observe(parent);
-    void document.fonts.ready.then(fit);
+    document.fonts.ready.then(fit);
 
     return () => observer.disconnect();
   }, [children]);

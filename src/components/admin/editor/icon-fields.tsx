@@ -186,7 +186,7 @@ export function TechIconFields() {
             <button
               type="button"
               disabled={form.disabled || !svgText.trim()}
-              onClick={() => void applySvg(svgText)}
+              onClick={() => { applySvg(svgText); }}
               className={smallButton}
             >
               Use this SVG

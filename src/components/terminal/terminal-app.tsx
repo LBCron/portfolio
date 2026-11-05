@@ -99,7 +99,7 @@ export default function TerminalApp() {
   useEffect(() => {
     let cancelled = false;
 
-    void loadTranslator(locale).then((translator) => {
+    loadTranslator(locale).then((translator) => {
       if (!cancelled) setT(() => translator);
     });
 
@@ -129,7 +129,7 @@ export default function TerminalApp() {
 
   // The server owns the session; ask on mount and when the window regains focus.
   useEffect(() => {
-    const refresh = () => void getSessionStatus().then(applyStatus, () => {});
+    const refresh = () => { getSessionStatus().then(applyStatus, () => {}); };
 
     refresh();
 
@@ -352,7 +352,7 @@ export default function TerminalApp() {
               t={t}
               skipTyping={skipTyping}
               onRun={(command) => {
-                void run(command);
+                run(command);
                 inputRef.current?.focus({ preventScroll: true });
               }}
             />
@@ -371,7 +371,7 @@ export default function TerminalApp() {
               type="button"
               disabled={running}
               onClick={() => {
-                void run(command);
+                run(command);
                 inputRef.current?.focus({ preventScroll: true });
               }}
               className="inline-flex min-h-6 items-center rounded-full border border-line-strong px-2.5 text-accent-2 disabled:opacity-50 pointer-coarse:min-h-9 hover-fine:bg-surface-2"
@@ -397,7 +397,7 @@ export default function TerminalApp() {
           inputRef={inputRef}
           onSubmit={(line, options) => {
             if (secretResolver.current) secretResolver.current(line);
-            else void run(line, options);
+            else run(line, options);
           }}
           onInterrupt={interrupt}
           onClear={() => useTerminalStore.getState().clear()}

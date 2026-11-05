@@ -20,7 +20,7 @@ async function recordTransitions(page: Page) {
     document.startViewTransition = ((argument: Parameters<typeof start>[0]) => {
       const transition = start(argument);
       record.started += 1;
-      void transition.ready.then(() => {
+      transition.ready.then(() => {
         record.animations = document.getAnimations().flatMap((animation) => {
           const effect = animation.effect;
 

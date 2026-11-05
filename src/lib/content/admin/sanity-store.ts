@@ -95,8 +95,6 @@ export function createSanityAdminStore(
       if (!current) return { ok: false, reason: 'missing' };
 
       const { _id, _type, ...fields } = stored;
-      void _id;
-      void _type;
       const unset = Object.keys(current).filter((key) => !key.startsWith('_') && !(key in fields));
       const patch = client.patch(document.id);
 

@@ -231,7 +231,7 @@ test.describe('singletons and lists', () => {
     await field(page, 'bookingUrl').fill('https://example.com/e2e-booking');
     page.once('dialog', (dialog) => {
       expect(dialog.message()).toContain('Discard unsaved changes?');
-      void dialog.dismiss();
+      dialog.dismiss();
     });
     await page
       .getByRole('navigation', { name: 'Admin areas' })

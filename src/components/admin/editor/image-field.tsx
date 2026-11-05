@@ -227,7 +227,7 @@ export function ImageField({
         accept="image/jpeg,image/png,image/webp,image/avif"
         busy={busy}
         label={asset ? 'Replace image' : 'Choose image'}
-        onFile={(file) => void onFile(file)}
+        onFile={(file) => { onFile(file); }}
       />
       {message || error ? (
         <p role="alert" className="text-small text-danger">
@@ -292,7 +292,7 @@ export function PdfField({ path, label }: { label: string; path: string }) {
         accept="application/pdf"
         busy={busy}
         label={value ? 'Replace PDF' : 'Choose PDF'}
-        onFile={(file) => void onFile(file)}
+        onFile={(file) => { onFile(file); }}
       />
       {value ? (
         <div>

@@ -78,7 +78,7 @@ function firstDifference(a: unknown, b: unknown, at = ''): null | string {
 }
 
 const warnings: string[] = [];
-const logger = { warn: (event: string) => void warnings.push(event) };
+const logger = { warn: (event: string) => { warnings.push(event); } };
 const sanity = await read(createRepository(createSanitySource(createSanityHttpFetch()), logger));
 const fixtures = await read(createRepository(createFixtureSource()));
 

@@ -222,7 +222,7 @@ export function CollectionList({
                   onDrop={(event) => {
                     event.preventDefault();
 
-                    if (dragging) void move(dragging, index);
+                    if (dragging) move(dragging, index);
 
                     setDragging(null);
                   }}
@@ -253,7 +253,7 @@ export function CollectionList({
                         aria-label={`Featured: ${row.cells[0] ?? row.id}`}
                         checked={row.featured === true}
                         disabled={readOnly}
-                        onChange={() => void toggle(row, 'featured')}
+                        onChange={() => { toggle(row, 'featured'); }}
                         className="size-5 accent-accent-1"
                       />
                     </td>
@@ -264,7 +264,7 @@ export function CollectionList({
                       aria-label={`Visible: ${row.cells[0] ?? row.id}`}
                       checked={row.visible}
                       disabled={readOnly}
-                      onChange={() => void toggle(row, 'visible')}
+                      onChange={() => { toggle(row, 'visible'); }}
                       className="size-5 accent-accent-1"
                     />
                   </td>
@@ -287,7 +287,7 @@ export function CollectionList({
                         type="button"
                         aria-label={`Move ${row.cells[0] ?? row.id} up`}
                         disabled={readOnly || narrowed || index === 0}
-                        onClick={() => void move(row.id, index - 1)}
+                        onClick={() => { move(row.id, index - 1); }}
                         className={smallButton}
                       >
                         ↑
@@ -296,7 +296,7 @@ export function CollectionList({
                         type="button"
                         aria-label={`Move ${row.cells[0] ?? row.id} down`}
                         disabled={readOnly || narrowed || index === rows.length - 1}
-                        onClick={() => void move(row.id, index + 1)}
+                        onClick={() => { move(row.id, index + 1); }}
                         className={smallButton}
                       >
                         ↓

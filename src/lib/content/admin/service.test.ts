@@ -101,10 +101,6 @@ describe('save', () => {
     const { store, service } = setup();
     const template = await firstProject(store);
     const { id, rev, order, slug, ...rest } = template;
-    void id;
-    void rev;
-    void order;
-    void slug;
     const before = (await store.list('project')).length;
     const result = await service.save('project', null, {
       ...rest,

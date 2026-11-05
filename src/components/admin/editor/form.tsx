@@ -178,7 +178,6 @@ export function DocumentEditor({
           if (!(path in current)) return current;
 
           const { [path]: _removed, ...rest } = current;
-          void _removed;
 
           return rest;
         });
@@ -244,7 +243,7 @@ export function DocumentEditor({
   function onSubmit(event: FormEvent) {
     event.preventDefault();
 
-    if (!disabled && dirty) void save();
+    if (!disabled && dirty) save();
   }
 
   const errorEntries = Object.entries(errors);
@@ -351,7 +350,7 @@ export function DocumentEditor({
             variant="secondary"
             onClick={() => {
               setConflict(false);
-              void save(true);
+              save(true);
             }}
           >
             Overwrite
@@ -461,7 +460,7 @@ function DeleteSection({
         <Button
           className="mt-6"
           disabled={typed !== confirmText || busy}
-          onClick={() => void remove()}
+          onClick={() => { remove(); }}
         >
           {busy ? 'Deleting…' : 'Delete permanently'}
         </Button>

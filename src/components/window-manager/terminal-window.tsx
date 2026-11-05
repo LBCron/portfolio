@@ -119,7 +119,7 @@ export function TerminalWindow() {
 
   // Warm the snapshot while the browser is idle so the first command is instant.
   useEffect(() => {
-    const warm = () => void loadSnapshot(locale).catch(() => {});
+    const warm = () => { loadSnapshot(locale).catch(() => {}); };
 
     if ('requestIdleCallback' in window) {
       const id = window.requestIdleCallback(warm, { timeout: 4000 });

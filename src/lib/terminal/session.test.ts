@@ -9,7 +9,7 @@ function fakeStorage() {
   return {
     data,
     getItem: (key: string) => data.get(key) ?? null,
-    setItem: (key: string, value: string) => void data.set(key, value),
+    setItem: (key: string, value: string) => { data.set(key, value); },
   };
 }
 
