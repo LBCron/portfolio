@@ -9,20 +9,20 @@ export class ErrorBoundary extends Component<
   { children: ReactNode; fallback: ReactNode; onError?: () => void },
   { failed: boolean }
 > {
-  constructor(props: { children: ReactNode; fallback: ReactNode; onError?: () => void }) {
+  public constructor(props: { children: ReactNode; fallback: ReactNode; onError?: () => void }) {
     super(props);
     this.state = { failed: false };
   }
 
-  static getDerivedStateFromError(): { failed: boolean } {
+  public static getDerivedStateFromError(): { failed: boolean } {
     return { failed: true };
   }
 
-  override componentDidCatch(): void {
+  public override componentDidCatch(): void {
     this.props.onError?.();
   }
 
-  override render(): ReactNode {
+  public override render(): ReactNode {
     return this.state.failed ? this.props.fallback : this.props.children;
   }
 }

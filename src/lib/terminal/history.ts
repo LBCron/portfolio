@@ -22,11 +22,11 @@ export class HistoryNavigator {
   private index: number;
   private draft = '';
 
-  constructor(private readonly entries: readonly string[]) {
+  public constructor(private readonly entries: readonly string[]) {
     this.index = entries.length;
   }
 
-  up(current: string): null | string {
+  public up(current: string): null | string {
     if (this.entries.length === 0) return null;
 
     if (this.index === this.entries.length) this.draft = current;
@@ -36,7 +36,7 @@ export class HistoryNavigator {
     return this.entries[this.index] ?? null;
   }
 
-  down(): null | string {
+  public down(): null | string {
     if (this.index >= this.entries.length) return null;
 
     this.index += 1;
