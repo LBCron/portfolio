@@ -1,9 +1,9 @@
+'use client';
+
 import { type FeatureBundle, LazyMotion, MotionConfig } from 'motion/react';
 import { type ReactNode } from 'react';
 
 import { useMotionPaused } from '@/lib/motion-preference';
-
-('use client');
 
 const loadFeatures = (): Promise<FeatureBundle> =>
   import('./motion-features').then((module) => module.domAnimation);
