@@ -1,0 +1,550 @@
+{
+  "meta": {
+    "siteDescription": "{name} é {jobTitle} em {city} e cria plataformas web, APIs, apps mobile e desktop, automações e integrações de ponta a ponta.",
+    "homeTitle": "{name} — {jobTitle}"
+  },
+  "a11y": {
+    "skipToContent": "Pular para o conteúdo principal",
+    "languageChanged": "Idioma alterado para português",
+    "opensInNewTab": "(abre em uma nova aba)",
+    "pauseAnimations": "Pausar animações",
+    "resumeAnimations": "Retomar animações",
+    "animationsPaused": "Animações pausadas",
+    "animationsResumed": "Animações retomadas",
+    "breadcrumb": "Trilha de navegação",
+    "scrollRegion": "Conteúdo com rolagem"
+  },
+  "window": {
+    "label": "Janela do terminal",
+    "controls": "Controles da janela",
+    "controlsHint": "As setas movem a janela. Alt com as setas redimensiona.",
+    "close": "Fechar terminal",
+    "minimize": "Minimizar terminal",
+    "maximize": "Maximizar terminal",
+    "restore": "Restaurar terminal",
+    "resizeSheet": "Alterar a altura do terminal",
+    "dock": "terminal",
+    "dockMinimized": "(minimizado)",
+    "hint": "Experimente o terminal: digite help",
+    "toggle": "Alternar terminal",
+    "error": "Não foi possível carregar o terminal. Recarregue a página e tente de novo.",
+    "buttonLabel": "Terminal"
+  },
+  "terminal": {
+    "inputLabel": "Entrada de comando, {prompt}",
+    "outputLabel": "Saída do terminal",
+    "quickActions": "Comandos rápidos",
+    "welcome1": "Bem-vindo. Este terminal sabe tudo o que há neste site.",
+    "welcome2": "Digite help para começar.",
+    "pasteMultiline": "Só a primeira linha do texto colado foi executada.",
+    "unexpectedError": "Algo deu errado ao executar esse comando.",
+    "usage": "Uso: {usage}",
+    "notFound": "comando não encontrado: {name}",
+    "didYouMean": "Você quis dizer {suggestion}?",
+    "unsupported": {
+      "unterminated": "Essa linha tem uma aspa sem fechar.",
+      "chain": "Encadear comandos com ; ou & não é suportado. Execute um comando por vez.",
+      "pipe": "Pipes não são suportados aqui. Execute um comando por vez.",
+      "redirect": "Redirecionamentos não são suportados: este shell é somente leitura.",
+      "glob": "Curingas não são suportados. Use Tab para completar nomes.",
+      "variable": "Variáveis não são expandidas aqui. Digite o valor diretamente."
+    },
+    "loading": "Carregando conteúdo…",
+    "loadFailed": "Não foi possível carregar o conteúdo do site. Verifique sua conexão e tente de novo.",
+    "empty": "Ainda não há nada para mostrar.",
+    "missingOperand": "{command}: operando ausente",
+    "groups": {
+      "navigate": "Navegar",
+      "explore": "Explorar",
+      "site": "Site",
+      "fun": "Diversão"
+    },
+    "help": {
+      "footer": "Pressione {shortcut} para abrir ou minimizar o terminal. Use --help em qualquer comando para ver detalhes. Tab completa."
+    },
+    "labels": {
+      "email": "E-mail",
+      "booking": "Agendar uma conversa",
+      "links": "Links",
+      "name": "Nome",
+      "role": "Cargo",
+      "location": "Local",
+      "languages": "Idiomas",
+      "focus": "Foco"
+    },
+    "about": {
+      "pointer": "Para a linha do tempo da carreira, rode:"
+    },
+    "fs": {
+      "notFound": "{command}: arquivo ou diretório inexistente: {path}",
+      "notDirectory": "{command}: não é um diretório: {path}",
+      "isDirectory": "{command}: {path}: é um diretório",
+      "binary": "{path} é um arquivo binário. Rode open {path} para baixar.",
+      "empty": "(vazio)"
+    },
+    "open": {
+      "resume": "Baixando o currículo…",
+      "project": "Abrindo {title}…",
+      "external": "Abrindo {label} em uma nova aba…",
+      "unknown": "open: nada chamado {target}. Tente o slug de um projeto, uma seção ou resume.pdf."
+    },
+    "goto": {
+      "going": "Indo para {section}…",
+      "unknown": "goto: seção desconhecida {section}",
+      "available": "Disponíveis: {list}"
+    },
+    "resume": {
+      "unavailable": "O currículo ainda não está disponível.",
+      "latest": "Cargo mais recente: {title}, {company}",
+      "counts": "{companies, plural, one {# empresa} other {# empresas}} · {education, plural, one {# formação} other {# formações}}",
+      "download": "Baixe o PDF:"
+    },
+    "skills": {
+      "unknown": "skills: categoria desconhecida {category}",
+      "available": "Disponíveis: {list}"
+    },
+    "projects": {
+      "head": {
+        "slug": "Slug",
+        "summary": "Resumo"
+      },
+      "hint": "Rode open slug para ver a história completa.",
+      "none": "Nenhum projeto encontrado.",
+      "unknownKind": "projects: tipo desconhecido {kind}",
+      "kinds": "Tipos: {list}"
+    },
+    "git": {
+      "onlyLog": "Aqui só está disponível git log --oneline.",
+      "milestone": "{title} em {company}"
+    },
+    "history": {
+      "empty": "Nenhum comando ainda."
+    },
+    "lang": {
+      "current": "Idioma atual: {language}",
+      "available": "Disponíveis: {list}",
+      "unknown": "lang: idioma desconhecido {language}",
+      "already": "Você já está em {language}.",
+      "switched": "Idioma alterado para {language}."
+    },
+    "commands": {
+      "help": {
+        "summary": "Lista os comandos ou explica um.",
+        "usage": "help [comando]"
+      },
+      "ls": {
+        "summary": "Lista arquivos e pastas.",
+        "usage": "ls [caminho]"
+      },
+      "cd": {
+        "summary": "Muda o diretório atual.",
+        "usage": "cd [caminho]"
+      },
+      "pwd": {
+        "summary": "Mostra o diretório atual.",
+        "usage": "pwd"
+      },
+      "cat": {
+        "summary": "Mostra o conteúdo de um arquivo.",
+        "usage": "cat arquivo..."
+      },
+      "tree": {
+        "summary": "Mostra a árvore de arquivos.",
+        "usage": "tree [caminho]"
+      },
+      "open": {
+        "summary": "Abre um projeto, seção, link ou o currículo.",
+        "usage": "open slug-do-projeto | seção | resume.pdf"
+      },
+      "goto": {
+        "summary": "Rola até uma seção da página.",
+        "usage": "goto about|experience|stack|work|recommended|contact"
+      },
+      "about": {
+        "summary": "Uma bio curta.",
+        "usage": "about"
+      },
+      "whoami": {
+        "summary": "Quem está usando este terminal.",
+        "usage": "whoami"
+      },
+      "experience": {
+        "summary": "Linha do tempo da carreira.",
+        "usage": "experience"
+      },
+      "education": {
+        "summary": "Formações e certificações.",
+        "usage": "education"
+      },
+      "contact": {
+        "summary": "E-mail e links (alias: socials).",
+        "usage": "contact"
+      },
+      "links": {
+        "summary": "Links em destaque.",
+        "usage": "links"
+      },
+      "recommend": {
+        "summary": "Pessoas que vale a pena seguir (alias: following).",
+        "usage": "recommend"
+      },
+      "skills": {
+        "summary": "Tecnologias por categoria (alias: stack).",
+        "usage": "skills [--category nome]"
+      },
+      "projects": {
+        "summary": "Lista os projetos.",
+        "usage": "projects [--kind tipo] [--featured] | projects open slug"
+      },
+      "resume": {
+        "summary": "Resumo do currículo ou download do PDF.",
+        "usage": "resume [--download]"
+      },
+      "lang": {
+        "summary": "Mostra ou troca o idioma do site.",
+        "usage": "lang [en|pt]"
+      },
+      "clear": {
+        "summary": "Limpa a tela (Ctrl+L).",
+        "usage": "clear"
+      },
+      "echo": {
+        "summary": "Imprime um texto.",
+        "usage": "echo [texto...]"
+      },
+      "history": {
+        "summary": "Mostra o histórico de comandos.",
+        "usage": "history"
+      },
+      "date": {
+        "summary": "Mostra data e hora.",
+        "usage": "date"
+      },
+      "uname": {
+        "summary": "Mostra informações do sistema.",
+        "usage": "uname [-a]"
+      },
+      "exit": {
+        "summary": "Fecha o terminal.",
+        "usage": "exit"
+      },
+      "minimize": {
+        "summary": "Minimiza o terminal.",
+        "usage": "minimize"
+      },
+      "maximize": {
+        "summary": "Maximiza ou restaura a janela.",
+        "usage": "maximize"
+      },
+      "neofetch": {
+        "summary": "Um cartão-resumo.",
+        "usage": "neofetch"
+      },
+      "git": {
+        "summary": "A carreira como um log de commits.",
+        "usage": "git log --oneline"
+      },
+      "fortune": {
+        "summary": "Mostra uma máxima curta de engenharia.",
+        "usage": "fortune"
+      },
+      "cowsay": {
+        "summary": "Deixa a vaca falar por você.",
+        "usage": "cowsay [texto...]"
+      },
+      "matrix": {
+        "summary": "Alguns segundos de chuva verde.",
+        "usage": "matrix"
+      },
+      "ping": {
+        "summary": "Confere se este site continua no ar.",
+        "usage": "ping [host]"
+      },
+      "ssh": {
+        "summary": "Tenta abrir um shell remoto.",
+        "usage": "ssh [host]"
+      },
+      "sudo": {
+        "summary": "Pede superpoderes.",
+        "usage": "sudo comando..."
+      },
+      "rm": {
+        "summary": "Remove arquivos (só que não).",
+        "usage": "rm [-rf] caminho"
+      },
+      "vim": {
+        "summary": "Abre um editor (também vi, nano, emacs).",
+        "usage": "vim [arquivo]"
+      }
+    },
+    "fun": {
+      "sudo": {
+        "denied": "visitor não está no arquivo sudoers. Este incidente será reportado.",
+        "joke": "Para ninguém, na verdade. Mas valeu a tentativa."
+      },
+      "rm": {
+        "refuse": "rm: me recuso a apagar isso. Excluir um site recursivamente de dentro dele é um plano ousado.",
+        "joke": "Aqui tudo é somente leitura, inclusive meu senso de humor sobre isso.",
+        "readOnly": "rm: não foi possível remover {path}: sistema de arquivos somente leitura"
+      },
+      "editor": "Nada de editor por aqui: o sistema de arquivos é somente leitura. O lado bom é que você nunca vai precisar descobrir como sair.",
+      "ping": {
+        "header": "PING {host} (127.0.0.1): 56 bytes de dados",
+        "reply": "64 bytes de {host}: icmp_seq={seq} ttl=64 tempo={time} ms",
+        "summary": "{count} pacotes enviados, {count} recebidos. Latência: baixa. Curiosidade: alta.",
+        "offline": "ping: {host}: este terminal não tem acesso à rede. Para falar com o Julio, use contact."
+      },
+      "ssh": {
+        "refused": "ssh: conexão com o host {host} na porta 22 recusada",
+        "joke": "Nada de shell remoto por aqui. O site inteiro já cabe nesta janela."
+      },
+      "matrix": {
+        "done": "A chuva passou. Era só CSS o tempo todo.",
+        "reduced": "A chuva fica desligada enquanto as animações estiverem reduzidas ou pausadas."
+      },
+      "cowsay": {
+        "default": "Muu. Digite help para ver os comandos de verdade.",
+        "label": "Uma vaca diz: {message}"
+      }
+    },
+    "fortune": {
+      "items": {
+        "names": "Dê nomes pensando em quem vai ler o código às 2 da manhã, no meio de um incidente.",
+        "deleted": "O código mais rápido é aquele que você apagou na última sprint.",
+        "cache": "Todo cache é uma promessa que alguém vai ter que cumprir.",
+        "estimate": "Estimativa sem as premissas escritas do lado é só um desejo.",
+        "logs": "Log é carta para o seu eu do futuro. Capriche na letra.",
+        "rollback": "Migration sem rollback é decisão, não mudança.",
+        "boring": "Entregue primeiro a versão sem graça. É ela que paga a interessante.",
+        "a11y": "Bug de acessibilidade também é bug. Só que quem sofre com ele raramente consegue abrir o chamado.",
+        "abstraction": "A abstração certa costuma ser a terceira. As duas primeiras ensinam o que ela deveria ser.",
+        "tests": "Teste é como você explica para o próximo dev o que queria dizer.",
+        "profile": "Meça antes de otimizar. Intuição é hipótese, não medição.",
+        "dependency": "Toda dependência é um colega de time que você nunca entrevistou."
+      }
+    }
+  },
+  "header": {
+    "homeLabel": "{name}, voltar ao topo",
+    "primaryNav": "Principal",
+    "nav": {
+      "about": "Sobre",
+      "stack": "Stack",
+      "work": "Projetos",
+      "resume": "Currículo",
+      "contact": "Contato"
+    },
+    "backToWork": "Voltar aos projetos",
+    "openMenu": "Abrir menu",
+    "closeMenu": "Fechar menu",
+    "menuTitle": "Menu",
+    "language": "Idioma",
+    "languageNames": {
+      "en": "English",
+      "pt": "Português"
+    },
+    "languageShort": {
+      "en": "EN",
+      "pt": "PT"
+    },
+    "linksLabel": "Perfis"
+  },
+  "hero": {
+    "eyebrow": "{jobTitle}",
+    "seeWork": "Ver meus projetos",
+    "getInTouch": "Fale comigo",
+    "scrollCue": "Rolar até a próxima seção"
+  },
+  "summary": {
+    "eyebrow": "Resumo",
+    "title": "Em um relance",
+    "factsTitle": "Em poucas palavras",
+    "location": "Moro em",
+    "languages": "Idiomas",
+    "focus": "Foco",
+    "metricsLabel": "Em números"
+  },
+  "about": {
+    "eyebrow": "Sobre",
+    "title": "Quem sou e como trabalho"
+  },
+  "resume": {
+    "eyebrow": "Currículo",
+    "title": "Trabalho e formação",
+    "lead": "A versão curta de por onde passei e o que estudei. O PDF e o LinkedIn têm o resto.",
+    "tablist": "Seções do currículo",
+    "experienceTab": "Experiência",
+    "educationTab": "Formação",
+    "present": "Atual",
+    "technologies": "Tecnologias",
+    "kinds": {
+      "degree": "Graduação",
+      "certification": "Certificação"
+    },
+    "viewCredential": "Ver credencial",
+    "viewCredentialLabel": "{title}: ver credencial (abre em uma nova aba)",
+    "download": "Baixar currículo (PDF)",
+    "downloadOther": "Também em {language} (PDF)"
+  },
+  "stack": {
+    "eyebrow": "Stack",
+    "title": "Tecnologias com que trabalho",
+    "lead": "As ferramentas que uso no dia a dia, agrupadas pelo lugar que ocupam em um sistema. É um mapa de amplitude, não um placar.",
+    "categories": {
+      "language": "Linguagens",
+      "frontend": "Frontend",
+      "backend": "Backend e APIs",
+      "data": "Dados e mensageria",
+      "cloud": "Cloud e DevOps",
+      "integration": "Integrações e automação",
+      "ai": "Agentes de IA e ferramentas"
+    },
+    "practicesTitle": "Práticas e conceitos",
+    "filterLabel": "Filtrar por categoria",
+    "filterChip": "{category} {count, plural, one {# tecnologia} other {# tecnologias}}",
+    "officialSite": "Site oficial ↗"
+  },
+  "work": {
+    "eyebrow": "Projetos",
+    "title": "Trabalhos selecionados",
+    "lead": "Alguns projetos sobre os quais gosto de conversar. Cada um traz o contexto, as escolhas que fiz e o que mudou depois.",
+    "allProjects": "Todos os projetos",
+    "visitApp": "Abrir app",
+    "visitAppLabel": "Abrir app: {title} (abre em uma nova aba)",
+    "viewDetails": "Ver detalhes",
+    "viewDetailsLabel": "Ver detalhes sobre {title}",
+    "moreTechnologies": "{count, plural, one {mais # tecnologia} other {mais # tecnologias}}",
+    "kinds": {
+      "web": "Web",
+      "mobile": "Mobile",
+      "desktop": "Desktop",
+      "automation": "Automação",
+      "integration": "Integração",
+      "open-source": "Open source"
+    },
+    "statuses": {
+      "live": "No ar",
+      "in-progress": "Em andamento",
+      "archived": "Arquivado",
+      "private": "Privado"
+    }
+  },
+  "projects": {
+    "title": "Projetos",
+    "intro": "Tudo o que posso mostrar: produtos, ferramentas internas e experimentos, cada um com o contexto por trás e o que ele mudou.",
+    "metaDescription": "Projetos de {name}: plataformas web, apps mobile e desktop, automações e integrações, cada um com contexto, abordagem e resultado.",
+    "pageTitle": "Projetos, página {page}",
+    "filteredTitle": "Projetos: {kind}",
+    "home": "Início",
+    "filterLabel": "Filtrar por tipo",
+    "all": "Todos",
+    "filters": {
+      "web": "Web",
+      "mobile": "Mobile",
+      "desktop": "Desktop",
+      "automation": "Automação",
+      "integration": "Integrações",
+      "open-source": "Open source"
+    },
+    "showing": "{count, plural, one {Mostrando # projeto} other {Mostrando # projetos}}",
+    "pagination": "Paginação",
+    "previousPage": "Página anterior",
+    "nextPage": "Próxima página",
+    "pageLabel": "Página {page}",
+    "pageOf": "Página {page} de {total}"
+  },
+  "project": {
+    "year": "Ano",
+    "kind": "Tipo",
+    "status": "Situação",
+    "role": "Meu papel",
+    "repository": "Repositório",
+    "repositoryLabel": "{title}: repositório (abre em uma nova aba)",
+    "context": "Contexto",
+    "approach": "Abordagem",
+    "highlights": "Destaques",
+    "outcome": "Resultado",
+    "details": "A história completa",
+    "technologies": "Tecnologias",
+    "gallery": "Galeria",
+    "openImage": "Abrir imagem {index} de {total}: {alt}",
+    "closeImage": "Fechar",
+    "previousImage": "Imagem anterior",
+    "nextImage": "Próxima imagem",
+    "imageCounter": "{index} de {total}",
+    "related": "Projetos relacionados",
+    "projectNav": "Mais projetos",
+    "previousProject": "Projeto anterior",
+    "nextProject": "Próximo projeto",
+    "facts": "Ficha do projeto"
+  },
+  "recommended": {
+    "eyebrow": "Recomendações",
+    "title": "Vale a pena seguir",
+    "lead": "Pessoas cujo trabalho me ensinou alguma coisa. Vale ler, assistir e acompanhar.",
+    "visit": "Ver perfil",
+    "visitLabel": "{name}: ver perfil (abre em uma nova aba)"
+  },
+  "contact": {
+    "eyebrow": "Contato",
+    "fallbackHeading": "Vamos trabalhar juntos",
+    "fallbackText": "Tem um problema difícil, uma ideia de produto ou uma vaga em mente? Vamos conversar.",
+    "email": "E-mail",
+    "copyEmail": "Copiar endereço de e-mail",
+    "copied": "Copiado",
+    "copyFailed": "Não consegui copiar. Selecione o endereço manualmente.",
+    "emailAt": "arroba",
+    "emailDot": "ponto",
+    "resume": "Baixar currículo (PDF)",
+    "resumeOther": "Também em <lang>{language}</lang> (PDF)",
+    "booking": "Agendar uma conversa",
+    "bookingLabel": "Agendar uma conversa (abre em uma nova aba)",
+    "phone": "Ligar para {phone}",
+    "linksLabel": "Em outros lugares"
+  },
+  "footer": {
+    "copyright": "© {year} {name}",
+    "builtBy": "Projetado e desenvolvido por {name}.",
+    "accessibility": "Acessibilidade",
+    "backToTop": "Voltar ao topo",
+    "terminalHint": "Pressione <kbd></kbd> para abrir o terminal",
+    "footerNav": "Rodapé",
+    "linksLabel": "Perfis"
+  },
+  "accessibility": {
+    "title": "Declaração de acessibilidade",
+    "metaDescription": "Como este site atende à WCAG 2.2 AA: teclado, leitores de tela, movimento reduzido, contraste, limitações conhecidas e como relatar um problema.",
+    "intro": "Quero que qualquer pessoa consiga ler este site e falar comigo, seja qual for o dispositivo, a forma de interação ou a tecnologia assistiva que use.",
+    "standardTitle": "Padrão adotado",
+    "standardText": "A meta é atender às Diretrizes de Acessibilidade para Conteúdo Web (WCAG) 2.2 no nível AA, com contraste AAA no texto corrido sempre que isso custa pouco.",
+    "measuresTitle": "O que já está implementado",
+    "measures": {
+      "keyboard": "Todos os controles funcionam pelo teclado, com indicador de foco visível e um atalho para pular direto ao conteúdo principal.",
+      "semantics": "As páginas usam landmarks, um único título principal, listas de verdade e controles nativos, e passam por testes automáticos a cada mudança.",
+      "motion": "As animações seguem a configuração de movimento reduzido do seu sistema, e o botão “Pausar animações” no rodapé as interrompe em qualquer dispositivo.",
+      "contrast": "Textos e controles atingem contraste AA em todas as superfícies, e os modos de alto contraste e cores forçadas são suportados.",
+      "noScript": "Toda a leitura e a navegação funcionam sem JavaScript: a troca de idioma, os filtros de projetos e a paginação são links comuns."
+    },
+    "limitationsTitle": "Limitações conhecidas",
+    "limitations": {
+      "decorative": "As animações decorativas, como o fundo do topo da página, ficam ocultas para tecnologias assistivas e não têm equivalente em texto porque não transmitem informação.",
+      "thirdParty": "Os sites externos para os quais aponto estão fora do meu controle e podem não seguir o mesmo padrão."
+    },
+    "feedbackTitle": "Fale comigo",
+    "feedbackText": "Se algo atrapalhar sua navegação, me avise que eu corrijo. Meu e-mail está na seção de contato.",
+    "feedbackLink": "Ir para a seção de contato",
+    "lastReviewed": "Revisado em {date}."
+  },
+  "errors": {
+    "notFoundTitle": "404 — comando não encontrado",
+    "notFoundText": "A página que você procurou não existe ou mudou de endereço.",
+    "notFoundPrompt": "visitor@julio-muller:~$ cd {path}",
+    "backHome": "Voltar ao início",
+    "errorTitle": "Algo quebrou do meu lado",
+    "errorText": "Um erro inesperado impediu esta página de carregar. Tente de novo e, se continuar acontecendo, volte ao início.",
+    "tryAgain": "Tentar de novo"
+  },
+  "devUi": {
+    "title": "Componentes de UI"
+  }
+}

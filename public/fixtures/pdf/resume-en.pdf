@@ -1,0 +1,49 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 5 0 R /F2 6 0 R >> >> /Contents 4 0 R >>
+endobj
+4 0 obj
+<< /Length 755 >>
+stream
+BT /F2 22 Tf 56 780 Td (Sample r\351sum\351 \(fictional\)) Tj ET
+BT /F1 11 Tf 56 758 Td (Julio L. Muller \227 Senior Full Stack Software Engineer \227 Curitiba, Brazil) Tj ET
+BT /F1 9 Tf 56 740 Td (Placeholder document for development. Every company, metric and project below is invented.) Tj ET
+BT /F2 13 Tf 56 710 Td (Experience) Tj ET
+BT /F1 10 Tf 56 692 Td (Lumen Works \227 Senior Full Stack Engineer \(2023 \226 present\)) Tj ET
+BT /F1 10 Tf 56 677 Td (Northbridge Labs \227 Lead Frontend Engineer \(2020 \226 2023\)) Tj ET
+BT /F1 10 Tf 56 662 Td (Fable & Co. \227 Software Engineer \(2016 \226 2020\)) Tj ET
+BT /F2 13 Tf 56 634 Td (Education) Tj ET
+BT /F1 10 Tf 56 616 Td (B.Sc. in Computer Science \227 Example University \(2012 \226 2016\)) Tj ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+6 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+7 0 obj
+<< /Title (Sample r\351sum\351 \(fictional\)) /Producer (juliolmuller.com fixtures) >>
+endobj
+xref
+0 8
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000121 00000 n 
+0000000257 00000 n 
+0000001063 00000 n 
+0000001160 00000 n 
+0000001262 00000 n 
+trailer
+<< /Size 8 /Root 1 0 R /Info 7 0 R >>
+startxref
+1364
+%%EOF

@@ -1,0 +1,158 @@
+# Decisions
+
+The "why" behind the current architecture ([ARCHITECTURE.md](./ARCHITECTURE.md) is the "what"). Ids are **stable**: code comments, tests and docs cite them (`D37`, `D56`…). Never renumber.
+
+**Format.** context → decision → consequence, kept to the part a future change must respect. Superseded entries stay as one line pointing at their replacement; the long reasoning lives in git history (`git log -p docs/DECISIONS.md`, last full version at `7ea54f1`). New decisions get the next id (D69+) and are added under the matching topic. Status: **active**, **superseded**, **amended**.
+
+Resolved against npm and the docs bundled in the published packages on 2026-10-13; majors are pinned with `^`, exact versions come from `bun.lock`.
+
+## Index
+
+| Topic                       | Decisions                                        |
+| --------------------------- | ------------------------------------------------ |
+| Toolchain and versions      | D5, D6, D15, D20, D24                            |
+| Rendering, routing, i18n    | D1/D1b, D2, D3, D16, D18, D19, D33–D35, D57, D62 |
+| Content and Sanity          | D7, D8, D9, D14, D25–D30, D53, D65               |
+| Security and admin          | D4, D10, D11, D21, D51, D52, D54–D56             |
+| Tech cloud                  | D13, D22, D37–D45, D59, D66                      |
+| Home, hero, header          | D17, D46–D48, D67, D69                           |
+| Window manager and terminal | D49, D50, D52, D63, D64                          |
+| Quality, tests, CI          | D12, D23, D31, D32, D36, D58, D60, D61           |
+| Analytics                   | D68                                              |
+
+## Toolchain and versions
+
+- **D5 — TypeScript 6.0, not 7.0** (active). `typescript-eslint@8.71` peers on `<6.1` and `eslint-config-next` depends on it. Pin `~6.0.3`; revisit when typescript-eslint supports 7.
+- **D6 — ESLint 9, not 10** (active). `eslint-plugin-jsx-a11y@6.10.2` peers on ESLint ≤ 9 and jsx-a11y strict is required. `bun run update` re-pins both after `bun update --latest`.
+- **D15 — Dependency build scripts** (superseded by D24). Bun blocks lifecycle scripts by default; `trustedDependencies: []`. The three blocked (`@parcel/watcher`, `@swc/core`, `unrs-resolver`) have prebuilt optional binaries. Add an entry only when a package fails without its script.
+- **D20 — Prettier** (active). Single quotes, trailing commas, 80 columns, semicolons, LF (the owner's editor default is CRLF, but the repo lives in WSL/Linux and CI is Linux; `.gitattributes` enforces it), Tailwind plugin.
+- **D24 — Bun 1.4 as package manager and Vercel runtime** (active; replaced pnpm). `vercel.json`: `bunVersion: "1.4.x"`, `bun install --frozen-lockfile`. `dev/build/start` run `bun run --bun next …` (required for ISR on Vercel's Bun runtime). Repo scripts run `bun --conditions=react-server scripts/*.ts` (resolves `server-only` to its no-op). Node 24 stays for tools that spawn `node` (ESLint, Vitest, Playwright). `audit:deps` ignores GHSA-vfj7-8cjw-p6xm (`braces`, dev-only via `eslint-config-next` → `fast-glob`, no patched release); remove the ignore when one ships. **Risk:** Bun runtime on Vercel is beta and the proxy likely stays on Node; if ISR or `sharp` misbehave, drop `bunVersion`.
+
+## Rendering, routing, i18n
+
+- **D1 — Cache Components** (superseded by D1b).
+- **D1b — Classic ISR** (active). Cache Components streamed `200` for unknown slugs and a client-side redirect for `previousSlugs`. So `cacheComponents` is off; routes use `revalidate = 86400`, `dynamicParams = true`, `generateStaticParams`; Sanity reads use `fetch` with `next.tags`; `unstable_cache` is not used. Fixtures have no fetch, so admin writes call `updateTag` **and** `revalidatePath`. Verified: `/en/projects/nope` → 404, `/en/projects/old-alpha` → 308. Migrating later needs a slug check in the proxy.
+- **D2 — `next/root-params`, not `setRequestLocale`** (active). `[locale]` is the root segment with its own `<html lang>`; `src/i18n/request.ts` reads the locale from root params; typed messages via `AppConfig`. Two root layouts (public, admin). Server Actions and Route Handlers can't read root params: pass the locale explicitly.
+- **D3 — URL policy and the indistinguishable 404** (active). The proxy invokes next-intl only for `/` (307: cookie → `Accept-Language` → `en`). Any other unprefixed path, and anonymous `/admin/**` (GET, POST, Server Action posts, `/admin/api/upload`), is a real 404 from the same global page with identical body and headers (an e2e diffs them). Multipart POSTs to a page are treated by Next as Server Action attempts (400 for every path).
+- **D16 — View Transitions** (superseded by D62).
+- **D18 — Locale negotiation in the proxy, not next-intl middleware** (active). `src/i18n/negotiate.ts` (pure, tested); `Vary: Accept-Language, Cookie`, `private, no-store`; next-intl runs with `localeCookie: false`, `localeDetection: false`. The cookie is written only by the language switcher. Without JS the switch works but nothing is remembered.
+- **D19 — Global 404 is `global-not-found.tsx`** (active; `experimental.globalNotFound`). The proxy rewrites any path whose first segment isn't a locale or known root file (including anonymous admin) to `/404`; `[locale]/[...rest]` calls `notFound()` for localized 404s.
+- **D33 — Invalid project query params are 404s** (active). Unknown `?kind=`, non-positive `?page=`, empty kinds and pages past the end → 404, so soft-404 URLs never enter the index.
+- **D34 — Project filter is link navigation** (active). No Motion layout animation: cards stay Server Components wrapping the `Tilt` island; the live region announces the count.
+- **D35 — `/projects` is request-rendered** (active). Awaiting `searchParams` makes it dynamic (`ƒ`); first hit after a deploy pays a render, then 24 h cache.
+- **D57 — Precompiled messages** (active). next-intl `experimental.messages` precompiles ICU at build (~8 KB gzip off first load). Read messages through a translator, never raw JSON; `global-not-found.tsx` uses `createTranslator`; scripts under Bun still read source JSON.
+- **D62 — Card → detail cover morph** (active). `CoverTransition` wraps the cover in React `<ViewTransition name="project-cover-<slug>" share="project-cover" default="none">`; only shared pairs animate; each slug at most once per page; CSS kills the pseudo-elements for reduced motion / Pause animations. `<html data-scroll-behavior="smooth">` is required so Next disables smooth scrolling during route changes (without it the pair never formed). Plays only if the detail page is prefetched.
+
+## Content and Sanity
+
+- **D7 — `@sanity/client`, no `next-sanity`** (active). `next-sanity` peers on Studio/styled-components for features we don't use. No live preview (not needed: admin saves publish at once).
+- **D8 — Sanity client settings** (amended by D26). `useCdn: false`, `perspective: 'published'`, pinned `apiVersion` (default `2026-10-01`), tokens from env, built in `server-only` modules.
+- **D9 — Revalidation APIs** (active). Server Actions: `updateTag` for every affected tag (+ `/sitemap.xml`). Webhook: `revalidateTag(tag, { expire: 0 })`. "Revalidate all" updates every `content:*` tag. Single-arg `revalidateTag` is deprecated; don't use it.
+- **D14 — Fixture images and PDFs are generated and committed** (active). `scripts/generate-fixtures.ts` is deterministic (seeded by slug), writes `public/fixtures/{images,pdf}` plus `src/lib/content/fixtures/assets.generated.ts` (dimensions, 20 px LQIP, sizes). WebP q82 only (`next/image` makes AVIF); 13 images + 2 PDFs ≈ 129 KB. Authored keys (`profile-photo`, `profile-photo-lg`, D47) encode from committed masters and are never SVG-regenerated.
+- **D25 — One content pipeline, two thin sources** (active). See ARCHITECTURE. A technology edit invalidates `content:technologies` only. A test asserts deep equality of every repository method across adapters.
+- **D26 — Sanity reads over plain `fetch`** (amends D8). `src/lib/content/sanity/http.ts` calls the HTTP query API with a Bearer Viewer token, `cache: 'force-cache'`, `next: { revalidate: 86400, tags }`; errors carry the status only. Long GROQ stays in the URL (≤ 1.5 KB today; Sanity asks for POST above 11 KB).
+- **D27 — Adapter contract-tested offline with `groq-js`** (active). `tests/support/sanity-memory.ts` converts fixtures into storage documents (the seed's own converter), synthesizes asset docs and evaluates the real GROQ. Remaining gap (hosted engine, auth header, asset pipeline) is covered by `content:smoke` after seeding.
+- **D28 — Storage shape and ids** (active). `localeString/Text/Markdown` `{en,pt}`; `_key` = sha1 of path; technology references; images with localized alt and hotspot; slugs `{current}`; singleton `_id` = type; seeded ids `<type>.<sha1-derived>`, admin-created ids plain UUIDs (nothing depends on the format). Dotted ids are "path ids" hidden from the public API — moot on a private dataset.
+- **D29 — Studio schema as plain data, deployed through MCP/API** (active). `sanity/schema.ts` has no `sanity` dependency; the same declaration is deployed to both datasets as workspace `default`; validation stays in zod; a unit test fails if a converted fixture field is missing from the schema. Extended by D65.
+- **D30 — Datasets and seeding** (active). Project `njcnsmax`: private `production` (real) and `development` (fictional seed). `sanity:seed` uses `createOrReplace` in one transaction, refuses `production` without `--force`, `--reset` deletes only `isFixture == true` after typing the dataset name, `--dry-run` converts only.
+- **D53 — Admin write path** (active). `AdminStore` / `AdminService` split, optimistic concurrency, revalidation, signed webhook (`sanity-webhook-signature` = `t=<ms>,v1=<base64url HMAC-SHA256 of "<t>.<body>">`, 10-minute tolerance, rate-limited, anything invalid is a bare 404), fixtures writable outside production (`ADMIN_FIXTURE_WRITES=1` for e2e only), `proxyClientMaxBodySize: 5mb`, `serverActions.bodySizeLimit: 2mb`. In fixtures mode public HTML regenerates lazily (seconds); the uncached terminal snapshot shows edits at once. Reorders renumber `order` to 10, 20, …
+- **D65 — Studio-ready schemas** (active; extends D29). `sanity/studio.ts` exports `studioSchemaTypes` (previews, "Display order" orderings, `validation` built from the zod field schemas via a two-method structural `Rule`) and `singletonTypes`. Cross-field/cross-document rules aren't repeated. Studio-created docs get random ids the admin can't open (D55). Setup in SANITY.md.
+
+## Security and admin
+
+- **D4 — CSP: static policy for public pages, nonce for admin** (active). Nonces force dynamic rendering and break PPR; experimental SRI can't cover inline RSC flight scripts under ISR. Public: `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self'; style-src-attr 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; manifest-src/worker-src 'self'; upgrade-insecure-requests` (`'unsafe-eval'` in dev only). Admin: `'nonce-…' 'strict-dynamic'` for scripts, nonce for styles. Mitigation for `'unsafe-inline'`: zero third-party origins, no user HTML, sanitized Markdown, escaped JSON-LD. Revisit when Next supports hashes for flight data.
+- **D10 — Upload transport** (active; limits changed by R3). Files go only through `POST /admin/api/upload` returning an asset reference; Server Actions never carry binaries and keep `bodySizeLimit`. **Limits are now 4 MB for images and PDFs** (Vercel's 4.5 MB body cap) and a missing `Content-Length` gets 411 (commit `3b4199c`).
+- **D11 — Hosting: Vercel, not GitHub Pages** (active). The spec needs a proxy, Server Actions, Route Handlers and on-demand revalidation. The repo keeps its historical name; GitHub Pages config from the old site must go when the domain moves.
+- **D21 — Inline motion-init script** (active). The persisted "Pause animations" choice must apply before first paint. React 19.3 rejects `<script>` created during client rendering. One constant IIFE (`src/lib/motion-init.ts`) is injected with `useServerInsertedHTML` from a client leaf returning `null`; `<html suppressHydrationWarning>`. Second (with JSON-LD) exception to the `dangerouslySetInnerHTML` rule.
+- **D51 — Admin access** (active). Fixed `/admin`; proxy gate; extra `ses` claim so the 8-hour cap survives renewals; renewal at most once a minute, never for Server Action posts; cookie `__Host-jm_session` (+`Secure`) when the site URL is https else `jm_session` (tied to the URL, not `NODE_ENV`, so `next start` over http works in e2e/WebKit); `ADMIN_PASSWORD` HMACed with `SESSION_SECRET` and compared in constant time, `ADMIN_PASSWORD_HASH` (`scrypt:N:r:p:salt:hash`, no `$`) wins; admin disabled unless `SESSION_SECRET` ≥ 32 chars and a password/hash exists (production: password ≥ 16); rate limiter interface with an in-memory default (Upstash **not** built); admin-only headers set by the proxy only on the allowed branch (a `next.config` rule would leak the path through anonymous 404s); `/admin` forced dynamic by reading cookies first.
+- **D52 — Terminal secret commands** (active). `secret/names.ts` (three names) is the only secret code in the public chunk; the rest loads on demand; public chunks must contain neither `Authentication failure` nor `/admin` (e2e scans scripts). `su` accepts any target, always prompts, native `type="password"`, paste OK, `Ctrl+C` cancels; success hard-navigates to the returned `redirectTo`. Without a session `admin`/`logout` are byte-identical to unknown commands. Server is the authority (`getSessionStatus()` on mount/focus). The command names being readable in the chunk is accepted: secrecy is UX, not security.
+- **D54 — Uploads and sanitizers** (active). See ARCHITECTURE. Fixtures mode runs the full pipeline then assigns a placeholder asset with the real dimensions.
+- **D55 — Admin UI structure** (active). One dynamic tree (`/admin/[area]`, `/new`, `/[id]`) driven by `areas.ts` / `area-config.tsx`; URLs carry only the uuid part of ids (the proxy lowercases URLs and ids have capitals); shared editor fields (`LocalizedField`, Markdown editor with safe preview, image field with focal point, list editor with up/down + drag, icon pickers); dirty guard, error summary, conflict dialog, typed-confirmation delete; saves return the stored document. Admin copy is English only.
+- **D56 — Security headers as built** (active). `src/lib/security/headers.ts` is dependency-free (imported by `next.config.ts`); common headers on **every** path; HSTS `max-age=63072000; includeSubDomains` (no `preload` until the owner confirms) only for https site URLs (otherwise WebKit upgrades localhost). `experimental.sri` stays off (stamps only some Turbopack chunks, all same-origin). zod is not imported by client code (v4 probes `new Function('')`, a CSP violation, and bloats the bundle). `security.spec.ts` records `securitypolicyviolation`: zero allowed.
+
+## Tech cloud
+
+- **D13 — Technology icon resolution** (active, audited). Simple Icons first, `devicon-plain` (single-tone) second, monogram last; only plain `path/circle/ellipse/rect/polygon` geometry (no gradients, transforms, strokes, `evenodd`). Overrides: TanStack Query → `reactquery`; Swagger/OpenAPI → `swagger`; Pub/Sub → `googlepubsub`; BigQuery → `googlebigquery`; Java, AWS, Zustand, gRPC, AngularJS from devicon-plain. Monograms (pinned via `monogram` field): SQL, Excel/Power Query (`XL`), Power BI (`BI`), SharePoint, VBA, VS Code, GPT. Re-run `icons:audit` (also writes `.cache/icons-audit.html`) after changing technologies.
+- **D22 — Nav indicator without Motion `layoutId`** (active). `layoutId` needs `domMax` (~10 KB gzip). The pill is positioned from the active link's box with a CSS transition.
+- **D37 — Tech cloud follows the `techs-cloud` prototype** (active; reworked by D38–D45). Port the feel and the set, not the runtime: geoid radii (0.8–1.2×), latitude spin, float, radial mask, yaw-only drag with inertia, hover slowdown + name over the mark. ~96 technologies in 7 categories, priorities 1–3 (phones render ≤ 2, ~49). Full-colour marks resolved server-side into on-origin files (amends D13 for this surface); dark marks are lifted to `#e8eaf0` when luminance < 0.25. Kept from the spec: List view as no-JS/reduced-motion default, sphere `aria-hidden`, `touch-action: pan-y`, rAF only while visible, no React state per frame. The prototype's CDN `<img>`s can't be used (no third-party requests).
+- **D38 — Full-bleed stage** (amended by D40).
+- **D39 — 7th category `ai`** (active). "AI agents & tooling" / "Agentes de IA e ferramentas" holds Cursor, VS Code, Claude, GPT, Gemini, Lovable. The `development` dataset needed those documents or the chip stays hidden (`count === 0`).
+- **D40 — Rectangular stage** (active). `h-[80svh] w-full`; projection uses independent X/Y radii (0.4 × width/height) and Z from `min(w,h)`; the glow uses `rounded-[50%]`; chips are a toolbar (`aria-pressed`, names include the count).
+- **D41 — Min height 600px** (active). Added to `geoidStageClassName` (live and placeholders).
+- **D42 — No Cloud|List toggle** (active). The geoid shows after hydration unless `useReducedMotionPreference()` (reduced motion or Pause animations); SSR/no-JS/crash render the List.
+- **D43 — Centered chips** (active). **D44 — Filter mutes unmatched icons** (active): ×0.08 opacity, no pointer events; exclusive filtering. **D45 — Dim eases in rAF** (active): lerp factor 0.12 (~250 ms); depth opacity stays a direct write.
+- **D59 — Logos as cached files; document weight** (active). `/tech-icons/<hash>.svg` (hash = two FNV-1a passes over viewBox+paths) is `immutable`, only visible technologies resolve, `?fill=<6 hex>` colours it; List view draws the same file as a CSS mask. Project detail keeps a few inline icons. JetBrains Mono not preloaded. Detail cover uses `preload` + `fetchPriority="high"` (`priority` is deprecated). Home HTML went 690 → 278 KB (47 KB gzip).
+- **D66 — Frame-time scaling and drag model** (active; from `techs-cloud` PR #1). `k = min(gap, 50 ms)/16.67 ms` for spin, easing, dim and friction; pointer travel accumulated per frame; stationary-hold decay; stage size from ResizeObserver only; loop stops when hidden/off-screen/zero-sized. Pure math in `src/lib/tech-cloud/motion.ts` (tested at 60/90/120/144 Hz). Not transposed: `touch-action: none` (the geoid sits in a scrolling page).
+
+## Home, hero, header
+
+- **D17 — Smaller interpretations** (active). Primary button = solid `text-1` background with `bg-0` label; skip link reads "Skip to main content"; experience VFS slugs derive from `company` (numeric suffix on collision); dev cookie is `jm_session`; admin `lang="en"`; `/dev/ui` calls `notFound()` in production.
+- **D46 — Home order** (superseded in part by D69: the Quote band is gone). Hero → Quote → About → Stack → Work → Résumé → Contact → Recommended. Nav: About · Stack · Work · Résumé · Contact. Résumé uses native radio tabs (CSS `:has()` shows the matching panel; works without JS); every job is a `<details>`, current role open; CTAs are the locale PDF and the owner's LinkedIn. `collapsedByDefault` stays in the schema but no longer drives the UI.
+- **D47 — Hero art direction** (headline/rotating-word parts superseded by D67). Optional `photoLg` (3:4, alpha preserved); `getImageProps` + `<picture>` (`min-width: 1024px` → lg) so one image downloads; OG/JSON-LD keep the square photo.
+- **D48 — About absorbs Summary** (active). One `#about`: bio left, up to 4 metrics as a 2×2 tile right from `lg`; `#summary` stays on the stats list; facts (`location`, `spokenLanguages`, `focus`) are terminal-only.
+- **D67 — Name as the hero title, selectable font, header links** (active). H1 = `displayName` on one line. `heroHeadline` and `rotatingWords` are gone; `heroLead` ≤ 120 chars (so the home meta description uses `meta.siteDescription`, intended). `profile.titleFont` picks one of ten Google fonts via `next/font/google` (self-hosted at build, `preload: false`, each defines `--font-title-<id>`, only the chosen file is fetched). **The hero must not import `styles/title-fonts.ts`** (Turbopack splits `@font-face` into a render-blocking stylesheet that cost `/pt` ~0.03 Lighthouse performance). `FitTitle` measures and sets `--fit`; never wraps or clips. Featured-link placement `hero` → `header` (max three icons from `md`). Terminal button is primary with a visible label. The header wordmark hides while the hero is in view. Migration steps: [SANITY.md](./SANITY.md#migration-2026-11-d67).
+- **D69 — Quote band removed** (active; 2026-11-04, owner request). The "Quotes of the moment" band, `profile.featuredQuote` (schema, repository, Sanity schema/query/mapper, fixtures), its admin fields and the `quote` messages are deleted. Existing Sanity documents may still hold the field; reads ignore it. The hero scroll cue now targets `#about`.
+
+## Window manager and terminal
+
+- **D49 — Window manager** (entry-point rule superseded by D50). Pure geometry in `src/lib/window-manager/geometry.ts`; gestures write to the DOM in rAF and commit on release; `Esc`/`pointercancel` reverts (WCAG 2.5.2); open/minimize/close are CSS transitions (~280 ms); persistence in `sessionStorage['jm.window.<id>.v1']` (zod-validated; a closed window isn't persisted).
+- **D50 — Public terminal** (active). Live entry points: header button, footer hint, dock chip, one-time "type help" hint (1.5 s, once per session, never with reduced motion). Pure core in `src/lib/terminal`; the React shell is one `next/dynamic` chunk; big `terminal` namespace is a lazy catalog, small `window` namespace ships with the provider; unit tests use a translator that throws on missing keys. `execute()` is an async generator; unsupported shell syntax (`; & | > < * ? $`) comes back as output; Ctrl+C aborts cleanly. Session in `sessionStorage['jm.terminal.v1']` (≤ 300 blocks, 100 history lines). Tab never traps focus on an empty line. Multi-line paste runs the first line. `git log --oneline` hashes are FNV-1a of `slug:title:start`.
+- **D63 — Snap preview** (active). One always-mounted `aria-hidden` element written straight to the DOM; hysteresis 8 px to arm / 32 px to release (`snapSideAt(pointer, viewport, armed)`); CSS transitions only.
+- **D64 — Easter eggs** (active). `fortune`, `cowsay`, `matrix` (4 s CSS rain behind `actions.effect`, skipped for reduced motion), `ping`, `ssh`, `sudo`, `rm`, `vim`/`vi`/`nano`/`emacs`. All local and harmless; none may mention the admin, `su`, sessions or passwords (unit-tested). Lives in the lazy terminal chunk (≤ 20 KB).
+
+## Quality, tests, CI
+
+- **D12 — `text-3` is `#828a9f`** (active; was `#7a8196`, 4.44:1 on `surface-2`). A unit test covers every foreground token × surface (≥ 4.5:1; `text-1`/`text-2` on `bg-0` ≥ 7:1). Don't put `text-3` on new surfaces without extending it.
+- **D23 — axe runs on Chromium projects only** (active). It hangs in WebKit `page.evaluate` here. Scans of animated UI wait for `getAnimations({ subtree: true })`.
+- **D31 — OG images via `next/og`** (active). One renderer (`src/lib/seo/og-image.tsx`), Geist TTF (Satori can't read woff2), per-segment `opengraph-image.tsx` + `twitter-image.tsx`.
+- **D32 — `check:seo` starts its own server** (active) on `SEO_PORT` (3101) unless `SEO_BASE_URL` is set; canonicals asserted against `NEXT_PUBLIC_SITE_URL`.
+- **D36 — axe ignores pending reveals; Playwright serializes under load** (active). Pending `Reveal` nodes stay `opacity: 0` and are excluded from axe; screenshots emulate reduced motion; 2 workers, 60 s timeout; `force` clicks on WebKit language/motion tests.
+- **D58 — Bundle budgets as enforced** (active; deviates from spec). Framework floor is 135.5 KB; Home budget 195 KB (measured ~191), projects/detail 190, others 185; lazy terminal ≤ 20, secret ≤ 3, sphere ≤ 10. `check:bundle` also fails on terminal/secret code in a public first load, the admin path in any non-admin chunk, and server-only names/values in client files. Reaching 150 KB would mean dropping Motion and next-intl from the client.
+- **D60 — Lighthouse CI thresholds as enforced** (active; deviates from spec). Simulated LCP counts all first-load JS before first paint (observed LCP ~150 ms, simulated 2.8–3.5 s). 3 runs per URL (Home, `/projects`, a detail page, both locales) with `bun x @lhci/cli@0.15.1` (kept out of `bun audit`). Fail on accessibility < 1, SEO < 1, best practices < 0.95, CLS > 0.05, performance < 0.85, LCP > 3.8 s, TBT > 350 ms. Under WSL it leaves `C:\Users\…\lighthouse.*` folders; delete them.
+- **D61 — Cross-browser smoke and visual baselines** (active). Firefox project runs the public specs; admin specs stay on Chromium/WebKit/mobile. Two per-browser adjustments: Firefox empties `clipboardData` on synthetic paste (that test is skipped) and keeps focus on the last tab stop when Tab leaves the page. Visual snapshots (hero and first card at 375/768/1440, Chromium, reduced motion, `maxDiffPixelRatio: 0.01`) run in CI and locally with `VISUAL=1`; the manual workflow regenerates baselines. CI runners are `ubuntu-24.04`.
+
+## Analytics
+
+- **D68 — Vercel Web Analytics** (active; 2026-11-02, previously an unnumbered section). `@vercel/analytics` is mounted in `src/app/[locale]/layout.tsx`; cookieless, served from `/_vercel/insights/*` on the site origin (CSP unchanged, no banner); `beforeSend` drops `/admin` URLs. `src/lib/analytics.ts` wraps `track` with a typed event list: `email_click`, `resume_open` (locale), `external_link` (host) via the delegated `ClickTracker`; `email_copy`, `language_switch` (to), `terminal_open` directly. Properties are never user input; terminal commands are never tracked. **Owner step:** enable Web Analytics on the Vercel project.
+
+## Spec contradictions and how they were resolved
+
+| Spec said                                               | Resolved by        |
+| ------------------------------------------------------- | ------------------ |
+| `dynamicParams` on with Cache Components                | D1b                |
+| `setRequestLocale` in every layout                      | D2                 |
+| "No blanket `unsafe-inline`" vs static prerendering     | D4                 |
+| Latest TypeScript / ESLint                              | D5, D6             |
+| `next-sanity` "if it fits"                              | D7                 |
+| `revalidateTag(tag)` in the write path                  | D9                 |
+| `text-3` ≥ 4.5:1                                        | D12                |
+| "Skip to content" vs "Skip to main content"             | D17                |
+| Only `/` negotiates vs next-intl redirecting everything | D3, D18            |
+| Uploads up to 10 MB vs Vercel's body limit              | D10, R3            |
+| 46-item inventory, monochrome sphere                    | D37                |
+| `defineType` schemas vs no Studio dependency            | D29, D65           |
+| Motion layout filter vs Server Component cards          | D34                |
+| Prerendered `/projects` vs `searchParams`               | D35                |
+| Original Home order and long H1 vs owner changes        | D46–D48, D67       |
+| Performance targets (150 KB JS, LCP < 2 s, Perf ≥ 95)   | D58, D60 (not met) |
+
+## Risks (open and closed)
+
+- **R1 — Status codes under streaming.** Closed by D1b.
+- **R2 — next-intl + root params.** Closed: `/en` and `/pt` build as static.
+- **R3 — Vercel 4.5 MB request body.** Closed: 4 MB limits, 411 without `Content-Length`. Raising them would need client-side downscaling or a chunked/Sanity-direct upload.
+- **R4 — Devicon single-tone legibility.** Mitigated by the contact sheet and the monogram fallback.
+- **R5 — Lighthouse performance on mobile.** **Open**, accepted via floors (D60). The owner decides whether to fund deeper work (e.g. moving hero animations and the window shell off the initial hydration path).
+- **R6 — rAF loops on hidden routes.** Mitigated: loops stop on visibility, intersection and zero size (D66).
+- **R7 — Admin 404 timing.** Accepted: JWT verification is microseconds; the login delay is the real equalizer.
+- **R8 — Server Action origin behind proxies.** Self-hosting behind a host-rewriting proxy needs `serverActions.allowedOrigins`.
+- **R9 — Bun runtime on Vercel is beta** (D24). **Open.**
+- **R10 — Per-instance login rate limiter.** **Open**, known gap (D51).
+
+## Assumptions
+
+- Launch URLs are `https://juliolmuller.vercel.app` (production) and `https://next-juliolmuller.vercel.app` (staging, branch `next`); `juliolmuller.com` comes later (SETUP §6.6). Previews send `noindex` (`VERCEL_ENV !== 'production'`).
+- Sanity project `njcnsmax` (org `ow3ahfjbr`) with private `production` and `development` datasets; the owner creates tokens (CI runs on fixtures).
+- HSTS `preload` is not added until the owner confirms.
+- GitHub Actions is available; Lighthouse CI uses `@lhci/cli` against `next start`, no LHCI server.
+- Real résumé, photo and content are entered later through the admin; nothing real is seeded.

@@ -1,0 +1,617 @@
+@import 'tailwindcss';
+
+@custom-variant hover-fine {
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      @slot;
+    }
+  }
+}
+
+@theme {
+  --color-*: initial;
+  --color-bg-0: #07080b;
+  --color-bg-1: #0c0e13;
+  --color-surface-1: #11141b;
+  --color-surface-2: #171b24;
+  --color-line: rgb(255 255 255 / 0.08);
+  --color-line-strong: rgb(255 255 255 / 0.16);
+  --color-text-1: #e8eaf0;
+  --color-text-2: #a3a9b8;
+  --color-text-3: #828a9f;
+  --color-accent-1: #8b7cff;
+  --color-accent-2: #4cc9f0;
+  --color-term-green: #4ade80;
+  --color-warn: #fbbf24;
+  --color-danger: #f87171;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+  --color-black: #000;
+  --color-white: #fff;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --breakpoint-xs: 30rem;
+
+  --text-display: clamp(2.5rem, 1.6rem + 4.4vw, 5.5rem);
+  --text-display--line-height: 1.02;
+  --text-display--letter-spacing: -0.035em;
+  --text-display--font-weight: 600;
+  --text-h2: clamp(1.875rem, 1.3rem + 2.4vw, 3.25rem);
+  --text-h2--line-height: 1.1;
+  --text-h2--letter-spacing: -0.025em;
+  --text-h2--font-weight: 600;
+  --text-h3: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem);
+  --text-h3--line-height: 1.3;
+  --text-h3--font-weight: 600;
+  --text-body: 1rem;
+  --text-body--line-height: 1.7;
+  --text-small: 0.875rem;
+  --text-small--line-height: 1.55;
+  --text-label: 0.75rem;
+  --text-label--line-height: 1.4;
+  --text-label--letter-spacing: 0.08em;
+}
+
+@theme inline {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono:
+    var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, Consolas,
+    monospace;
+}
+
+:root {
+  color-scheme: dark;
+
+  --gradient-accent: linear-gradient(120deg, #8b7cff 0%, #4cc9f0 100%);
+  --shadow-card-inset: inset 0 1px 0 rgb(255 255 255 / 0.04);
+  --shadow-window: 0 24px 80px rgb(0 0 0 / 0.55);
+
+  --z-header: 40;
+  --z-floating: 50;
+  --z-window: 60;
+  --z-dock: 70;
+  --z-menu: 80;
+  --z-toast: 90;
+
+  --header-height: 56px;
+  --container: min(1200px, 100% - 2 * clamp(1rem, 4vw, 2rem));
+  --section-padding: clamp(4.5rem, 9vw, 8rem);
+
+  --noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@media (min-width: 48rem) {
+  :root {
+    --header-height: 64px;
+  }
+}
+
+@layer base {
+  html {
+    background-color: var(--color-bg-0);
+    color: var(--color-text-2);
+    font-family: var(--font-sans);
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    scroll-padding-top: calc(var(--header-height) + 16px);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    min-height: 100dvh;
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+  }
+
+  @media (min-width: 64rem) {
+    body {
+      font-size: 1.0625rem;
+    }
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image: var(--noise);
+    opacity: 0.03;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    color: var(--color-text-1);
+    text-wrap: balance;
+  }
+
+  p,
+  li,
+  figcaption {
+    text-wrap: pretty;
+  }
+
+  section[id] {
+    scroll-margin-top: 80px;
+  }
+
+  ::selection {
+    background-color: rgb(139 124 255 / 0.35);
+    color: var(--color-text-1);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent-2);
+    outline-offset: 2px;
+  }
+
+  [tabindex='-1']:focus:not(:focus-visible) {
+    outline: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html:not([data-motion='reduced']) {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Same effect as the media query, driven by the "Pause animations" toggle. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+html[data-motion='reduced'] *,
+html[data-motion='reduced'] *::before,
+html[data-motion='reduced'] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --color-line: rgb(255 255 255 / 0.24);
+    --color-line-strong: rgb(255 255 255 / 0.4);
+    --color-text-2: #c4c9d4;
+    --color-text-3: #aab0bf;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass {
+    background-color: var(--color-bg-1) !important;
+    backdrop-filter: none !important;
+  }
+}
+
+@media (forced-colors: active) {
+  body::before,
+  .decorative {
+    display: none;
+  }
+
+  .glass,
+  .card {
+    border: 1px solid CanvasText;
+  }
+
+  :focus-visible {
+    outline: 2px solid Highlight;
+  }
+}
+
+/* --- Hero ------------------------------------------------------------- */
+
+.hero-blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(80px);
+  opacity: 0.55;
+  will-change: transform;
+  animation: aurora-a 34s ease-in-out infinite alternate;
+}
+
+.hero-blob-a {
+  top: -18%;
+  left: -12%;
+  width: min(48rem, 90vw);
+  aspect-ratio: 1;
+  background: radial-gradient(circle, rgb(139 124 255 / 0.5), transparent 65%);
+}
+
+.hero-blob-b {
+  top: 10%;
+  right: -18%;
+  width: min(40rem, 80vw);
+  aspect-ratio: 1;
+  background: radial-gradient(circle, rgb(76 201 240 / 0.38), transparent 65%);
+  animation-name: aurora-b;
+  animation-duration: 40s;
+}
+
+.hero-backdrop[data-paused='true'] .hero-blob {
+  animation-play-state: paused;
+}
+
+.hero-grid {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.045) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(
+    ellipse 70% 60% at 50% 35%,
+    #000 20%,
+    transparent 75%
+  );
+}
+
+@keyframes aurora-a {
+  to {
+    transform: translate3d(12%, 10%, 0) scale(1.12);
+  }
+}
+
+@keyframes aurora-b {
+  to {
+    transform: translate3d(-14%, 8%, 0) scale(0.92);
+  }
+}
+
+@keyframes cue-bob {
+  50% {
+    transform: translateY(4px);
+  }
+}
+
+/* --- Timeline ---------------------------------------------------------- */
+
+[data-timeline-node] {
+  transition: background-color 300ms var(--ease-out-expo);
+}
+
+[data-timeline-node][data-reached='true'] {
+  background-color: var(--color-accent-2);
+}
+
+[data-timeline-node][data-reached='true']::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  border: 1px solid var(--color-accent-2);
+  animation: node-pulse 900ms var(--ease-out-expo) 1 forwards;
+}
+
+@keyframes node-pulse {
+  from {
+    opacity: 1;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.8);
+  }
+}
+
+/* --- Routes ------------------------------------------------------------ */
+
+.route-fade {
+  animation: route-fade 280ms var(--ease-out-expo) both;
+}
+
+@keyframes route-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/*
+ * Card → detail cover morph (React <ViewTransition share="project-cover">,
+ * D62). The overlay never swallows clicks; reduced motion and the "Pause
+ * animations" toggle make every view transition instant.
+ */
+::view-transition {
+  pointer-events: none;
+}
+
+::view-transition-group(.project-cover) {
+  animation-duration: 420ms;
+  animation-timing-function: var(--ease-out-expo);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+html[data-motion='reduced']::view-transition-group(*),
+html[data-motion='reduced']::view-transition-old(*),
+html[data-motion='reduced']::view-transition-new(*) {
+  animation: none !important;
+}
+
+/* `matrix` in the terminal: 4s of falling columns, transforms only. */
+.matrix-rain {
+  container-type: size;
+  animation: matrix-fade 4s linear both;
+}
+
+.matrix-column {
+  position: absolute;
+  top: 0;
+  white-space: pre;
+  line-height: 1.15;
+  color: var(--color-term-green);
+  mask-image: linear-gradient(to bottom, transparent, #000 75%);
+  transform: translateY(-100%);
+  animation: matrix-fall var(--fall) linear var(--wait) 3 both;
+}
+
+@keyframes matrix-fade {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  8%,
+  90% {
+    opacity: 1;
+  }
+}
+
+@keyframes matrix-fall {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(100cqh);
+  }
+}
+
+/* Delayed entrances must not wait out their delay with reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  .route-fade {
+    animation: none !important;
+  }
+}
+
+html[data-motion='reduced'] .route-fade {
+  animation: none !important;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+}
+
+@keyframes menu-item-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+@property --title-max {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0px;
+}
+
+/* One-line hero title: never wraps, shrinks to fit (see FitTitle). */
+@utility title-fit {
+  --title-max: clamp(3.3rem, 2.16rem + 3.36vw, 6rem);
+  white-space: nowrap;
+  /* Script fonts have tall ascenders and swashes that 1.02 would clip. */
+  line-height: 1.15;
+  padding-block: 0.05em;
+  /* Estimate before hydration: about 0.62em per glyph. */
+  font-size: var(
+    --fit,
+    min(var(--title-max), calc(100cqi / var(--chars) / 0.62))
+  );
+}
+
+/* No flash of the wordmark name on the home page: hidden until JS says the
+   hero left the viewport (data-hero="false"). */
+:root:has(#top) header:not([data-hero='false']) [data-header-name] {
+  opacity: 0;
+}
+
+@utility container-page {
+  width: var(--container);
+  margin-inline: auto;
+}
+
+@utility section-y {
+  padding-block: var(--section-padding);
+}
+
+@utility glass {
+  background-color: rgb(12 14 19 / 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+
+  @supports not (
+    (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+  ) {
+    background-color: var(--color-bg-1);
+  }
+}
+
+@utility text-gradient {
+  background-image: var(--gradient-accent);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+
+  @media (forced-colors: active) {
+    color: CanvasText;
+    background: none;
+  }
+}
+
+@utility bg-gradient-accent {
+  background-image: var(--gradient-accent);
+}
+
+@utility font-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  line-height: var(--text-label--line-height);
+  letter-spacing: var(--text-label--letter-spacing);
+  text-transform: uppercase;
+}
+
+@utility measure {
+  max-width: 68ch;
+}
+
+@utility safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Long-form Markdown (project bodies, bio). */
+@utility prose-site {
+  color: var(--color-text-2);
+  max-width: 68ch;
+
+  & > * + * {
+    margin-top: 1.1em;
+  }
+
+  & :is(h2, h3, h4, h5, h6) {
+    color: var(--color-text-1);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    scroll-margin-top: 96px;
+  }
+
+  & h2 {
+    margin-top: 2.2em;
+    font-size: 1.5rem;
+    line-height: 1.25;
+  }
+
+  & h3 {
+    margin-top: 1.8em;
+    font-size: 1.1875rem;
+    line-height: 1.35;
+  }
+
+  & :is(h4, h5, h6) {
+    margin-top: 1.5em;
+    font-size: 1rem;
+  }
+
+  & :is(h2, h3, h4, h5, h6) + * {
+    margin-top: 0.6em;
+  }
+
+  & a {
+    color: var(--color-text-1);
+    text-decoration: underline;
+    text-decoration-color: rgb(76 201 240 / 0.6);
+    text-underline-offset: 3px;
+  }
+
+  & strong {
+    color: var(--color-text-1);
+    font-weight: 600;
+  }
+
+  & :is(ul, ol) {
+    padding-left: 1.25rem;
+  }
+
+  & ul {
+    list-style: disc;
+  }
+
+  & ol {
+    list-style: decimal;
+  }
+
+  & li + li {
+    margin-top: 0.4em;
+  }
+
+  & li::marker {
+    color: var(--color-text-3);
+  }
+
+  & blockquote {
+    border-left: 2px solid var(--color-accent-1);
+    padding-left: 1rem;
+    color: var(--color-text-1);
+  }
+
+  & :not(pre) > code {
+    border-radius: 6px;
+    background: var(--color-surface-2);
+    padding: 0.1em 0.35em;
+    font-family: var(--font-mono);
+    font-size: 0.875em;
+    color: var(--color-text-1);
+  }
+
+  & pre {
+    overflow-x: auto;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-md);
+    background: var(--color-bg-1);
+    padding: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--color-text-1);
+  }
+
+  & hr {
+    border-color: var(--color-line);
+  }
+
+  & .md-scroll {
+    overflow-x: auto;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-md);
+  }
+
+  & table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9375rem;
+  }
+
+  & :is(th, td) {
+    border-bottom: 1px solid var(--color-line);
+    padding: 0.6rem 0.9rem;
+    text-align: left;
+  }
+
+  & th {
+    color: var(--color-text-1);
+    font-weight: 600;
+  }
+}

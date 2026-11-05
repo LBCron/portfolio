@@ -1,0 +1,58 @@
+version: 2
+
+# Weekly, grouped updates (SPEC §15). Security updates are separate and
+# immediate. Next.js and React move together; review their release notes.
+updates:
+  - package-ecosystem: bun
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      framework:
+        patterns:
+          - next
+          - eslint-config-next
+          - react
+          - react-dom
+          - '@types/react'
+          - '@types/react-dom'
+      sanity:
+        patterns:
+          - '@sanity/*'
+          - groq-js
+      testing:
+        patterns:
+          - '@playwright/test'
+          - '@axe-core/playwright'
+          - vitest
+          - '@vitest/*'
+          - '@testing-library/*'
+          - jsdom
+      tooling:
+        dependency-type: development
+        update-types:
+          - minor
+          - patch
+      runtime-minor:
+        dependency-type: production
+        update-types:
+          - minor
+          - patch
+    ignore:
+      # D5: typescript-eslint does not support TypeScript 7 yet.
+      - dependency-name: typescript
+        update-types: ['version-update:semver-major']
+      # D6: ESLint 10 waits for eslint-config-next.
+      - dependency-name: eslint
+        update-types: ['version-update:semver-major']
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    groups:
+      actions:
+        patterns: ['*']
