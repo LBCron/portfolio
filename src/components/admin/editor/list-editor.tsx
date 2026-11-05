@@ -81,7 +81,7 @@ export function ListEditor({
       <ol className="flex flex-col gap-3">
         {items.map((_, index) => (
           // Dragging is a pointer extra; the up/down buttons are the keyboard path.
-          // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
+          // eslint-disable-next-line jsx-a11y-x/no-noninteractive-element-interactions
           <li
             key={index}
             data-row={`${path}.${index}`}

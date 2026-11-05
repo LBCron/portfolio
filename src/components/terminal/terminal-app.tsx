@@ -184,7 +184,7 @@ export default function TerminalApp(): React.JSX.Element {
       inputRef.current?.focus({ preventScroll: true });
     }
     // Only the loading transition matters here.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line @eslint-react/exhaustive-deps
   }, [t]);
 
   useLayoutEffect(() => {
@@ -339,7 +339,7 @@ export default function TerminalApp(): React.JSX.Element {
           role="log"
           aria-label={t('terminal.outputLabel')}
           aria-live="polite"
-          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a scrollable log must be keyboard reachable
+          // eslint-disable-next-line jsx-a11y-x/no-noninteractive-tabindex -- a scrollable log must be keyboard reachable
           tabIndex={0}
           onScroll={(event) => {
             const el = event.currentTarget;

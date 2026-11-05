@@ -177,7 +177,7 @@ export function CollectionList({
         role="region"
         aria-label={`${plural} table`}
         // A horizontally scrollable region must be reachable by keyboard.
-        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+        // eslint-disable-next-line jsx-a11y-x/no-noninteractive-tabindex
         tabIndex={0}
         className="overflow-x-auto rounded-lg border border-line"
       >

@@ -152,7 +152,7 @@ export function Markdown({
         role="region"
         aria-label={scrollRegionLabel}
         // Keyboard access for overflow (axe scrollable-region-focusable).
-        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+        // eslint-disable-next-line jsx-a11y-x/no-noninteractive-tabindex
         tabIndex={0}
         className="md-scroll"
       >
@@ -161,7 +161,7 @@ export function Markdown({
     ),
     pre: ({ children: content }: ComponentProps<'pre'>) => (
       // Same as tables: long lines scroll inside the block.
-      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+      // eslint-disable-next-line jsx-a11y-x/no-noninteractive-tabindex
       <pre tabIndex={0} aria-label={scrollRegionLabel}>
         {content}
       </pre>

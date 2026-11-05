@@ -56,7 +56,7 @@ export function RovingRadiogroup({
   }
 
   return (
-    // eslint-disable-next-line jsx-a11y/interactive-supports-focus -- focus lives on the radios inside
+    // eslint-disable-next-line jsx-a11y-x/interactive-supports-focus -- focus lives on the radios inside
     <div ref={ref} role="radiogroup" onKeyDown={handleKeyDown} {...props}>
       {children}
     </div>

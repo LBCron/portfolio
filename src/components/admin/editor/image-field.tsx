@@ -58,7 +58,7 @@ function DropZone({
 
   return (
     // Dropping is a pointer extra; the button inside is the keyboard path.
-    // eslint-disable-next-line jsx-a11y/no-static-element-interactions
+    // eslint-disable-next-line jsx-a11y-x/no-static-element-interactions
     <div
       onDragOver={(event) => {
         event.preventDefault();

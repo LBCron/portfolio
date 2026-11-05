@@ -219,7 +219,7 @@ function Node({
         <div
           role="region"
           aria-label={t('a11y.scrollRegion')}
-          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a scrollable region must be keyboard reachable
+          // eslint-disable-next-line jsx-a11y-x/no-noninteractive-tabindex -- a scrollable region must be keyboard reachable
           tabIndex={0}
           className="overflow-x-auto"
         >
