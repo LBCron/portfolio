@@ -103,7 +103,7 @@ const firstLoad = (routes: RouteStats[]): Set<string> =>
 const publicChunks = firstLoad(publicRoutes);
 const adminChunks = firstLoad(stats.filter((r) => isAdmin(r.route)));
 
-const clientFiles = walk(STATIC_DIR).filter((path) => /\.(js|css|json|txt|map)$/.test(path));
+const clientFiles = walk(STATIC_DIR).filter((path) => /\.(?:js|css|json|txt|map)$/.test(path));
 const jsChunks = clientFiles.filter((path) => path.endsWith('.js'));
 
 // 1. First-load budgets.

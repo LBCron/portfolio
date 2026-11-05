@@ -60,7 +60,7 @@ describe('fixture dataset', () => {
   it('uses only example.com links outside the technology inventory', () => {
     const urls = collectStrings(
       documentTypes.filter((type) => type !== 'technology').map((type) => dataset[type]),
-    ).filter((value) => /^(https?:|mailto:)/.test(value));
+    ).filter((value) => /^(?:https?:|mailto:)/.test(value));
 
     expect(urls.length).toBeGreaterThan(10);
     for (const url of urls) {

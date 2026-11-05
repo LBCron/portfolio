@@ -22,7 +22,7 @@ const GEOMETRY = new Set(['cx', 'cy', 'd', 'height', 'points', 'r', 'rx', 'ry', 
 const PAINT =
   /^(?:transform|stroke(?:-.*)?|clip-path|clip-rule|fill-rule|mask|filter|opacity|fill-opacity|style|class|display|visibility)$/;
 
-const TAG = /<(\/?)([a-z][\w:-]*)((?:"[^"]*"|'[^']*'|[^>"'])*?)(\/?)>/gi;
+const TAG = /<(\/?)([a-z][\w:-]*)(?=[\s/>])((?:"[^"]*"|'[^']*'|[^>"'])*?)(\/?)>/gi;
 const ATTRIBUTE = /([a-z_:][\w:.-]*)\s*=\s*(?:"([^"]*)"|'([^']*)')/gi;
 
 export type SvgResult = { message: string; ok: false } | { ok: true; svg: SvgData };

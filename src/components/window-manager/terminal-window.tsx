@@ -30,7 +30,7 @@ function isTypingOutsideWindow(target: EventTarget | null): boolean {
     return false;
   }
 
-  return target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName);
+  return target.isContentEditable || /^(?:INPUT|TEXTAREA|SELECT)$/.test(target.tagName);
 }
 
 /**

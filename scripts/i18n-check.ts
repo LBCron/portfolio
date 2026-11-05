@@ -210,7 +210,7 @@ function checkFixtures(): number {
         && typeof value.en === 'string'
         && hasTranslatableText(value.en)
         && !PROPER_NOUNS.has(value.en)
-        && !/(^|\.)(title|name)$/.test(where)
+        && !/(?:^|\.)(?:title|name)$/.test(where)
       ) {
         notices.push(`fixture ${where}: identical in en and pt ("${value.en}")`);
       }

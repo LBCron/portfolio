@@ -45,7 +45,7 @@ interface MarkdownProps {
 type Level = 1 | 2 | 3 | 4 | 5 | 6;
 
 function topLevel(markdown: string): Level {
-  const withoutCode = markdown.replace(/^(```|~~~)[\s\S]*?^\1/gm, '');
+  const withoutCode = markdown.replace(/^(```|~~~)[\s\S]+?^\1/gm, '');
   let min = 6;
   for (const match of withoutCode.matchAll(/^(#{1,6})[ \t]/gm)) {
     min = Math.min(min, match[1]?.length ?? 6);

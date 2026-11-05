@@ -58,7 +58,7 @@ function collectIds(value: unknown, ids: Set<string>, refs: Set<string>): void {
 }
 
 function collectUrls(value: unknown, out: string[]): void {
-  if (typeof value === 'string' && /^(\/|https?:)/.test(value)) out.push(value);
+  if (typeof value === 'string' && /^(?:\/|https?:)/.test(value)) out.push(value);
   else if (Array.isArray(value)) value.forEach((item) => collectUrls(item, out));
   else if (value && typeof value === 'object') {
     Object.values(value).forEach((item) => collectUrls(item, out));
