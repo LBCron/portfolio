@@ -26,12 +26,12 @@ Unit tests cover the JSON-LD builders (required properties, resolvable `@id`s, a
 
 ## Launch checklist
 
-1. Set `NEXT_PUBLIC_SITE_URL=https://juliolmuller.vercel.app` in production. Canonicals, the sitemap, OG URLs, HSTS and the `__Host-` cookie depend on it. A later move to `juliolmuller.com` is described in [SETUP.md §6.6](./SETUP.md#66-custom-domain-later-optional).
+1. Set `NEXT_PUBLIC_SITE_URL=https://juliolmuller.com` in production. Canonicals, the sitemap, OG URLs, HSTS and the `__Host-` cookie depend on it. The domain setup is described in [SETUP.md §6.6](./SETUP.md#66-custom-domain).
 2. Add `GOOGLE_SITE_VERIFICATION` and `BING_SITE_VERIFICATION`, redeploy, and verify both properties.
-3. Submit `https://juliolmuller.vercel.app/sitemap.xml` in Search Console and Bing Webmaster Tools.
+3. Submit `https://juliolmuller.com/sitemap.xml` in Search Console and Bing Webmaster Tools.
 4. URL Inspection on `/en`, `/pt`, `/en/projects` and one project per locale: indexable, canonical as declared, rendered HTML complete.
 5. Rich Results Test and the Schema.org validator on Home (Person, WebSite, ProfilePage, ItemList), `/en/projects` (CollectionPage, BreadcrumbList) and a live project (SoftwareApplication).
 6. Confirm in URL Inspection that `?kind=` URLs report "Excluded by noindex" and that a `previousSlugs` URL redirects (308).
 7. PageSpeed Insights (mobile) on Home and a project page; compare with the CI Lighthouse reports.
 8. Share a project URL in a social card validator and check the 1200×630 preview in both languages.
-9. Re-run `bun run check:seo` with `SEO_BASE_URL=https://juliolmuller.vercel.app` against production.
+9. Re-run `bun run check:seo` with `SEO_BASE_URL=https://juliolmuller.com` against production.

@@ -48,7 +48,7 @@ Visual snapshots run in CI; locally use `VISUAL=1 bun run test:e2e visual.spec.t
 
 ## Environments
 
-`next` → Vercel Preview at `https://next-juliolmuller.vercel.app` (Sanity `development`, `noindex`, behind Vercel login); `main` → production at `https://juliolmuller.vercel.app` (Sanity `production`). `main` still serves the old static portfolio through GitHub Pages until the launch merge — read [docs/SETUP.md §6.4](docs/SETUP.md#64-production-launch-one-time) before merging. All environment variables are listed in [docs/SETUP.md §3](docs/SETUP.md#3-environment-variables) and `.env.example`.
+`next` → Vercel Preview at `https://next-juliolmuller.vercel.app` (Sanity `development`, `noindex`, behind Vercel login); `main` → production at `https://juliolmuller.com` (Sanity `production`). `main` still serves the old static portfolio through GitHub Pages until the launch merge — read [docs/SETUP.md §6.4](docs/SETUP.md#64-production-launch-one-time) before merging. All environment variables are listed in [docs/SETUP.md §3](docs/SETUP.md#3-environment-variables) and `.env.example`.
 
 ## Documentation
 

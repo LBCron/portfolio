@@ -15,7 +15,7 @@ Other secret commands: `logout` ends the session. They are invisible in `help` a
 
 **Session.** 30 minutes idle, 8 hours at most, renewed at most once a minute while you browse the admin, and every 10 minutes while an editor has unsaved changes. If saving or uploading finds the session gone, the message says so and your edits stay on the page: sign in again in another tab and retry. Two minutes before expiry a dialog offers **Stay signed in**. The header also has a **Sign out** button and a **View site** link.
 
-**Where to sign in.** On whichever deployment you want to edit: local (`localhost:3000`), staging (`next-juliolmuller.vercel.app`, behind a Vercel login) or production (`juliolmuller.vercel.app`). Each has its own password and its own data ([SETUP.md](./SETUP.md#environments-at-a-glance)). Staging edits go to the `development` dataset; **production edits are live immediately**.
+**Where to sign in.** On whichever deployment you want to edit: local (`localhost:3000`), staging (`next-juliolmuller.vercel.app`, behind a Vercel login) or production (`juliolmuller.com`). Each has its own password and its own data ([SETUP.md](./SETUP.md#environments-at-a-glance)). Staging edits go to the `development` dataset; **production edits are live immediately**.
 
 ### If sign-in does not work
 
