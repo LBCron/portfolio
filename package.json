@@ -30,8 +30,8 @@
     "release": "semantic-release"
   },
   "dependencies": {
-    "@iconify-json/devicon": "^1.2.76",
-    "@iconify-json/devicon-plain": "^1.2.67",
+    "@iconify-json/devicon": "^1.2.77",
+    "@iconify-json/devicon-plain": "^1.2.68",
     "@sanity/client": "^8.14.1",
     "@vercel/analytics": "^2.0.1",
     "class-variance-authority": "^0.7.1",
