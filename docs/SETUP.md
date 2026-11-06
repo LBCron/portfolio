@@ -6,15 +6,15 @@ Related: [USAGE.md](./USAGE.md) (signing in and editing content) · [SANITY.md](
 
 ## Environments at a glance
 
-|                           | Local                             | Staging (Vercel Preview)                       | Production (Vercel Production)    |
-| ------------------------- | --------------------------------- | ---------------------------------------------- | --------------------------------- |
-| Git branch                | any                               | `next` (and every other non-production branch) | `main`                            |
-| URL                       | `http://localhost:3000`           | `https://next-juliolmuller.vercel.app`         | `https://juliolmuller.vercel.app` |
-| Content                   | fixtures, or Sanity `development` | Sanity `development`                           | Sanity `production`               |
-| Indexed by search         | no                                | no (`noindex` unless `VERCEL_ENV=production`)  | yes                               |
-| HSTS and `__Host-` cookie | no (http)                         | yes (https site URL)                           | yes                               |
-| Admin                     | optional                          | yes, own password and secret                   | yes, own password and secret      |
-| Access                    | you                               | Vercel Authentication (Deployment Protection)  | public                            |
+|                           | Local                             | Staging (Vercel Preview)                       | Production (Vercel Production) |
+| ------------------------- | --------------------------------- | ---------------------------------------------- | ------------------------------ |
+| Git branch                | any                               | `next` (and every other non-production branch) | `main`                         |
+| URL                       | `http://localhost:3000`           | `https://next-juliolmuller.vercel.app`         | `https://juliolmuller.com`     |
+| Content                   | fixtures, or Sanity `development` | Sanity `development`                           | Sanity `production`            |
+| Indexed by search         | no                                | no (`noindex` unless `VERCEL_ENV=production`)  | yes                            |
+| HSTS and `__Host-` cookie | no (http)                         | yes (https site URL)                           | yes                            |
+| Admin                     | optional                          | yes, own password and secret                   | yes, own password and secret   |
+| Access                    | you                               | Vercel Authentication (Deployment Protection)  | public                         |
 
 Rules that hold everywhere:
 
@@ -31,7 +31,7 @@ Rules that hold everywhere:
 | Git     | any recent version                   | Husky installs a pre-commit hook (`lint-staged`) |
 | OpenSSL | any                                  | generating secrets (`openssl rand`)              |
 
-Accounts: **GitHub** (repository `juliolmuller/portfolio`), **Sanity** (project `njcnsmax`, organization `ow3ahfjbr`), **Vercel**, and DNS access for `juliolmuller.com` only if you later adopt the custom domain (§6.6).
+Accounts: **GitHub** (repository `juliolmuller/portfolio`), **Sanity** (project `njcnsmax`, organization `ow3ahfjbr`), **Vercel**, and DNS access for `juliolmuller.com` (hosted at Hostinger, §6.6).
 
 **Windows:** use WSL2 and keep the clone inside the Linux filesystem (`~/…`, not `/mnt/c/…`); Turbopack and file watching are much slower across the boundary.
 
@@ -99,21 +99,21 @@ bun run lhci                         # optional, slow
 
 All live in [.env.example](../.env.example) and are validated at boot by `src/env.ts` (names only in errors). Only `NEXT_PUBLIC_SITE_URL` is public. Local values go in `.env.local`; Vercel values go in the dashboard.
 
-| Variable                                             | Production                        | Preview                                | Purpose                                                                                                |
-| ---------------------------------------------------- | --------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `NEXT_PUBLIC_SITE_URL`                               | `https://juliolmuller.vercel.app` | `https://next-juliolmuller.vercel.app` | Canonical origin. An https URL also enables HSTS, `upgrade-insecure-requests` and the `__Host-` cookie |
-| `CONTENT_SOURCE`                                     | `sanity`                          | `sanity`                               | `sanity` or `fixtures`; inferred from the Sanity variables when empty                                  |
-| `SANITY_PROJECT_ID`                                  | `njcnsmax`                        | `njcnsmax`                             |                                                                                                        |
-| `SANITY_DATASET`                                     | `production`                      | `development`                          |                                                                                                        |
-| `SANITY_API_VERSION`                                 | `2026-10-01`                      | `2026-10-01`                           | Pinned API date                                                                                        |
-| `SANITY_READ_TOKEN`                                  | `production-read`                 | `preview-read`                         | Viewer token for reads                                                                                 |
-| `SANITY_WRITE_TOKEN`                                 | `production-write`                | `preview-write`                        | Editor token for admin writes and seeding                                                              |
-| `SANITY_WEBHOOK_SECRET`                              | own `openssl rand -hex 32`        | own (only with a staging webhook)      | Signs `POST /api/revalidate`                                                                           |
-| `SESSION_SECRET`                                     | own `openssl rand -base64 48`     | own                                    | 32+ chars; rotating signs everyone out                                                                 |
-| `ADMIN_PASSWORD_HASH`                                | `bun run admin:hash`              | a different password's hash            | Preferred over `ADMIN_PASSWORD` (16+ chars in production); the hash wins when both are set             |
-| `GOOGLE_SITE_VERIFICATION`, `BING_SITE_VERIFICATION` | after launch                      | empty                                  | Search console ownership tags                                                                          |
-| `ADMIN_FIXTURE_WRITES`                               | **never**                         | **never**                              | E2E only: lets the admin write demo data in a production build                                         |
-| `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | empty                             | empty                                  | Reserved; the rate limiter is in memory (D51)                                                          |
+| Variable                                             | Production                    | Preview                                | Purpose                                                                                                |
+| ---------------------------------------------------- | ----------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `NEXT_PUBLIC_SITE_URL`                               | `https://juliolmuller.com`    | `https://next-juliolmuller.vercel.app` | Canonical origin. An https URL also enables HSTS, `upgrade-insecure-requests` and the `__Host-` cookie |
+| `CONTENT_SOURCE`                                     | `sanity`                      | `sanity`                               | `sanity` or `fixtures`; inferred from the Sanity variables when empty                                  |
+| `SANITY_PROJECT_ID`                                  | `njcnsmax`                    | `njcnsmax`                             |                                                                                                        |
+| `SANITY_DATASET`                                     | `production`                  | `development`                          |                                                                                                        |
+| `SANITY_API_VERSION`                                 | `2026-10-01`                  | `2026-10-01`                           | Pinned API date                                                                                        |
+| `SANITY_READ_TOKEN`                                  | `production-read`             | `preview-read`                         | Viewer token for reads                                                                                 |
+| `SANITY_WRITE_TOKEN`                                 | `production-write`            | `preview-write`                        | Editor token for admin writes and seeding                                                              |
+| `SANITY_WEBHOOK_SECRET`                              | own `openssl rand -hex 32`    | own (only with a staging webhook)      | Signs `POST /api/revalidate`                                                                           |
+| `SESSION_SECRET`                                     | own `openssl rand -base64 48` | own                                    | 32+ chars; rotating signs everyone out                                                                 |
+| `ADMIN_PASSWORD_HASH`                                | `bun run admin:hash`          | a different password's hash            | Preferred over `ADMIN_PASSWORD` (16+ chars in production); the hash wins when both are set             |
+| `GOOGLE_SITE_VERIFICATION`, `BING_SITE_VERIFICATION` | after launch                  | empty                                  | Search console ownership tags                                                                          |
+| `ADMIN_FIXTURE_WRITES`                               | **never**                     | **never**                              | E2E only: lets the admin write demo data in a production build                                         |
+| `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | empty                         | empty                                  | Reserved; the rate limiter is in memory (D51)                                                          |
 
 `VERCEL_ENV` is set by Vercel and keeps previews `noindex`; never override it. Fill-in copies of the production and preview columns can be kept as `.env.production` / `.env.preview` in the repo root (git-ignored by `.env*`; Next.js loads them only in a matching `next build/start`, so treat them as scratch files and don't leave real secrets in them longer than needed).
 
@@ -177,10 +177,10 @@ Details in [SANITY.md](./SANITY.md). Summary:
 
 ### 6.3 Domains
 
-Both URLs are free one-level `*.vercel.app` names (certificates don't cover `a.b.vercel.app`), so no DNS is needed.
+Production uses the custom domain `juliolmuller.com` (DNS setup in [§6.6](#66-custom-domain)). Staging stays on a free one-level `*.vercel.app` name (certificates don't cover `a.b.vercel.app`), so it needs no DNS.
 
-1. **Production:** **Settings → Domains**, ensure `juliolmuller.vercel.app` serves Production. Vercel adds it automatically if the project is named `juliolmuller`. If the name is taken: another project owns it — a project called `juliolmuller` exists under the `lacussolutions` team (checked 2026-11-04, Vercel MCP). Remove the domain there or rename that project first.
-2. **Staging:** add `next-juliolmuller.vercel.app` and set **Git branch: `next`**. Every push to `next` updates staging.
+1. **Production:** **Settings → Domains**, `juliolmuller.com` serves Production (no redirect). `www.juliolmuller.com` and every other `*.vercel.app` alias, including the former production URL `juliolmuller.vercel.app`, redirect to it (308). `lacus.solutions` and `www.lacus.solutions` also redirect to it (307).
+2. **Staging:** add `next-juliolmuller.vercel.app` and set **Git branch: `next`**, with no redirect. Every push to `next` updates staging.
 3. Redeploy `next` so the build picks up the Preview variables.
 
 ### 6.4 Production launch (one-time)
@@ -201,17 +201,17 @@ Before the merge:
 
 Launch:
 
-1. Merge `next` into `main` (PR, CI green). Vercel builds production at `https://juliolmuller.vercel.app`.
+1. Merge `next` into `main` (PR, CI green). Vercel builds production at `https://juliolmuller.com`.
 2. Open it in a private window: it must load **without** a Vercel login. If it asks for one, make the production domain public in Deployment Protection.
 3. Sign in to the admin there and enter real content (replace any demo data).
 4. Configure the production Sanity webhook ([SANITY.md → Webhook](./SANITY.md#revalidation-webhook)).
 5. Remote SEO crawl (empty `SESSION_SECRET` skips the admin check, which needs the production secret):
 
    ```sh
-   SESSION_SECRET= SEO_BASE_URL=https://juliolmuller.vercel.app bun run check:seo
+   SESSION_SECRET= SEO_BASE_URL=https://juliolmuller.com bun run check:seo
    ```
 
-6. `curl -sI https://juliolmuller.vercel.app/en` must show `strict-transport-security`, `content-security-policy` and no `x-robots-tag`; any preview URL must carry `noindex`.
+6. `curl -sI https://juliolmuller.com/en` must show `strict-transport-security`, `content-security-policy` and no `x-robots-tag`; any preview URL must carry `noindex`.
 7. Work through [SEO.md](./SEO.md) (Search Console URL-prefix property verified with the HTML tag, Bing, sitemap) and the manual screen-reader pass in [ACCESSIBILITY.md](./ACCESSIBILITY.md).
 
 ### 6.5 Rolling back
@@ -220,13 +220,13 @@ Launch:
 - **Content:** Sanity keeps document history (Manage → document history), or re-save the old values in the admin.
 - **Old portfolio:** keeps running from `legacy-pages` until you turn Pages off.
 
-### 6.6 Custom domain later (optional)
+### 6.6 Custom domain
 
-Canonical URL, sitemap, Open Graph and HSTS all follow `NEXT_PUBLIC_SITE_URL`, so `juliolmuller.com` is configuration plus a redeploy:
+`juliolmuller.com` is the production domain (D70). Canonical URL, sitemap, Open Graph and HSTS all follow `NEXT_PUBLIC_SITE_URL`, so attaching or changing a domain is configuration plus a redeploy:
 
 1. A day ahead, lower the domain's DNS TTL to 300 s.
 2. In GitHub → Settings → Pages, remove the custom domain if Pages still claims it.
-3. Vercel → Domains: add `juliolmuller.com`, plus `www` redirecting to the apex (308). Create the DNS records Vercel lists (usually `A @ 76.76.21.21`, `CNAME www → cname.vercel-dns.com`) and wait for the certificate.
+3. Vercel → Domains: add `juliolmuller.com`, plus `www` redirecting to the apex (308). Create the DNS records Vercel lists under **View DNS configuration** (currently `A @ 216.198.79.1` and a per-project `CNAME www` ending in `.vercel-dns-017.com`; the legacy `76.76.21.21` and `cname.vercel-dns.com` keep working) and wait for the certificate.
 4. Set Production `NEXT_PUBLIC_SITE_URL=https://juliolmuller.com` and **redeploy**.
 5. Redirect `juliolmuller.vercel.app` → `juliolmuller.com` (308).
 6. Re-point the Sanity webhook, add the new property in Search Console and Bing, submit the new sitemap.
@@ -271,7 +271,7 @@ Self-hosting works with `bun run build && bun run start` behind a reverse proxy 
 **Production**
 
 - [ ] Production variables set (dataset `production`, production tokens, own secrets)
-- [ ] `juliolmuller.vercel.app` serves Production (name conflict with the `lacussolutions` project resolved)
+- [ ] `juliolmuller.com` serves Production; `www.juliolmuller.com` and `juliolmuller.vercel.app` redirect to it (308)
 - [ ] `main` copied to `legacy-pages` and Pages pointed at it (or Pages off)
 - [ ] CI green incl. `audit`; `next` merged into `main`; production build succeeded
 - [ ] Loads without a Vercel login; Web Analytics enabled
