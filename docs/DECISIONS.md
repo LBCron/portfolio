@@ -23,7 +23,15 @@ Resolved against npm and the docs bundled in the published packages on 2026-10-1
 ## Toolchain and versions
 
 - **D5 — TypeScript 6.0, not 7.0** (active). `typescript-eslint@8.71` peers on `<6.1` and `eslint-config-next` depends on it. Pin `~6.0.3`; revisit when typescript-eslint supports 7.
-- **D6 — ESLint 9, not 10** (active). `eslint-plugin-jsx-a11y@6.10.2` peers on ESLint ≤ 9 and jsx-a11y strict is required. `bun run update` re-pins both after `bun update --latest`.
+
+<!-- coderabbit-ai-generated:v1 -->
+
+<!-- coderabbit-ai-generated-section:v1:41e31d04b6835298f5368fa5fa0b68a35e60e7261c5f5576d99a18264ca36d72 -->
+
+- **D6 — ESLint 10** (active). `eslint-config-any@3.0.0-beta.3` requires ESLint `^10.3.0`; its `eslint-plugin-jsx-a11y-x@0.2.0` supports ESLint 9 and 10.
+
+<!-- /coderabbit-ai-generated:v1 -->
+
 - **D15 — Dependency build scripts** (superseded by D24). Bun blocks lifecycle scripts by default; `trustedDependencies: []`. The three blocked (`@parcel/watcher`, `@swc/core`, `unrs-resolver`) have prebuilt optional binaries. Add an entry only when a package fails without its script.
 - **D20 — Prettier** (active). Single quotes, trailing commas, 80 columns, semicolons, LF (the owner's editor default is CRLF, but the repo lives in WSL/Linux and CI is Linux; `.gitattributes` enforces it), Tailwind plugin.
 - **D24 — Bun 1.4 as package manager and Vercel runtime** (active; replaced pnpm). `vercel.json`: `bunVersion: "1.4.x"`, `bun install --frozen-lockfile`. `dev/build/start` run `bun run --bun next …` (required for ISR on Vercel's Bun runtime). Repo scripts run `bun --conditions=react-server scripts/*.ts` (resolves `server-only` to its no-op). Node 24 stays for tools that spawn `node` (ESLint, Vitest, Playwright). `audit:deps` ignores GHSA-vfj7-8cjw-p6xm (`braces`, dev-only via `eslint-config-next` → `fast-glob`, no patched release); remove the ignore when one ships. **Risk:** Bun runtime on Vercel is beta and the proxy likely stays on Node; if ISR or `sharp` misbehave, drop `bunVersion`.
@@ -111,6 +119,7 @@ Resolved against npm and the docs bundled in the published packages on 2026-10-1
 - **D58 — Bundle budgets as enforced** (active; deviates from spec). Framework floor is 135.5 KB; Home budget 195 KB (measured ~191), projects/detail 190, others 185; lazy terminal ≤ 20, secret ≤ 3, sphere ≤ 10. `check:bundle` also fails on terminal/secret code in a public first load, the admin path in any non-admin chunk, and server-only names/values in client files. Reaching 150 KB would mean dropping Motion and next-intl from the client.
 - **D60 — Lighthouse CI thresholds as enforced** (active; deviates from spec). Simulated LCP counts all first-load JS before first paint (observed LCP ~150 ms, simulated 2.8–3.5 s). 3 runs per URL (Home, `/projects`, a detail page, both locales) with `bun x @lhci/cli@0.15.1` (kept out of `bun audit`). Fail on accessibility < 1, SEO < 1, best practices < 0.95, CLS > 0.05, performance < 0.85, LCP > 3.8 s, TBT > 350 ms. Under WSL it leaves `C:\Users\…\lighthouse.*` folders; delete them.
 - **D61 — Cross-browser smoke and visual baselines** (active). Firefox project runs the public specs; admin specs stay on Chromium/WebKit/mobile. Two per-browser adjustments: Firefox empties `clipboardData` on synthetic paste (that test is skipped) and keeps focus on the last tab stop when Tab leaves the page. Visual snapshots (hero and first card at 375/768/1440, Chromium, reduced motion, `maxDiffPixelRatio: 0.01`) run in CI and locally with `VISUAL=1`; the manual workflow regenerates baselines. CI runners are `ubuntu-24.04`.
+- **D71 — `conventional-changelog-conventionalcommits` stays on v9** (active; 2026-11-06). v10 needs `conventional-changelog-writer@9+`, but the latest `@semantic-release/release-notes-generator` (14.1.1) pins writer `^8`, so the Release workflow failed in `generateNotes` with `Missing helper: "conventional-changelog-conventionalcommits requires conventional-changelog-writer@9 or newer…"`. The direct dependency is `^9.3.1`; `@commitlint/config-conventional` keeps its own nested v10, which is unaffected. Dependabot ignores the v10 major until `@semantic-release/release-notes-generator` ships a writer-9 release; then drop the ignore and bump. Note: with no prior tag, the first successful release computes `1.0.0` (the history contains a `feat(content)!` breaking commit).
 
 ## Analytics
 
