@@ -69,10 +69,11 @@ export function useLogoSearch(): Cached & { search: (query: string) => void } {
 
       let catalog: CatalogHit[] | null = null;
       let online: null | Pick<Cached, 'online' | 'status'> = null;
+      let catalogFailed = false;
 
       // Cache only once both requests are in, so a fast online answer never stores an empty catalog.
       const settle = (): void => {
-        if (catalog && online && online.status !== 'unavailable') {
+        if (catalog && online && !catalogFailed && online.status !== 'unavailable') {
           // Failures are not cached: the next try may succeed.
           cacheRef.current.set(query.toLowerCase(), { catalog, ...online });
         }
@@ -81,8 +82,16 @@ export function useLogoSearch(): Cached & { search: (query: string) => void } {
       timersRef.current.push(
         window.setTimeout(async () => {
           const [simple, devicon] = await Promise.all([
-            searchIconsAction('simple-icons', query).catch(() => []),
-            searchIconsAction('devicon', query).catch(() => []),
+            searchIconsAction('simple-icons', query).catch(() => {
+              catalogFailed = true;
+
+              return [];
+            }),
+            searchIconsAction('devicon', query).catch(() => {
+              catalogFailed = true;
+
+              return [];
+            }),
           ]);
 
           if (controller.signal.aborted) return;
