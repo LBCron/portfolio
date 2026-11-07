@@ -65,7 +65,7 @@ export function useLogoSearch(): Cached & { search: (query: string) => void } {
       const controller = new AbortController();
 
       abortRef.current = controller;
-      setState((current) => ({ ...current, online: [], status: 'searching' }));
+      setState((current) => ({ ...current, catalog: [], online: [], status: 'searching' }));
 
       let catalog: CatalogHit[] = [];
 
