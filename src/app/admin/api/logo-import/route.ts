@@ -1,11 +1,10 @@
-import { notFound } from 'next/navigation';
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
 import { createRemoteIconFetcher } from '@/lib/admin/logo-search/remote-icon';
 import { createWindowCounter } from '@/lib/admin/rate';
 import { sameOrigin } from '@/lib/admin/same-origin';
-import { getSession } from '@/lib/auth/session';
+import { requireAdmin } from '@/lib/auth/session';
 
 export const maxDuration = 15;
 
@@ -17,9 +16,7 @@ const fail = (status: number, error: string): NextResponse =>
   NextResponse.json({ error }, { status, headers });
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
-  const session = await getSession();
-
-  if (!session) notFound();
+  const session = await requireAdmin();
 
   if (!sameOrigin(request)) return fail(403, 'Cross-origin request refused');
 
