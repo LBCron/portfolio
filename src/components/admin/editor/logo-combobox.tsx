@@ -11,8 +11,9 @@ import { type CatalogHit, useLogoSearch } from './use-logo-search';
 function Thumb({ svg }: { svg: SvgData }): React.JSX.Element {
   return (
     <svg viewBox={svg.viewBox} aria-hidden="true" fill="currentColor" className="size-7 shrink-0">
-      {svg.paths.map((d) => (
-        <path key={d} d={d} />
+      {svg.paths.map((d, index) => (
+        // eslint-disable-next-line @eslint-react/no-array-index-key -- paths are static data and may repeat
+        <path key={`${index}-${d}`} d={d} />
       ))}
     </svg>
   );
@@ -70,6 +71,8 @@ export function LogoCombobox(): React.JSX.Element {
   function pick(option: Option): void {
     if (option.kind === 'url') {
       setUrlMode(true);
+      setOpen(false);
+      requestAnimationFrame(() => document.getElementById(`${baseId}-url-input`)?.focus());
     } else if (option.kind === 'catalog') {
       form.set('iconSource', option.hit.source);
       form.set('iconSlug', option.hit.slug);
@@ -136,9 +139,11 @@ export function LogoCombobox(): React.JSX.Element {
     } else if (event.key === 'End' && expanded) {
       event.preventDefault();
       setActive(last);
-    } else if (event.key === 'Enter' && expanded && current) {
+    } else if (event.key === 'Enter') {
+      // The input sits inside the editor form: Enter must never submit it.
       event.preventDefault();
-      pick(current);
+
+      if (expanded && current) pick(current);
     }
   }
 
