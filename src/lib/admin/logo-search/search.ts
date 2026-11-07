@@ -37,14 +37,12 @@ const MAX_RESULTS = 6;
 const CONCURRENCY = 4;
 
 const answerSchema = z.object({
-  candidates: z
-    .array(
-      z.object({
-        url: z.url(),
-        variant: z.enum(['mark', 'mark + wordmark', 'wordmark']).catch('mark'),
-      }),
-    )
-    .max(MAX_RESULTS),
+  candidates: z.array(
+    z.object({
+      url: z.url(),
+      variant: z.enum(['mark', 'mark + wordmark', 'wordmark']).catch('mark'),
+    }),
+  ),
 });
 
 const SYSTEM = `You suggest direct https links to SVG logo files for a software technology.
@@ -62,7 +60,7 @@ export function allowedHosts(): Set<string> {
 }
 
 /**
- * First JSON object in the text; free models don't all honor `response_format`.
+ * First JSON object in the text; models may wrap it in prose or code fences.
  */
 export function parseCandidates(text: string): z.infer<typeof answerSchema>['candidates'] {
   const start = text.indexOf('{');
@@ -73,7 +71,8 @@ export function parseCandidates(text: string): z.infer<typeof answerSchema>['can
   try {
     const parsed = answerSchema.safeParse(JSON.parse(text.slice(start, end + 1)));
 
-    return parsed.success ? parsed.data.candidates : [];
+    // Models often exceed the requested count: truncate rather than lose them all.
+    return parsed.success ? parsed.data.candidates.slice(0, MAX_RESULTS) : [];
   } catch {
     return [];
   }
@@ -154,9 +153,13 @@ export function createLogoSearch(deps: { ai: AiProvider; fetcher: RemoteIconFetc
     });
 
     const fetched = await mapLimit(candidates, CONCURRENCY, async (candidate) => {
-      const result = await deps.fetcher.fetch(candidate.url, signal);
+      try {
+        const result = await deps.fetcher.fetch(candidate.url, signal);
 
-      return result.ok ? { candidate, svg: result.svg } : null;
+        return result.ok ? { candidate, svg: result.svg } : null;
+      } catch {
+        return null; // one bad candidate must not discard the others
+      }
     });
 
     const results = fetched

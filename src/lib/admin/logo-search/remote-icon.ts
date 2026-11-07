@@ -28,6 +28,15 @@ export function isBlockedAddress(address: string): boolean {
 
   if (mapped) return isBlockedAddress(mapped[1] as string);
 
+  const hex = /^::ffff:([0-9a-f]{1,4}):([0-9a-f]{1,4})$/i.exec(address);
+
+  if (hex) {
+    const high = Number.parseInt(hex[1] as string, 16);
+    const low = Number.parseInt(hex[2] as string, 16);
+
+    return isBlockedAddress(`${high >> 8}.${high & 255}.${low >> 8}.${low & 255}`);
+  }
+
   if (isIP(address) === 4) {
     const [a = 0, b = 0] = address.split('.').map(Number);
 
@@ -85,9 +94,8 @@ async function checkUrl(
 
   if (allowedHosts && !allowedHosts.has(url.hostname)) return 'That host is not allowed';
 
-  const addresses = isIP(url.hostname)
-    ? [url.hostname.replace(/^\[|\]$/g, '')]
-    : await resolve(url.hostname).catch(() => []);
+  const host = url.hostname.replace(/^\[|\]$/g, '');
+  const addresses = isIP(host) ? [host] : await resolve(host).catch(() => []);
 
   if (addresses.length === 0) return 'That host could not be reached';
 
@@ -179,7 +187,13 @@ export function createRemoteIconFetcher(
 
         if (!/^(?:image\/svg\+xml|text\/)/i.test(type)) return fail('That URL is not an SVG');
 
-        const text = await readCapped(response).catch(() => null);
+        let text: null | string;
+
+        try {
+          text = await readCapped(response);
+        } catch {
+          return fail('That URL could not be read');
+        }
 
         if (text === null) return fail('That file is too large');
 

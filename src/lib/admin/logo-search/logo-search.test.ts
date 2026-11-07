@@ -23,6 +23,8 @@ describe('isBlockedAddress', () => {
     'fd00::1',
     'fe80::1',
     '::ffff:127.0.0.1',
+    '::ffff:7f00:1',
+    '::ffff:a9fe:a9fe',
   ])('blocks %s', (address) => expect(isBlockedAddress(address)).toBe(true));
 
   it.each(['93.184.216.34', '8.8.8.8', '2606:4700::1111'])('allows %s', (address) =>
@@ -51,6 +53,10 @@ describe('createRemoteIconFetcher', () => {
       expect(fetchImpl).not.toHaveBeenCalled();
     },
   );
+
+  it('refuses bracketed IPv6 literals', async () => {
+    expect((await make(vi.fn()).fetch('https://[::1]/x.svg')).ok).toBe(false);
+  });
 
   it('refuses hosts resolving to private addresses', async () => {
     const result = await make(vi.fn(), () => Promise.resolve(['10.0.0.5'])).fetch(
@@ -108,6 +114,14 @@ describe('parseCandidates', () => {
 
     expect(parseCandidates(text)).toHaveLength(1);
     expect(parseCandidates('no json')).toEqual([]);
+
+    const many = JSON.stringify({
+      candidates: Array.from({ length: 9 }, (_, i) => ({
+        url: `https://cdn.jsdelivr.net/${i}.svg`,
+      })),
+    });
+
+    expect(parseCandidates(many)).toHaveLength(6);
     expect(parseCandidates('{"candidates":[{"url":"not a url"}]}')).toEqual([]);
   });
 });
