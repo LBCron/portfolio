@@ -18,6 +18,9 @@ function Thumb({ svg }: { svg: SvgData }): React.JSX.Element {
   );
 }
 
+// Mirrors `iconSlug` in technologySchema.
+const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
 type Option =
   | { hit: CatalogHit; id: string; kind: 'catalog' }
   | { host: string; id: string; kind: 'online'; label: string; svg: SvgData; variant: string }
@@ -71,10 +74,20 @@ export function LogoCombobox(): React.JSX.Element {
       form.set('iconSlug', option.hit.slug);
       setOpen(false);
     } else {
-      form.set('iconSource', 'custom-svg');
-      form.set('customSvg', option.svg);
+      applySvg(option.svg);
       setOpen(false);
     }
+  }
+
+  /**
+   * An inactive but malformed slug would still fail validation on save; valid
+   * ones stay.
+   */
+  function applySvg(svg: SvgData): void {
+    form.set('iconSource', 'custom-svg');
+    form.set('customSvg', svg);
+
+    if (!SLUG.test(String(form.get('iconSlug') ?? ''))) form.set('iconSlug', '');
   }
 
   async function importUrl(): Promise<void> {
@@ -94,8 +107,7 @@ export function LogoCombobox(): React.JSX.Element {
         return;
       }
 
-      form.set('iconSource', 'custom-svg');
-      form.set('customSvg', data.svg);
+      applySvg(data.svg);
       setUrlMode(false);
       setUrl('');
     } catch {
