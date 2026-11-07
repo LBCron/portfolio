@@ -67,7 +67,16 @@ export function useLogoSearch(): Cached & { search: (query: string) => void } {
       abortRef.current = controller;
       setState((current) => ({ ...current, catalog: [], online: [], status: 'searching' }));
 
-      let catalog: CatalogHit[] = [];
+      let catalog: CatalogHit[] | null = null;
+      let online: null | Pick<Cached, 'online' | 'status'> = null;
+
+      // Cache only once both requests are in, so a fast online answer never stores an empty catalog.
+      const settle = (): void => {
+        if (catalog && online && online.status !== 'unavailable') {
+          // Failures are not cached: the next try may succeed.
+          cacheRef.current.set(query.toLowerCase(), { catalog, ...online });
+        }
+      };
 
       timersRef.current.push(
         window.setTimeout(async () => {
@@ -78,11 +87,13 @@ export function useLogoSearch(): Cached & { search: (query: string) => void } {
 
           if (controller.signal.aborted) return;
 
-          catalog = [
+          const hits = [
             ...simple.slice(0, 6).map((item): CatalogHit => ({ ...item, source: 'simple-icons' })),
             ...devicon.slice(0, 6).map((item): CatalogHit => ({ ...item, source: 'devicon' })),
           ];
-          setState((current) => ({ ...current, catalog }));
+          catalog = hits;
+          setState((current) => ({ ...current, catalog: hits }));
+          settle();
         }, CATALOG_DELAY),
         window.setTimeout(async () => {
           let result: LogoSearchResult | null = null;
@@ -102,8 +113,7 @@ export function useLogoSearch(): Cached & { search: (query: string) => void } {
 
           if (controller.signal.aborted) return;
 
-          const next: Cached = {
-            catalog,
+          online = {
             online: result?.results ?? [],
             status: result
               ? result.status === 'ai-unavailable'
@@ -111,11 +121,8 @@ export function useLogoSearch(): Cached & { search: (query: string) => void } {
                 : result.status
               : 'unavailable',
           };
-
-          // Failures are not cached: the next try may succeed.
-          if (next.status !== 'unavailable') cacheRef.current.set(query.toLowerCase(), next);
-
-          setState(next);
+          setState((current) => ({ ...current, ...online }));
+          settle();
         }, ONLINE_DELAY),
       );
     },
