@@ -25,11 +25,29 @@ describe('isBlockedAddress', () => {
     '::ffff:127.0.0.1',
     '::ffff:7f00:1',
     '::ffff:a9fe:a9fe',
+    'febf::1',
+    '172.31.255.255',
+    '100.64.0.0',
+    '100.127.255.255',
+    '198.19.255.255',
+    '192.0.0.1',
+    '192.0.2.1',
+    '198.51.100.1',
+    '203.0.113.1',
   ])('blocks %s', (address) => expect(isBlockedAddress(address)).toBe(true));
 
-  it.each(['93.184.216.34', '8.8.8.8', '2606:4700::1111'])('allows %s', (address) =>
-    expect(isBlockedAddress(address)).toBe(false),
-  );
+  it.each([
+    '93.184.216.34',
+    '8.8.8.8',
+    '2606:4700::1111',
+    'fec0::1',
+    '172.15.255.255',
+    '172.32.0.1',
+    '100.63.255.255',
+    '100.128.0.1',
+    '198.20.0.1',
+    '192.0.64.1',
+  ])('allows %s', (address) => expect(isBlockedAddress(address)).toBe(false));
 });
 
 describe('createRemoteIconFetcher', () => {
@@ -64,6 +82,16 @@ describe('createRemoteIconFetcher', () => {
     );
 
     expect(result.ok).toBe(false);
+  });
+
+  it('refuses hosts resolving to a mix of public and private addresses', async () => {
+    const fetchImpl = vi.fn();
+    const result = await make(fetchImpl, () =>
+      Promise.resolve(['93.184.216.34', '10.0.0.5']),
+    ).fetch('https://a.test/x.svg');
+
+    expect(result.ok).toBe(false);
+    expect(fetchImpl).not.toHaveBeenCalled();
   });
 
   it('re-validates redirects and caps hops', async () => {
