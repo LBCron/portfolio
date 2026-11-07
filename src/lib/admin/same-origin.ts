@@ -9,5 +9,11 @@ export function sameOrigin(request: NextRequest): boolean {
 
   if (fetchSite && fetchSite !== 'same-origin') return false;
 
-  return origin !== null && new URL(origin).host === request.headers.get('host');
+  if (origin === null) return false;
+
+  try {
+    return new URL(origin).host === request.headers.get('host');
+  } catch {
+    return false; // `Origin: null` or malformed
+  }
 }
