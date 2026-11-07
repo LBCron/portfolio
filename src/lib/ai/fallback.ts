@@ -51,7 +51,7 @@ export function getAiProvider(): AiProvider {
   const order = (env.AI_PROVIDER_ORDER ?? 'vercel,openrouter')
     .split(',')
     .map((id) => id.trim())
-    .filter((id) => id in all);
+    .filter((id) => Object.hasOwn(all, id));
 
   return new FallbackAiProvider(order.map((id) => all[id] as AiProvider));
 }
