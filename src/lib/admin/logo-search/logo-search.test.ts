@@ -84,6 +84,29 @@ describe('createRemoteIconFetcher', () => {
     expect(result.ok).toBe(false);
   });
 
+  it('connects to the validated address on every hop', async () => {
+    const seen: string[] = [];
+    const resolve = (host: string): Promise<string[]> =>
+      Promise.resolve([host === 'a.test' ? '93.184.216.34' : '93.184.216.35']);
+    let calls = 0;
+    const fetcher = createRemoteIconFetcher({
+      resolve,
+      fetchImpl: (_url, _init, address) => {
+        seen.push(address);
+        calls += 1;
+
+        return Promise.resolve(
+          calls === 1
+            ? new Response(null, { status: 302, headers: { location: 'https://b.test/x.svg' } })
+            : svgResponse(),
+        );
+      },
+    });
+
+    expect((await fetcher.fetch('https://a.test/x.svg')).ok).toBe(true);
+    expect(seen).toEqual(['93.184.216.34', '93.184.216.35']);
+  });
+
   it('refuses hosts resolving to a mix of public and private addresses', async () => {
     const fetchImpl = vi.fn();
     const result = await make(fetchImpl, () =>

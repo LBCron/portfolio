@@ -1,7 +1,9 @@
 import 'server-only';
 
 import { lookup } from 'node:dns/promises';
+import { request } from 'node:https';
 import { isIP } from 'node:net';
+import { Readable } from 'node:stream';
 
 import { sanitizeSvg } from '@/lib/admin/upload/svg';
 import { type SvgData } from '@/lib/content/schema';
@@ -77,32 +79,78 @@ async function checkUrl(
   raw: string,
   allowedHosts: Set<string> | undefined,
   resolve: Resolver,
-): Promise<null | string> {
+): Promise<{ address: string } | { error: string }> {
   let url: URL;
 
   try {
     url = new URL(raw);
   } catch {
-    return 'That is not a valid URL';
+    return { error: 'That is not a valid URL' };
   }
 
-  if (raw.length > MAX_URL) return 'That URL is too long';
+  if (raw.length > MAX_URL) return { error: 'That URL is too long' };
 
   if (url.protocol !== 'https:' || (url.port && url.port !== '443')) {
-    return 'Only https URLs on the default port are allowed';
+    return { error: 'Only https URLs on the default port are allowed' };
   }
 
-  if (url.username || url.password) return 'URLs with credentials are not allowed';
+  if (url.username || url.password) return { error: 'URLs with credentials are not allowed' };
 
-  if (allowedHosts && !allowedHosts.has(url.hostname)) return 'That host is not allowed';
+  if (allowedHosts && !allowedHosts.has(url.hostname)) return { error: 'That host is not allowed' };
 
   const host = url.hostname.replace(/^\[|\]$/g, '');
   const addresses = isIP(host) ? [host] : await resolve(host).catch(() => []);
 
-  if (addresses.length === 0) return 'That host could not be reached';
+  const [address] = addresses;
 
-  return addresses.some(isBlockedAddress) ? 'That host is not allowed' : null;
+  if (!address) return { error: 'That host could not be reached' };
+
+  return addresses.some(isBlockedAddress) ? { error: 'That host is not allowed' } : { address };
 }
+
+type PinnedFetch = (url: string, init: RequestInit, address: string) => Promise<Response>;
+
+/**
+ * Connects to the address that was just validated, so the host cannot resolve
+ * differently at connect time (DNS rebinding). TLS SNI, certificate checks and
+ * the Host header stay on the original hostname.
+ */
+const pinnedFetch: PinnedFetch = (raw, init, address) => {
+  const url = new URL(raw);
+  const literal = isIP(url.hostname.replace(/^\[|\]$/g, '')) !== 0;
+
+  return new Promise((resolve, reject) => {
+    const req = request(
+      {
+        host: address,
+        port: 443,
+        path: url.pathname + url.search,
+        method: 'GET',
+        ...(literal ? {} : { servername: url.hostname }),
+        headers: { ...(init.headers as Record<string, string>), Host: url.host },
+        ...(init.signal ? { signal: init.signal } : {}),
+      },
+      (res) => {
+        const headers = new Headers();
+
+        for (const [key, value] of Object.entries(res.headers)) {
+          if (value !== undefined)
+            headers.set(key, Array.isArray(value) ? value.join(', ') : value);
+        }
+
+        const status = res.statusCode ?? 502;
+        const empty = status === 204 || status === 205 || status === 304;
+
+        resolve(
+          new Response(empty ? null : (Readable.toWeb(res) as ReadableStream), { status, headers }),
+        );
+      },
+    );
+
+    req.on('error', reject);
+    req.end();
+  });
+};
 
 async function readCapped(response: Response): Promise<null | string> {
   const reader = response.body?.getReader();
@@ -133,14 +181,13 @@ async function readCapped(response: Response): Promise<null | string> {
 
 /**
  * Admin-initiated, SSRF-hardened SVG download (D73). `allowedHosts` narrows
- * AI-proposed URLs; manual imports pass none. shortcut: DNS rebinding between
- * lookup and connect is not pinned; acceptable for a single-owner,
- * admin-authenticated endpoint.
+ * AI-proposed URLs; manual imports pass none. Each hop connects to its own
+ * validated address (see `pinnedFetch`).
  */
 export function createRemoteIconFetcher(
-  options: { allowedHosts?: Set<string>; fetchImpl?: typeof fetch; resolve?: Resolver } = {},
+  options: { allowedHosts?: Set<string>; fetchImpl?: PinnedFetch; resolve?: Resolver } = {},
 ): RemoteIconFetcher {
-  const { allowedHosts, fetchImpl = fetch, resolve = resolveHost } = options;
+  const { allowedHosts, fetchImpl = pinnedFetch, resolve = resolveHost } = options;
 
   return {
     async fetch(start, signal): Promise<RemoteIconResult> {
@@ -149,20 +196,24 @@ export function createRemoteIconFetcher(
       let current = start;
 
       for (let hop = 0; hop <= MAX_HOPS; hop += 1) {
-        const problem = await checkUrl(current, allowedHosts, resolve);
+        const checked = await checkUrl(current, allowedHosts, resolve);
 
-        if (problem) return fail(problem);
+        if ('error' in checked) return fail(checked.error);
 
         let response: Response;
 
         try {
-          response = await fetchImpl(current, {
-            redirect: 'manual',
-            credentials: 'omit',
-            cache: 'no-store',
-            headers: { 'User-Agent': 'juliolmuller.com-logo-import', 'Accept': 'image/svg+xml' },
-            signal: combined,
-          });
+          response = await fetchImpl(
+            current,
+            {
+              redirect: 'manual',
+              credentials: 'omit',
+              cache: 'no-store',
+              headers: { 'User-Agent': 'juliolmuller.com-logo-import', 'Accept': 'image/svg+xml' },
+              signal: combined,
+            },
+            checked.address,
+          );
         } catch {
           return fail('That URL could not be reached');
         }
