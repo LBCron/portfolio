@@ -20,6 +20,7 @@ function Thumb({ svg }: { svg: SvgData }): React.JSX.Element {
 
 // Mirrors `iconSlug` in technologySchema.
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const MAX_SLUG = 64;
 
 type Option =
   | { hit: CatalogHit; id: string; kind: 'catalog' }
@@ -87,7 +88,9 @@ export function LogoCombobox(): React.JSX.Element {
     form.set('iconSource', 'custom-svg');
     form.set('customSvg', svg);
 
-    if (!SLUG.test(String(form.get('iconSlug') ?? ''))) form.set('iconSlug', '');
+    const slug = String(form.get('iconSlug') ?? '');
+
+    if (slug.length > MAX_SLUG || !SLUG.test(slug)) form.set('iconSlug', '');
   }
 
   async function importUrl(): Promise<void> {
